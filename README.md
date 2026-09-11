@@ -81,16 +81,18 @@ npx skills add zhjx19/math-concept-coach
 **方式 B：手动三步**
 
 1. 得到 `math-concept-coach` 文件夹（`git clone` 下来，或从 Releases 下载 zip）；
-2. 把**整个文件夹**复制到技能目录：
+2. 把**整个文件夹**放进**你所用客户端的技能目录**（下表是常见位置，跨平台无需改任何文件）：
 
-   | 系统 | 路径 |
+   | 客户端 | 技能目录（把整个 `math-concept-coach/` 放进去） |
    |---|---|
-   | Windows | `C:\Users\<你的用户名>\.workbuddy\skills\` |
-   | macOS / Linux | `~/.workbuddy/skills/` |
+   | OpenCode | `~/.config/opencode/skills/` |
+   | Claude Code | `~/.claude/skills/`（或项目级 `.claude/skills/`） |
+   | WorkBuddy | `~/.workbuddy/skills/` |
+   | 其他 Agent Skills 运行时 | 放进它会扫描的那个 `skills/` 目录即可 |
 
 3. **重启客户端**（或刷新技能列表），技能才会被扫描到。
 
-其他 runtime：同一文件夹也可放到 `~/.config/opencode/skills/`（OpenCode）或项目级 `.claude/skills/`，跨平台无需改文件。
+> 找不到你的客户端的目录？只要能加载标准 `SKILL.md`，放它的 `skills/` 目录就行；不确定就先用上面的「方式 A」一行安装。
 
 **为什么它是通用的**
 
@@ -105,8 +107,8 @@ npx skills add zhjx19/math-concept-coach
 ### ⚠️ 头号安装失败原因：多套了一层目录
 
 ```
-✅ .workbuddy/skills/math-concept-coach/SKILL.md
-❌ .workbuddy/skills/math-concept-coach/math-concept-coach/SKILL.md
+✅ <客户端技能目录>/math-concept-coach/SKILL.md
+❌ <客户端技能目录>/math-concept-coach/math-concept-coach/SKILL.md
 ```
 
 只要 `SKILL.md` 不在技能文件夹的**第一层**，客户端就找不到它。
