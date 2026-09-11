@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>一致连续</title>
+<style>
+/* ============================================================
+   概念卡样式（concept-card.css）
+   浅色主题 · 离线可用 · 可打印
+   ============================================================ */
+
+:root {
+  --ink: #1f2328;
+  --muted: #5b6570;
+  --line: #e4e8ec;
+  --line-strong: #cdd5dd;
+  --bg: #ffffff;
+  --soft: #f7f9fb;
+  --accent: #2f6fb3;
+  --accent-soft: #eaf2fa;
+
+  /* 六棱镜各面配色 */
+  --f1: #c2582a;  /* 正反 */
+  --f2: #1f8a63;  /* 直观 */
+  --f3: #2f6fb3;  /* 严格 */
+  --f4: #7a4fb3;  /* 意义 */
+  --f5: #a8791a;  /* 图形 */
+  --f6: #475569;  /* 联系 */
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  padding: 32px 16px 64px;
+  background: #f2f5f8;
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei",
+               "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", sans-serif;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+/* ---------- 卡片容器 ---------- */
+.card {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 40px 44px 56px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 0 6px 28px rgba(31, 35, 40, 0.07);
+}
+
+/* ---------- 标题 ---------- */
+.card > h1:first-child {
+  margin: 0 0 6px;
+  padding-bottom: 14px;
+  font-size: 26px;
+  line-height: 1.4;
+  border-bottom: 3px solid var(--accent);
+}
+.card > h1:first-child::after {
+  content: "概念卡 · 六棱镜拆解";
+  display: block;
+  margin-top: 8px;
+  font-size: 12.5px;
+  font-weight: 400;
+  letter-spacing: .12em;
+  color: var(--muted);
+}
+
+/* 非「面」的小节标题（自检、错位清单等） */
+.card > h2 {
+  margin: 40px 0 14px;
+  padding: 8px 0 8px 16px;
+  font-size: 19px;
+  line-height: 1.5;
+  border-left: 5px solid var(--accent);
+  background: linear-gradient(90deg, var(--accent-soft), transparent 72%);
+  border-radius: 0 6px 6px 0;
+}
+
+/* ---------- 六棱镜各面：折叠面板（渐进揭示） ---------- */
+.facet-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin: 30px 0 -10px;
+}
+.facet-toggle {
+  font: inherit;
+  font-size: 13px;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid #cddff0;
+  border-radius: 999px;
+  padding: 4px 14px;
+  cursor: pointer;
+}
+.facet-toggle:hover { background: #dceaf8; }
+
+details.facet {
+  margin: 26px 0 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+}
+details.facet[open] { box-shadow: 0 1px 6px rgba(31, 35, 40, 0.05); }
+
+.facet-h {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 12px 16px;
+  font-size: 18px;
+  line-height: 1.5;
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+  border-left: 5px solid var(--accent);
+  background: linear-gradient(90deg, var(--accent-soft), transparent 72%);
+}
+.facet-h::-webkit-details-marker { display: none; }
+.facet-h::before {
+  content: "▸";
+  flex: 0 0 auto;
+  font-size: 14px;
+  color: var(--muted);
+  transition: transform .15s ease;
+}
+details.facet[open] > .facet-h::before { transform: rotate(90deg); }
+
+.facet-h.f1 { border-left-color: var(--f1); background: linear-gradient(90deg,#fbeee8,transparent 72%); }
+.facet-h.f2 { border-left-color: var(--f2); background: linear-gradient(90deg,#e8f6f1,transparent 72%); }
+.facet-h.f3 { border-left-color: var(--f3); background: linear-gradient(90deg,#eaf2fa,transparent 72%); }
+.facet-h.f4 { border-left-color: var(--f4); background: linear-gradient(90deg,#f1ecfa,transparent 72%); }
+.facet-h.f5 { border-left-color: var(--f5); background: linear-gradient(90deg,#faf3e3,transparent 72%); }
+.facet-h.f6 { border-left-color: var(--f6); background: linear-gradient(90deg,#eef1f5,transparent 72%); }
+
+.facet-body { padding: 4px 18px 16px; }
+
+/* 面内的小节标题（### 定义、### 量词骨架 …） */
+.card h3 {
+  margin: 26px 0 10px;
+  font-size: 16.5px;
+  color: var(--accent);
+}
+
+/* ---------- 段落与列表 ---------- */
+.card p { margin: 10px 0; }
+.card ul, .card ol { margin: 10px 0; padding-left: 1.6em; }
+.card li { margin: 5px 0; }
+.card li::marker { color: var(--accent); }
+
+.card strong { color: #0f1419; }
+.card em { color: var(--muted); font-style: normal; background: #fff6d9; padding: 0 3px; border-radius: 3px; }
+
+/* ---------- 表格（三线表） ---------- */
+.card table {
+  width: 100%;
+  margin: 16px 0;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+.card table th, .card table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+.card table thead th {
+  background: var(--soft);
+  border-top: 2px solid var(--line-strong);
+  border-bottom: 1.5px solid var(--line-strong);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.card table tbody tr:last-child td { border-bottom: 2px solid var(--line-strong); }
+.card table tbody tr:hover { background: #fbfcfe; }
+
+/* ---------- 引用块 = 提示框 ---------- */
+.card blockquote {
+  margin: 16px 0;
+  padding: 12px 18px;
+  background: var(--accent-soft);
+  border-left: 4px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  color: #26333f;
+}
+.card blockquote p:first-child { margin-top: 0; }
+.card blockquote p:last-child { margin-bottom: 0; }
+
+/* ---------- 代码 ---------- */
+.card code {
+  padding: 2px 6px;
+  background: #f1f4f7;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+  font-size: .9em;
+}
+.card pre {
+  margin: 16px 0;
+  padding: 14px 16px;
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow-x: auto;
+  line-height: 1.6;
+}
+.card pre code { padding: 0; background: none; border: 0; }
+
+/* ---------- 分隔线 ---------- */
+.card hr {
+  margin: 36px 0;
+  border: 0;
+  border-top: 1px dashed var(--line-strong);
+}
+
+/* ---------- 公式（MathML） ---------- */
+.card math { font-size: 1.06em; }
+.card math[display="block"],
+.card .math.display {
+  display: block;
+  margin: 14px 0;
+  text-align: center;
+  overflow-x: auto;
+}
+
+/* ---------- 图形演示占位 ---------- */
+.card img { max-width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--line); }
+.card .hint {
+  margin: 10px 0;
+  padding: 10px 14px;
+  background: #fffaf0;
+  border: 1px dashed #e0b978;
+  border-radius: 8px;
+  font-size: 14.5px;
+  color: #6b4a12;
+}
+
+/* ============================================================
+   自绘交互组件（card-widgets.js）
+   ============================================================ */
+.wb-widget {
+  margin: 18px 0 22px;
+  padding: 14px 16px 12px;
+  background: #fcfdfe;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.wb-canvas {
+  display: block;
+  width: 100%;
+  border-radius: 8px;
+  background: #fff;
+  touch-action: none;
+}
+.wb-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  margin-top: 12px;
+}
+.wb-ctl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  color: var(--ink);
+  min-width: 210px;
+  flex: 1 1 210px;
+}
+.wb-ctl-name { font-weight: 600; white-space: nowrap; }
+.wb-ctl input[type="range"] {
+  flex: 1 1 auto;
+  min-width: 80px;
+  accent-color: var(--accent);
+  height: 20px;
+}
+.wb-ctl-out {
+  min-width: 56px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+  font-weight: 600;
+}
+.wb-readout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+  margin-top: 10px;
+  padding-top: 9px;
+  border-top: 1px dashed var(--line-strong);
+  font-size: 13.5px;
+  color: var(--muted);
+}
+.wb-ro b { color: var(--ink); font-weight: 600; }
+.wb-ro { font-variant-numeric: tabular-nums; }
+.wb-hint {
+  margin: 11px 0 0;
+  padding: 9px 13px;
+  background: #fffaf0;
+  border: 1px dashed #e0b978;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #6b4a12;
+}
+.wb-err {
+  margin: 0;
+  padding: 10px 14px;
+  background: #fdeeee;
+  border: 1px solid #e8b4b4;
+  border-radius: 8px;
+  color: #a33232;
+  font-size: 14px;
+}
+
+/* ============================================================
+   GeoGebra 指令块
+   ============================================================ */
+.gb-block {
+  margin: 18px 0;
+  border: 1px solid #cfe0d4;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fbfdfb;
+}
+.gb-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 14px;
+  background: #eef6f0;
+  border-bottom: 1px solid #d8e9dd;
+  font-size: 13.5px;
+  color: #1f6b4a;
+}
+.gb-copy {
+  flex: 0 0 auto;
+  padding: 5px 13px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #fff;
+  background: #1f8a63;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.gb-copy:hover { background: #176f4f; }
+.gb-block pre {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: #fbfdfb;
+  font-size: 13.5px;
+}
+
+/* ============================================================
+   知识图谱（knowledge_map.py 生成的内联 SVG）
+   ============================================================ */
+.km-svg {
+  display: block;
+  width: 100%;
+  margin: 20px 0;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei",
+               "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", sans-serif;
+}
+.km-bg { fill: #fff; }
+.km-ttl { font-size: 13px; font-weight: 700; fill: #1f2328; }
+.km-lg { font-size: 11px; fill: #5b6570; }
+.km-cap { font-size: 11px; fill: #7a8693; text-anchor: middle; }
+.km-note { font-size: 12px; fill: #5b6570; text-anchor: middle; }
+
+/* ---------- 打印 ---------- */
+/* ============================================================
+   降级模式（未安装 pandoc 时由内置转换器生成）
+   ============================================================ */
+.fb-note {
+  margin: 18px 0;
+  padding: 12px 16px;
+  background: #fff8e6;
+  border: 1px solid #f0d8a0;
+  border-left: 4px solid #e0a53a;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.75;
+  color: #6b551f;
+}
+.fb-note strong { color: #8a5a00; }
+
+/* 内置转换器解析不了的公式：原样显示 LaTeX 源码，绝不做半吊子猜测 */
+code.math-src {
+  font-family: "JetBrains Mono", Consolas, "Courier New", monospace;
+  font-size: 0.92em;
+  background: #f4f6f8;
+  border: 1px solid #e3e8ee;
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+math { font-size: 1.02em; }
+
+/* ---------- 窄屏（手机）适配 ---------- */
+@media (max-width: 640px) {
+  body { padding: 10px 6px; }
+  .card { padding: 16px 14px; border-radius: 10px; }
+  .card > h1:first-child { font-size: 1.45em; }
+  .card > h2 { font-size: 1.12em; }
+  .facet-h { font-size: 1.08em; padding: 10px 12px; }
+  .facet-body { padding: 2px 12px 14px; }
+  .card table { display: block; overflow-x: auto; white-space: nowrap; }
+  .wb-controls { flex-wrap: wrap; }
+}
+
+@media print {
+  @page { margin: 14mm 12mm; }
+  body { padding: 0; background: #fff; font-size: 11.5pt; line-height: 1.65; }
+  .card {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .card > h2 { page-break-after: avoid; break-after: avoid; }
+  /* 打印：折叠面全部展开（beforeprint 已打开），隐去折叠按钮与箭头 */
+  .facet-toolbar { display: none; }
+  details.facet { border: 0; border-radius: 0; margin: 20px 0 0; }
+  details.facet[open] { box-shadow: none; }
+  .facet-h { page-break-after: avoid; break-after: avoid; background: none; border-left-width: 4px; padding: 6px 0 6px 10px; }
+  .facet-h::before { display: none; }
+  .facet-body { padding: 0 0 0 10px; }
+  .card table, .card pre, .card blockquote, .card img { page-break-inside: avoid; break-inside: avoid; }
+  .card a { color: inherit; text-decoration: none; }
+  /* 打印时：交互组件保留图形、隐去滑块（滑块打印无意义） */
+  .wb-widget { page-break-inside: avoid; break-inside: avoid; border-color: #ccc; background: #fff; }
+  .wb-controls { display: none; }
+  .km-svg, .gb-block { page-break-inside: avoid; break-inside: avoid; }
+  .gb-copy { display: none; }
+}
+
+</style>
+</head>
+<body>
+<main class="card">
+<h1 id="一致连续">一致连续</h1>
+<blockquote>
+<p>📌 所属：数学分析 · 函数连续性 ｜
+教材出处：以你所用教材对应章节为准（华东师大版可查”函数的一致连续性”一节）
+🎯
+学完你应该能：写出定义、说出它与「连续」的唯一差别、举出反例、判断给定的函数是否一致连续。
+💡 <strong>一句话钩子</strong>：同一个 δ
+要能管住整条区间，不能每换一个点就换一把尺子。 🧱
+<strong>假设基底（待你确认）</strong>：我猜你已经会「极限、连续」——<strong>你觉得自己会吗？</strong>
+→ 缺「δ 能不能与点的位置无关」→ 本概念补上这一步。</p>
+</blockquote>
+<div class="facet-toolbar"><button type="button" class="facet-toggle" data-open="1">收起全部</button></div><details class="facet" open><summary class="facet-h f1">F1 正反拆解</summary><div class="facet-body">
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>类别</th>
+<th>例子</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>正例</td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>x</mi></mrow><annotation encoding="application/x-tex">f(x)=x</annotation></semantics></math>、<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mrow><mi mathvariant="normal">sin</mi><mo>&#8289;</mo></mrow><mi>x</mi></mrow><annotation encoding="application/x-tex">f(x)=\sin x</annotation></semantics></math>
+在
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ℝ</mi><annotation encoding="application/x-tex">\mathbb{R}</annotation></semantics></math>
+上</td>
+<td>整条实轴共用一个 δ</td>
+</tr>
+<tr>
+<td>正例</td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msqrt><mi>x</mi></msqrt></mrow><annotation encoding="application/x-tex">f(x)=\sqrt{x}</annotation></semantics></math>
+在
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">[</mo><mn>1</mn><mo>,</mo><mi>+</mi><mi>∞</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">[1,+\infty)</annotation></semantics></math>
+上</td>
+<td>变化率有界</td>
+</tr>
+<tr>
+<td><strong>边界例</strong></td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msup><mi>x</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">f(x)=x^2</annotation></semantics></math>：在
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">[</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[0,1]</annotation></semantics></math>
+上<strong>一致连续</strong>，在
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ℝ</mi><annotation encoding="application/x-tex">\mathbb{R}</annotation></semantics></math>
+上<strong>不一致连续</strong></td>
+<td>同一函数，换个定义域结论就反了</td>
+</tr>
+<tr>
+<td><strong>反例</strong></td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mstyle displaystyle="true"><mfrac><mn>1</mn><mi>x</mi></mfrac></mstyle></mrow><annotation encoding="application/x-tex">f(x)=\dfrac{1}{x}</annotation></semantics></math>
+在
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(0,1)</annotation></semantics></math>
+上连续但<strong>不一致连续</strong></td>
+<td>越靠近 0，需要越小的 δ</td>
+</tr>
+</tbody>
+</table>
+</div></details><details class="facet"><summary class="facet-h f2">F2 通俗理解</summary><div class="facet-body">
+<ul>
+<li><strong>一句人话</strong>：「整段曲线能<strong>共用一套宽容标准</strong>：无论你站在哪一段，我都能用<strong>同一个
+δ</strong>，保证函数值的变化小于你给的 ε。」</li>
+<li><strong>类比</strong>：像一把<strong>刻度固定的尺子</strong>量整条曲线。连续的函数每一点都能量，但可以一点换一把尺；一致连续要求<strong>换点不换尺</strong>。</li>
+<li><strong>类比失效的边界</strong>：别说「一致连续就是更连续」——<strong>连续不分强弱</strong>。差别<strong>只在
+δ 是否依赖位置</strong>，不在「更/更不」。</li>
+<li><strong>为什么要它</strong>：它把「逐点的局部性质」升级为「整体性质」，是「闭区间上连续函数可积」以及极限与积分可交换这类定理的落脚点。</li>
+</ul>
+</div></details><details class="facet"><summary class="facet-h f3">F3 严格数学表述</summary><div class="facet-body">
+<p><strong>定义</strong>：设
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>f</mi><annotation encoding="application/x-tex">f</annotation></semantics></math>
+在区间
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>I</mi><annotation encoding="application/x-tex">I</annotation></semantics></math>
+上有定义。
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> 在 </mtext><mspace width="0.333em"></mspace></mrow><mi>I</mi><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> 上一致连续</mtext></mrow><mo>⇔</mo><mo>∀</mo><mi>ε</mi><mo>&gt;</mo><mn>0</mn><mo>,</mo><mspace width="0.222em"></mspace><mo>∃</mo><mi>δ</mi><mo>&gt;</mo><mn>0</mn><mo>,</mo><mspace width="0.222em"></mspace><mo>∀</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>x</mi><mn>2</mn></msub><mo>∈</mo><mi>I</mi><mo>,</mo><mspace width="0.222em"></mspace><mo stretchy="false" form="prefix">|</mo><msub><mi>x</mi><mn>1</mn></msub><mo>−</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="false" form="postfix">|</mo><mo>&lt;</mo><mi>δ</mi><mo>⟹</mo><mo stretchy="false" form="prefix">|</mo><mi>f</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo stretchy="false" form="postfix">)</mo><mo>−</mo><mi>f</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">|</mo><mo>&lt;</mo><mi>ε</mi><mi>.</mi></mrow><annotation encoding="application/x-tex">f \text{ 在 } I \text{ 上一致连续} \iff \forall \varepsilon&gt;0,\ \exists \delta&gt;0,\ \forall x_1,x_2\in I,\ \lvert x_1-x_2\rvert&lt;\delta \implies \lvert f(x_1)-f(x_2)\rvert&lt;\varepsilon.</annotation></semantics></math></p>
+<p><strong>对照「连续」（逐点）</strong>：
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∀</mo><msub><mi>x</mi><mn>0</mn></msub><mo>∈</mo><mi>I</mi><mo>,</mo><mspace width="0.222em"></mspace><mo>∀</mo><mi>ε</mi><mo>&gt;</mo><mn>0</mn><mo>,</mo><mspace width="0.222em"></mspace><mo>∃</mo><mi>δ</mi><mo>&gt;</mo><mn>0</mn><mo>,</mo><mspace width="0.222em"></mspace><mo>∀</mo><mi>x</mi><mo>∈</mo><mi>I</mi><mo>,</mo><mspace width="0.222em"></mspace><mo stretchy="false" form="prefix">|</mo><mi>x</mi><mo>−</mo><msub><mi>x</mi><mn>0</mn></msub><mo stretchy="false" form="postfix">|</mo><mo>&lt;</mo><mi>δ</mi><mo>⟹</mo><mo stretchy="false" form="prefix">|</mo><mi>f</mi><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="postfix">)</mo><mo>−</mo><mi>f</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mn>0</mn></msub><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">|</mo><mo>&lt;</mo><mi>ε</mi><mi>.</mi></mrow><annotation encoding="application/x-tex">\forall x_0\in I,\ \forall \varepsilon&gt;0,\ \exists \delta&gt;0,\ \forall x\in I,\ \lvert x-x_0\rvert&lt;\delta \implies \lvert f(x)-f(x_0)\rvert&lt;\varepsilon.</annotation></semantics></math></p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>项目</th>
+<th>一致连续</th>
+<th>连续（逐点）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>量词骨架</td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∀</mo><mi>ε</mi><mspace width="0.167em"></mspace><mo>∃</mo><mi>δ</mi><mspace width="0.167em"></mspace><mo>∀</mo><msub><mi>x</mi><mn>1</mn></msub><mspace width="0.167em"></mspace><mo>∀</mo><msub><mi>x</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">\forall\varepsilon\,\exists\delta\,\forall x_1\,\forall x_2</annotation></semantics></math></td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∀</mo><msub><mi>x</mi><mn>0</mn></msub><mspace width="0.167em"></mspace><mo>∀</mo><mi>ε</mi><mspace width="0.167em"></mspace><mo>∃</mo><mi>δ</mi><mspace width="0.167em"></mspace><mo>∀</mo><mi>x</mi></mrow><annotation encoding="application/x-tex">\forall x_0\,\forall\varepsilon\,\exists\delta\,\forall x</annotation></semantics></math></td>
+</tr>
+<tr>
+<td>δ 可以依赖谁</td>
+<td><strong>只依赖 ε</strong></td>
+<td>依赖 ε <strong>和
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>x</mi><mn>0</mn></msub><annotation encoding="application/x-tex">x_0</annotation></semantics></math></strong></td>
+</tr>
+<tr>
+<td>身份</td>
+<td><strong>定义</strong>（人为规定，不要去证它）</td>
+<td><strong>定义</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>核心一句话</strong>：δ 出现在
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>x</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">x_1,x_2</annotation></semantics></math>
+<strong>之前</strong>还是<strong>之后</strong>，就是本质区别。</p>
+</blockquote>
+<p><strong>否定式</strong>（用来证明「不一致连续」）：
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∃</mo><mi>ε</mi><mo>&gt;</mo><mn>0</mn><mo>,</mo><mspace width="0.222em"></mspace><mo>∀</mo><mi>δ</mi><mo>&gt;</mo><mn>0</mn><mo>,</mo><mspace width="0.222em"></mspace><mo>∃</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>x</mi><mn>2</mn></msub><mo>∈</mo><mi>I</mi><mo>,</mo><mspace width="0.222em"></mspace><mo stretchy="false" form="prefix">|</mo><msub><mi>x</mi><mn>1</mn></msub><mo>−</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="false" form="postfix">|</mo><mo>&lt;</mo><mi>δ</mi><mspace width="0.222em"></mspace><mo>∧</mo><mspace width="0.222em"></mspace><mo stretchy="false" form="prefix">|</mo><mi>f</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo stretchy="false" form="postfix">)</mo><mo>−</mo><mi>f</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">|</mo><mo>≥</mo><mi>ε</mi><mi>.</mi></mrow><annotation encoding="application/x-tex">\exists \varepsilon&gt;0,\ \forall \delta&gt;0,\ \exists x_1,x_2\in I,\ \lvert x_1-x_2\rvert&lt;\delta\ \wedge\ \lvert f(x_1)-f(x_2)\rvert\ge\varepsilon.</annotation></semantics></math></p>
+<p><strong>删条件实验</strong>：把定义里的「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∀</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>x</mi><mn>2</mn></msub><mo>∈</mo><mi>I</mi><mo>,</mo><mspace width="0.222em"></mspace><mo stretchy="false" form="prefix">|</mo><msub><mi>x</mi><mn>1</mn></msub><mo>−</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="false" form="postfix">|</mo><mo>&lt;</mo><mi>δ</mi></mrow><annotation encoding="application/x-tex">\forall x_1,x_2\in I,\ \lvert x_1-x_2\rvert&lt;\delta</annotation></semantics></math>」改成「固定
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>x</mi><mn>0</mn></msub><annotation encoding="application/x-tex">x_0</annotation></semantics></math>，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">|</mo><mi>x</mi><mo>−</mo><msub><mi>x</mi><mn>0</mn></msub><mo stretchy="false" form="postfix">|</mo><mo>&lt;</mo><mi>δ</mi></mrow><annotation encoding="application/x-tex">\lvert x-x_0\rvert&lt;\delta</annotation></semantics></math>」——
+量词一改，概念立刻<strong>退化为连续</strong>。这就是两者的<strong>全部差别</strong>。</p>
+<p><strong>操作骨架（怎么证一致连续）</strong>：① 任给
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ε</mi><mo>&gt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\varepsilon&gt;0</annotation></semantics></math>
+→ ② 找一个<strong>不依赖位置</strong>的
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>δ</mi><mo stretchy="false" form="prefix">(</mo><mi>ε</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\delta(\varepsilon)</annotation></semantics></math>
+（常用 Lipschitz 估计
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">|</mo><mi>f</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo stretchy="false" form="postfix">)</mo><mo>−</mo><mi>f</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">|</mo><mo>≤</mo><mi>L</mi><mo stretchy="false" form="prefix">|</mo><msub><mi>x</mi><mn>1</mn></msub><mo>−</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="false" form="postfix">|</mo></mrow><annotation encoding="application/x-tex">\lvert f(x_1)-f(x_2)\rvert\le L\lvert x_1-x_2\rvert</annotation></semantics></math>，或中值定理）→
+③ 取
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>δ</mi><annotation encoding="application/x-tex">\delta</annotation></semantics></math>
+使
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mi>δ</mi><mo>≤</mo><mi>ε</mi></mrow><annotation encoding="application/x-tex">L\delta\le \varepsilon</annotation></semantics></math>
+→ ④ 验证。</p>
+</div></details><details class="facet"><summary class="facet-h f4">F4 几何意义</summary><div class="facet-body">
+<p>把曲线放进一个「<strong>横向 ε 带、纵向 δ
+带</strong>」的矩形窗口里：</p>
+<ul>
+<li><strong>连续</strong>：在<strong>每一个位置</strong>，都能找到某个 δ
+窗口把曲线框住；</li>
+<li><strong>一致连续</strong>：全区间能用<strong>同一个宽度</strong>的 δ
+窗口框住。</li>
+</ul>
+<p>曲线越陡，需要的 δ 越小。一致连续 =
+陡峭程度<strong>整体上被控制住</strong>，没有一处可以任意陡。<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mi>/</mi><mi>x</mi></mrow><annotation encoding="application/x-tex">1/x</annotation></semantics></math>
+在 0 附近越来越陡，于是失守。</p>
+<p><strong>回指式子</strong>：这个「同一个 δ」正是 F3 里
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∃</mo><mi>δ</mi></mrow><annotation encoding="application/x-tex">\exists\delta</annotation></semantics></math>
+出现在
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∀</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>x</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">\forall x_1,x_2</annotation></semantics></math>
+<strong>之前</strong>的几何含义。</p>
+</div></details><details class="facet"><summary class="facet-h f5">F5 图形化演示</summary><div class="facet-body">
+<p><strong>先预测</strong>：把下面的 δ 固定在 0.06，然后移动
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>x</mi><mn>0</mn></msub><annotation encoding="application/x-tex">x_0</annotation></semantics></math>。你觉得在哪个位置，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>、<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>B</mi><annotation encoding="application/x-tex">B</annotation></semantics></math>
+两点的高度差会超过 ε？</p>
+<div class="wb-widget" data-wb="plot"
+data-spec="eyJ0eXBlIjogInBsb3QiLCAiZXhwciI6ICJzaW4oMS94KSIsICJ4cmFuZ2UiOiBbMC4wMiwgMV0sICJ5cmFuZ2UiOiBbLTEuMzUsIDEuMzVdLCAicmF0aW8iOiAwLjUsICJzbGlkZXJzIjogW3sibmFtZSI6ICJ4MCIsICJsYWJlbCI6ICJ44oKAIOS9jee9riIsICJtaW4iOiAwLjAzLCAibWF4IjogMC45LCAic3RlcCI6IDAuMDEsICJ2YWx1ZSI6IDAuNn0sIHsibmFtZSI6ICJkIiwgImxhYmVsIjogIs60IiwgIm1pbiI6IDAuMDA1LCAibWF4IjogMC4yNSwgInN0ZXAiOiAwLjAwNSwgInZhbHVlIjogMC4wNn0sIHsibmFtZSI6ICJlcHMiLCAibGFiZWwiOiAizrUiLCAibWluIjogMC4xLCAibWF4IjogMS4zLCAic3RlcCI6IDAuMDUsICJ2YWx1ZSI6IDAuNn1dLCAib3ZlcmxheXMiOiBbeyJraW5kIjogImhiYXIiLCAieSI6ICJmKHgwKSIsICJoYWxmIjogImVwcyIsICJjb2xvciI6ICIjZjBhNTNhIiwgImxhYmVsIjogIs61IOW4pu+8iOS7pSBmKHjigoApIOS4uuS4reW/g++8iSJ9LCB7ImtpbmQiOiAidmJhbmQiLCAieCI6ICJ4MCIsICJoYWxmIjogImQiLCAiY29sb3IiOiAiIzZhYTNkNSJ9XSwgInBvaW50cyI6IFt7IngiOiAieDAiLCAieSI6ICJmKHgwKSIsICJsYWJlbCI6ICJBIiwgImNvbG9yIjogIiNjMjU4MmEifSwgeyJ4IjogIngwK2QiLCAieSI6ICJmKHgwK2QpIiwgImxhYmVsIjogIkIiLCAiY29sb3IiOiAiIzFmOGE2MyJ9XSwgInNlZ21lbnRzIjogW3sieDEiOiAieDAiLCAieTEiOiAiZih4MCkiLCAieDIiOiAieDArZCIsICJ5MiI6ICJmKHgwK2QpIiwgImNvbG9yIjogIiNjMjU4MmEiLCAiZGFzaCI6IFs0LCAzXX1dLCAicmVhZG91dCI6IFt7ImxhYmVsIjogInxmKEEp4oiSZihCKXwiLCAiZXhwciI6ICJhYnMoZih4MCtkKS1mKHgwKSkiLCAiZGlnaXRzIjogM30sIHsibGFiZWwiOiAizrUiLCAiZXhwciI6ICJlcHMiLCAiZGlnaXRzIjogMn1dLCAiaGludCI6ICLmioogzrQg5Zu65a6a5ZyoIDAuMDbvvIzmhaLmhaLnp7vliqggeOKCgCDliLDpnaDov5EgMCDnmoTlnLDmlrnvvJrOtCDnqpflj6PmsqHlj5jvvIzkvYYgfGYoQSniiJJmKEIpfCDlhrLnoLTkuoYgzrXjgILlkIzkuIDkuKogzrQg6LWw6YGN5YWo5Yy66Ze05YGa5LiN5YiwIOKAlOKAlCDov5nlsLHmmK/jgIzkuI3kuIDoh7Tov57nu63jgI3jgIIifQ==">
+
+</div>
+<p><strong>在 GeoGebra 里自己复现</strong>（也可以拖动滑块）：</p>
+<div class="gb-block">
+<div class="gb-head">
+<span>在 GeoGebra
+里自己复现（把下面指令逐行粘贴到输入栏，回车）</span><button type="button" class="gb-copy">复制指令</button>
+</div>
+<pre><code>f(x) = sin(1/x)
+SetColor(f, 0.18, 0.44, 0.70)
+d = Slider(0.005, 0.25, 0.005)
+x_0 = Slider(0.03, 0.9, 0.01)
+A = (x_0, f(x_0))
+B = (x_0 + d, f(x_0 + d))
+s = Segment(A, B)
+SetColor(s, 0.76, 0.35, 0.17)
+eps = Slider(0.1, 1.3, 0.05)
+g: y = f(x_0) + eps
+h: y = f(x_0) - eps
+SetLineStyle(g, 2)
+SetLineStyle(h, 2)</code></pre>
+</div>
+<blockquote>
+<p>命令与你安装的 GeoGebra
+版本可能略有差异；<code>SetColor</code>/<code>SetLineStyle</code>
+若报错可整行删掉，不影响图形本身。</p>
+</blockquote>
+</div></details><details class="facet"><summary class="facet-h f6">F6 联系其它概念</summary><div class="facet-body">
+<svg class="km-svg" viewBox="0 0 680 344" width="100%" role="img" aria-label="一致连续 的知识图谱">
+<rect class="km-bg" x="0" y="0" width="680" height="344"/>
+<defs><marker id="km-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8a97a3"/></marker><marker id="km-ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#a693cc"/></marker></defs>
+<text class="km-ttl" x="18" y="20">一致连续 · 知识图谱</text>
+<rect x="18" y="25" width="11" height="11" rx="3" fill="#eef2f6" stroke="#b9c4cf"/>
+<text class="km-lg" x="34" y="35">下楼 · 前置</text>
+<rect x="116.48" y="25" width="11" height="11" rx="3" fill="#2f6fb3" stroke="#20507f"/>
+<text class="km-lg" x="132.48000000000002" y="35">本概念</text>
+<rect x="185.48000000000002" y="25" width="11" height="11" rx="3" fill="#e8f5ef" stroke="#a9d3c1"/>
+<text class="km-lg" x="201.48000000000002" y="35">上楼 · 后续</text>
+<rect x="283.96000000000004" y="25" width="11" height="11" rx="3" fill="#f1ecfa" stroke="#c3b0e0"/>
+<text class="km-lg" x="299.96000000000004" y="35">平移 · 对偶</text>
+<rect x="19.0" y="42.0" width="178.0" height="36.0" rx="9" fill="#eef2f6" stroke="#b9c4cf" stroke-width="1.4"/>
+<text x="108.0" y="60.0" font-size="13.5" font-weight="600" fill="#33414d" text-anchor="middle" dominant-baseline="central">函数</text>
+<path d="M197.0,60.0 H216.0" fill="none" stroke="#8a97a3" stroke-width="1.4"/>
+<rect x="19.0" y="92.0" width="178.0" height="36.0" rx="9" fill="#eef2f6" stroke="#b9c4cf" stroke-width="1.4"/>
+<text x="108.0" y="110.0" font-size="13.5" font-weight="600" fill="#33414d" text-anchor="middle" dominant-baseline="central">极限</text>
+<path d="M197.0,110.0 H216.0" fill="none" stroke="#8a97a3" stroke-width="1.4"/>
+<rect x="19.0" y="142.0" width="178.0" height="36.0" rx="9" fill="#eef2f6" stroke="#b9c4cf" stroke-width="1.4"/>
+<text x="108.0" y="160.0" font-size="13.5" font-weight="600" fill="#33414d" text-anchor="middle" dominant-baseline="central">连续</text>
+<path d="M197.0,160.0 H216.0" fill="none" stroke="#8a97a3" stroke-width="1.4"/>
+<rect x="19.0" y="192.0" width="178.0" height="36.0" rx="9" fill="#eef2f6" stroke="#b9c4cf" stroke-width="1.4"/>
+<text x="108.0" y="210.0" font-size="13.5" font-weight="600" fill="#33414d" text-anchor="middle" dominant-baseline="central">区间</text>
+<path d="M197.0,210.0 H216.0" fill="none" stroke="#8a97a3" stroke-width="1.4"/>
+<rect x="483.0" y="42.0" width="178.0" height="36.0" rx="9" fill="#e8f5ef" stroke="#a9d3c1" stroke-width="1.4"/>
+<text x="572.0" y="60.0" font-size="9.0" font-weight="600" fill="#17674a" text-anchor="middle" dominant-baseline="central">闭区间上连续函数性质（Cantor
+定理）</text>
+<path d="M464.0,60.0 H483.0" fill="none" stroke="#8a97a3" stroke-width="1.4" marker-end="url(#km-ar)"/>
+<rect x="483.0" y="92.0" width="178.0" height="36.0" rx="9" fill="#e8f5ef" stroke="#a9d3c1" stroke-width="1.4"/>
+<text x="572.0" y="110.0" font-size="13.5" font-weight="600" fill="#17674a" text-anchor="middle" dominant-baseline="central">一致收敛</text>
+<path d="M464.0,110.0 H483.0" fill="none" stroke="#8a97a3" stroke-width="1.4" marker-end="url(#km-ar)"/>
+<rect x="483.0" y="142.0" width="178.0" height="36.0" rx="9" fill="#e8f5ef" stroke="#a9d3c1" stroke-width="1.4"/>
+<text x="572.0" y="160.0" font-size="13.5" font-weight="600" fill="#17674a" text-anchor="middle" dominant-baseline="central">可积性</text>
+<path d="M464.0,160.0 H483.0" fill="none" stroke="#8a97a3" stroke-width="1.4" marker-end="url(#km-ar)"/>
+<path d="M216.0,42.0 V228.0" fill="none" stroke="#8a97a3" stroke-width="1.4"/>
+<path d="M216.0,135.0 H242.0" fill="none" stroke="#8a97a3" stroke-width="1.6" marker-end="url(#km-ar)"/>
+<path d="M464.0,42.0 V228.0" fill="none" stroke="#8a97a3" stroke-width="1.4"/>
+<path d="M438.0,135.0 H464.0" fill="none" stroke="#8a97a3" stroke-width="1.6" marker-end="url(#km-ar)"/>
+<text class="km-cap" x="340.0" y="102.0">数学分析 · 函数连续性</text>
+<rect x="242.0" y="112.0" width="196.0" height="46.0" rx="9" fill="#2f6fb3" stroke="#20507f" stroke-width="1.4"/>
+<text x="340.0" y="135.0" font-size="15.0" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">一致连续</text>
+<text class="km-cap" x="340.0" y="248.0">平移 ·
+同类或对偶概念（双向）</text>
+<rect x="251.0" y="256.0" width="178.0" height="36.0" rx="9" fill="#f1ecfa" stroke="#c3b0e0" stroke-width="1.4"/>
+<text x="340.0" y="274.0" font-size="13.5" font-weight="600" fill="#5b3f8f" text-anchor="middle" dominant-baseline="central">连续</text>
+<path d="M340.0,252.0 V162.0" fill="none" stroke="#a693cc" stroke-width="1.4" stroke-dasharray="5 4" marker-start="url(#km-ar2)" marker-end="url(#km-ar2)"/>
+<text class="km-note" x="340.0" y="334">从「局部」走向「整体」的第一个范例</text>
+</svg>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>方向</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>下楼（前置）</strong></td>
+<td>函数、极限、连续、区间的概念</td>
+</tr>
+<tr>
+<td><strong>上楼（后续）</strong></td>
+<td>闭区间上连续 ⟹ 一致连续；一致连续 ⟹ 连续；一致连续把 Cauchy 列映为
+Cauchy 列</td>
+</tr>
+<tr>
+<td><strong>平移（同类/对偶）</strong></td>
+<td>与「连续」对偶（整体 vs
+局部）；后续的「一致收敛」是<strong>同一个思想母题</strong>在函数列上的重演</td>
+</tr>
+<tr>
+<td><strong>大厦位置</strong></td>
+<td>中间层的基础概念——「从局部走向整体」的第一个范例</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2
+id="说到一致连续你要想到闭卷能一口气说出-4-条才算过">说到「一致连续」，你要想到……（闭卷能一口气说出
+≥4 条才算过）</h2>
+<ol type="1">
+<li><strong>定义</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∀</mo><mi>ε</mi><mo>&gt;</mo><mn>0</mn><mspace width="0.222em"></mspace><mo>∃</mo><mi>δ</mi><mo>&gt;</mo><mn>0</mn><mspace width="0.222em"></mspace><mo>∀</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>x</mi><mn>2</mn></msub><mo>∈</mo><mi>I</mi><mo>,</mo><mspace width="0.222em"></mspace><mo stretchy="false" form="prefix">|</mo><msub><mi>x</mi><mn>1</mn></msub><mo>−</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="false" form="postfix">|</mo><mo>&lt;</mo><mi>δ</mi><mo>⇒</mo><mo stretchy="false" form="prefix">|</mo><mi>f</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo stretchy="false" form="postfix">)</mo><mo>−</mo><mi>f</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">|</mo><mo>&lt;</mo><mi>ε</mi></mrow><annotation encoding="application/x-tex">\forall\varepsilon&gt;0\ \exists\delta&gt;0\ \forall x_1,x_2\in I,\ \lvert x_1-x_2\rvert&lt;\delta\Rightarrow\lvert f(x_1)-f(x_2)\rvert&lt;\varepsilon</annotation></semantics></math>——<strong>δ
+出现在
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>x</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">x_1,x_2</annotation></semantics></math>
+之前</strong>；</li>
+<li>与<strong>连续</strong>的唯一差别：δ
+是否依赖位置（就是量词顺序之差）；</li>
+<li><strong>几何</strong>：整段曲线共用<strong>同一个宽度的 δ
+盒子</strong>；</li>
+<li><strong>定理</strong>（不是定义）：闭区间上连续
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>⇒</mo><annotation encoding="application/x-tex">\Rightarrow</annotation></semantics></math>
+一致连续（Cantor 定理）；</li>
+<li><strong>判别路径</strong>：端点、陡峭度——Lipschitz
+连续或导数有界是<strong>充分条件</strong>；</li>
+<li><strong>反例</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mstyle displaystyle="true"><mfrac><mn>1</mn><mi>x</mi></mfrac></mstyle><annotation encoding="application/x-tex">\dfrac1x</annotation></semantics></math>
+在
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(0,1)</annotation></semantics></math>
+上、<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>x</mi><mn>2</mn></msup><annotation encoding="application/x-tex">x^2</annotation></semantics></math>
+在
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ℝ</mi><annotation encoding="application/x-tex">\mathbb{R}</annotation></semantics></math>
+上。</li>
+</ol>
+<hr />
+<h2
+id="自检你学会了吗先自己想再看答案">自检：你学会了吗？（先自己想，再看答案
+↓）</h2>
+<ol type="1">
+<li>判断真假并说明依据：「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>f</mi><annotation encoding="application/x-tex">f</annotation></semantics></math>
+在
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(0,1)</annotation></semantics></math>
+上连续，则
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>f</mi><annotation encoding="application/x-tex">f</annotation></semantics></math>
+在
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(0,1)</annotation></semantics></math>
+上一致连续。」</li>
+<li>举一个反例：一个在某个区间上连续但不一致连续的函数。（提示：让它越靠近某点越陡。）</li>
+<li>写出「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>f</mi><annotation encoding="application/x-tex">f</annotation></semantics></math>
+在
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>I</mi><annotation encoding="application/x-tex">I</annotation></semantics></math>
+上<strong>不</strong>一致连续」的严格表述。（提示：逐量词翻转，并把
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>⟹</mo><annotation encoding="application/x-tex">\implies</annotation></semantics></math>
+拆开。）</li>
+<li><strong>（自己造一个）</strong>
+把定义里的「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∃</mo><mi>δ</mi><mo>&gt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\exists\delta&gt;0</annotation></semantics></math>」挪到「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∀</mo><mi>ε</mi><mo>&gt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\forall\varepsilon&gt;0</annotation></semantics></math>」<strong>之前</strong>（先存在一个
+δ，再对一切 ε），概念还一样吗？举一个满足它的函数。</li>
+</ol>
+<blockquote>
+<p><strong>迁移练习</strong>：用「假设基底 +
+删条件实验」两招，试着自己拆一个<strong>对偶概念</strong>（如「一致收敛」）——先写一句「我猜你已经会……」，再改它的定义看会冒出什么反例。</p>
+</blockquote>
+<details>
+<summary>
+参考答案
+</summary>
+<ol type="1">
+<li><strong>假</strong>。<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(0,1)</annotation></semantics></math>
+是<strong>开</strong>区间，不是闭区间，闭区间上连续才必然一致连续。反例见第
+2 题。</li>
+<li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mstyle displaystyle="true"><mfrac><mn>1</mn><mi>x</mi></mfrac></mstyle></mrow><annotation encoding="application/x-tex">f(x)=\dfrac{1}{x}</annotation></semantics></math>
+在
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(0,1)</annotation></semantics></math>
+上：连续，但不一致连续。取
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ε</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\varepsilon=1</annotation></semantics></math>，对任意
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>δ</mi><mo>&gt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\delta&gt;0</annotation></semantics></math>，都能在
+0 附近找到相距小于
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>δ</mi><annotation encoding="application/x-tex">\delta</annotation></semantics></math>
+的两点，而函数值差超过 1。</li>
+<li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∃</mo><mi>ε</mi><mo>&gt;</mo><mn>0</mn><mo>,</mo><mspace width="0.222em"></mspace><mo>∀</mo><mi>δ</mi><mo>&gt;</mo><mn>0</mn><mo>,</mo><mspace width="0.222em"></mspace><mo>∃</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>x</mi><mn>2</mn></msub><mo>∈</mo><mi>I</mi></mrow><annotation encoding="application/x-tex">\exists \varepsilon&gt;0,\ \forall \delta&gt;0,\ \exists x_1,x_2\in I</annotation></semantics></math>，使
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">|</mo><msub><mi>x</mi><mn>1</mn></msub><mo>−</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="false" form="postfix">|</mo><mo>&lt;</mo><mi>δ</mi></mrow><annotation encoding="application/x-tex">\lvert x_1-x_2\rvert&lt;\delta</annotation></semantics></math>
+<strong>且</strong>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">|</mo><mi>f</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo stretchy="false" form="postfix">)</mo><mo>−</mo><mi>f</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">|</mo><mo>≥</mo><mi>ε</mi></mrow><annotation encoding="application/x-tex">\lvert f(x_1)-f(x_2)\rvert\ge \varepsilon</annotation></semantics></math>。</li>
+<li><strong>不一样，强得多</strong>。「先存在 δ、再对一切 ε」即要求
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">|</mo><mi>f</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo stretchy="false" form="postfix">)</mo><mo>−</mo><mi>f</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">|</mo><mo>&lt;</mo><mi>ε</mi></mrow><annotation encoding="application/x-tex">\lvert f(x_1)-f(x_2)\rvert&lt;\varepsilon</annotation></semantics></math>
+对<strong>一切</strong>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ε</mi><mo>&gt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\varepsilon&gt;0</annotation></semantics></math>
+成立， 于是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">|</mo><mi>f</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo stretchy="false" form="postfix">)</mo><mo>−</mo><mi>f</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">|</mo><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\lvert f(x_1)-f(x_2)\rvert=0</annotation></semantics></math>：只要
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">|</mo><msub><mi>x</mi><mn>1</mn></msub><mo>−</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="false" form="postfix">|</mo><mo>&lt;</mo><mi>δ</mi></mrow><annotation encoding="application/x-tex">\lvert x_1-x_2\rvert&lt;\delta</annotation></semantics></math>
+就有
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>f</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">f(x_1)=f(x_2)</annotation></semantics></math>。
+也就是说，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>f</mi><annotation encoding="application/x-tex">f</annotation></semantics></math>
+在每个长度 δ
+的小区间上都是<strong>常数</strong>——在连通区间上只能是<strong>常数函数</strong>。
+满足它的例子：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="postfix">)</mo><mo>≡</mo><mi>C</mi></mrow><annotation encoding="application/x-tex">f(x)\equiv C</annotation></semantics></math>（常函数）。可见把
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∃</mo><mi>δ</mi></mrow><annotation encoding="application/x-tex">\exists\delta</annotation></semantics></math>
+提到最前，概念几乎塌掉。</li>
+</ol>
+</details>
+<hr />
+<h2
+id="学完自测对照勾选勾不满就回去重读">学完自测（对照勾选，勾不满就回去重读）</h2>
+<ul class="task-list">
+<li><label><input type="checkbox" /><strong>字字清</strong>：说得清 δ
+为什么必须出现在
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>x</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">x_1,x_2</annotation></semantics></math>
+<strong>之前</strong>，并能逐词解释「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∀</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>x</mi><mn>2</mn></msub><mo>∈</mo><mi>I</mi></mrow><annotation encoding="application/x-tex">\forall x_1,x_2\in I</annotation></semantics></math>」管住了什么；</label></li>
+<li><label><input
+type="checkbox" /><strong>证得明</strong>：能说出「闭区间上连续
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>⇒</mo><annotation encoding="application/x-tex">\Rightarrow</annotation></semantics></math>
+一致连续」（Cantor）的<strong>证明思路</strong>（反证 + 区间套 /
+致密性），并标出关键一步的依据；</label></li>
+<li><label><input
+type="checkbox" /><strong>画得出</strong>：画出它与「连续」「Lipschitz
+连续」的关系，说清<strong>谁推出谁</strong>（Lipschitz
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>⇒</mo><annotation encoding="application/x-tex">\Rightarrow</annotation></semantics></math>
+一致连续
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>⇒</mo><annotation encoding="application/x-tex">\Rightarrow</annotation></semantics></math>
+连续；闭区间上连续
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>⇒</mo><annotation encoding="application/x-tex">\Rightarrow</annotation></semantics></math>
+一致连续）。</label></li>
+</ul>
+<blockquote>
+<p>三条<strong>至少完成一半</strong>，再去做题也不迟。做题是<strong>验证</strong>掌握，不是掌握本身。</p>
+</blockquote>
+</div></details>
+</main>
+<script>
+/* ============================================================
+   card-widgets.js — 概念卡自绘交互组件（零依赖 / 离线可用）
+   由 md2card.py 自动注入。扫描 .wb-widget[data-wb][data-spec] 并渲染。
+   data-spec = base64(UTF-8 JSON)
+   ============================================================ */
+(function () {
+  'use strict';
+
+  /* ---------------- 表达式编译 ---------------- */
+  var FN = {
+    sin: 'Math.sin', cos: 'Math.cos', tan: 'Math.tan',
+    asin: 'Math.asin', acos: 'Math.acos', atan: 'Math.atan',
+    sinh: 'Math.sinh', cosh: 'Math.cosh', tanh: 'Math.tanh',
+    exp: 'Math.exp', log: 'Math.log', ln: 'Math.log', sqrt: 'Math.sqrt',
+    abs: 'Math.abs', floor: 'Math.floor', ceil: 'Math.ceil', sign: 'Math.sign',
+    min: 'Math.min', max: 'Math.max', pow: 'Math.pow',
+    pi: 'Math.PI', PI: 'Math.PI', e: 'Math.E', E: 'Math.E'
+  };
+
+  // 把一个数学表达式编译为 fn(V, f)；V 含变量值，f 为主函数（供叠加层使用）
+  function makeFn(expr, vars, funcs) {
+    vars = vars || []; funcs = funcs || [];
+    var body = String(expr).replace(/[A-Za-z_][A-Za-z_0-9]*/g, function (t) {
+      if (funcs.indexOf(t) >= 0) return t;
+      if (FN[t]) return FN[t];
+      return 'V.' + t;
+    }).replace(/\^/g, '**');
+    var raw;
+    try { raw = new Function('V', 'f', 'return (' + body + ');'); }
+    catch (err) { throw new Error('表达式无法解析：' + expr); }
+    return function (V, f) {
+      var r;
+      try { r = raw(V, f); } catch (e2) { return NaN; }
+      return (typeof r === 'number' && isFinite(r)) ? r : NaN;
+    };
+  }
+
+  /* ---------------- 小工具 ---------------- */
+  function el(tag, cls, txt) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (txt != null) n.textContent = txt;
+    return n;
+  }
+  function fmtNum(v) {
+    if (!isFinite(v)) return '—';
+    if (v === 0) return '0';
+    var a = Math.abs(v);
+    if (a >= 1e5 || a < 1e-4) return v.toExponential(2);
+    return String(Math.round(v * 1e4) / 1e4);
+  }
+  function niceTicks(a, b, count) {
+    var span = b - a;
+    if (!(span > 0)) return [a];
+    var step = Math.pow(10, Math.floor(Math.log10(span / count)));
+    var err = span / count / step;
+    if (err >= 7.5) step *= 10; else if (err >= 3.5) step *= 5; else if (err >= 1.5) step *= 2;
+    var out = [], v = Math.ceil(a / step) * step, guard = 0;
+    while (v <= b + step * 1e-6 && guard++ < 200) {
+      out.push(Math.abs(v) < step * 1e-6 ? 0 : v);
+      v += step;
+    }
+    return out;
+  }
+  function b64utf8(s) {
+    var bin = atob(s);
+    var bytes = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return new TextDecoder('utf-8').decode(bytes);
+  }
+  function frame(cv, ratio) {
+    var dpr = window.devicePixelRatio || 1;
+    var w = cv.clientWidth || 640;
+    if (w < 220) w = 640;
+    var h = Math.round(w * (ratio || 0.52));
+    cv.width = Math.round(w * dpr);
+    cv.height = Math.round(h * dpr);
+    cv.style.height = h + 'px';
+    var ctx = cv.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    return { ctx: ctx, W: w, H: h };
+  }
+
+  /* ---------------- 坐标系 ---------------- */
+  function makeAxes(ctx, W, H, xr, yr, opts) {
+    opts = opts || {};
+    var pad = opts.square ? { l: 18, r: 18, t: 18, b: 18 } : { l: 50, r: 18, t: 16, b: 34 };
+    var iw = W - pad.l - pad.r, ih = H - pad.t - pad.b;
+    function X(x) { return pad.l + (x - xr[0]) / (xr[1] - xr[0]) * iw; }
+    function Y(y) { return pad.t + (yr[1] - y) / (yr[1] - yr[0]) * ih; }
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
+    if (!opts.square) {
+      ctx.strokeStyle = '#eef2f6'; ctx.lineWidth = 1;
+      niceTicks(xr[0], xr[1], 6).forEach(function (v) {
+        ctx.beginPath(); ctx.moveTo(X(v), pad.t); ctx.lineTo(X(v), pad.t + ih); ctx.stroke();
+      });
+      niceTicks(yr[0], yr[1], 5).forEach(function (v) {
+        ctx.beginPath(); ctx.moveTo(pad.l, Y(v)); ctx.lineTo(pad.l + iw, Y(v)); ctx.stroke();
+      });
+    }
+    // 坐标轴
+    ctx.strokeStyle = opts.axisColor || '#9aa6b2'; ctx.lineWidth = 1.4;
+    var y0 = Math.max(pad.t, Math.min(pad.t + ih, Y(0)));
+    var x0 = Math.max(pad.l, Math.min(pad.l + iw, X(0)));
+    ctx.beginPath(); ctx.moveTo(pad.l, y0); ctx.lineTo(pad.l + iw, y0); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x0, pad.t); ctx.lineTo(x0, pad.t + ih); ctx.stroke();
+    if (!opts.square) {
+      ctx.fillStyle = '#5b6570'; ctx.font = '11px system-ui,-apple-system,sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      niceTicks(xr[0], xr[1], 6).forEach(function (v) { ctx.fillText(fmtNum(v), X(v), pad.t + ih + 6); });
+      ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+      niceTicks(yr[0], yr[1], 5).forEach(function (v) { ctx.fillText(fmtNum(v), pad.l - 6, Y(v)); });
+    }
+    return { X: X, Y: Y, pad: pad, iw: iw, ih: ih, xr: xr, yr: yr, ctx: ctx };
+  }
+
+  function drawCurve(A, fn, V, main, color, width, dash) {
+    var ctx = A.ctx, xr = A.xr, yr = A.yr;
+    var span = yr[1] - yr[0];
+    ctx.save();
+    ctx.strokeStyle = color; ctx.lineWidth = width || 2.4;
+    if (dash) ctx.setLineDash(dash);
+    ctx.beginPath();
+    var started = false, N = Math.max(A.iw, 2);
+    for (var i = 0; i <= N; i++) {
+      var x = xr[0] + (xr[1] - xr[0]) * i / N;
+      V.x = x;
+      var y = fn(V, main);
+      if (!isFinite(y) || y < yr[0] - span * 3 || y > yr[1] + span * 3) { started = false; continue; }
+      var px = A.X(x), py = A.Y(y);
+      if (!started) { ctx.moveTo(px, py); started = true; } else ctx.lineTo(px, py);
+    }
+    ctx.stroke(); ctx.restore();
+  }
+
+  function dot(A, x, y, color, r, label) {
+    var ctx = A.ctx;
+    ctx.fillStyle = color; ctx.beginPath();
+    ctx.arc(A.X(x), A.Y(y), r || 4, 0, Math.PI * 2); ctx.fill();
+    if (label) {
+      ctx.fillStyle = color; ctx.font = '600 12px system-ui,-apple-system,sans-serif';
+      ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+      ctx.fillText(label, A.X(x) + 6, A.Y(y) - 4);
+    }
+  }
+
+  /* ---------------- 控件 ---------------- */
+  function buildControls(box, sliders, onChange) {
+    var V = {};
+    var wrap = el('div', 'wb-controls');
+    (sliders || []).forEach(function (s) {
+      V[s.name] = (s.value != null) ? s.value : (s.min + s.max) / 2;
+      var lab = el('label', 'wb-ctl');
+      lab.appendChild(el('span', 'wb-ctl-name', s.label || s.name));
+      var inp = document.createElement('input');
+      inp.type = 'range';
+      inp.min = s.min; inp.max = s.max; inp.step = s.step || 0.01; inp.value = V[s.name];
+      var out = el('span', 'wb-ctl-out', fmtNum(V[s.name]));
+      inp.addEventListener('input', function () {
+        V[s.name] = parseFloat(inp.value);
+        out.textContent = fmtNum(V[s.name]);
+        onChange();
+      });
+      lab.appendChild(inp); lab.appendChild(out);
+      wrap.appendChild(lab);
+    });
+    box.appendChild(wrap);
+    return V;
+  }
+
+  function buildReadout(box, rows) {
+    if (!rows || !rows.length) return null;
+    var d = el('div', 'wb-readout');
+    d.innerHTML = '';
+    box.appendChild(d);
+    return {
+      el: d,
+      update: function (vals) {
+        d.innerHTML = '';
+        rows.forEach(function (r) {
+          var s = el('span', 'wb-ro');
+          s.appendChild(el('b', null, r.label + ' = '));
+          s.appendChild(document.createTextNode(vals[r.label] != null ? vals[r.label] : '—'));
+          d.appendChild(s);
+        });
+      }
+    };
+  }
+
+  /* ---------------- 组件：plot ---------------- */
+  function renderPlot(box, spec) {
+    var cv = el('canvas', 'wb-canvas'); cv.style.display = 'block';
+    box.appendChild(cv);
+    var varNames = (spec.sliders || []).map(function (s) { return s.name; }).concat(['x']);
+    var main = makeFn(spec.expr, varNames, ['f']);
+    var xr = spec.xrange, yr = spec.yrange;
+    var A, ro;
+    // f(t)：把 t 作为自变量求主函数值（不能在叠加层里直接复用 V.x）
+    function fOf(t) {
+      var tmp = {}; for (var k in V) tmp[k] = V[k];
+      tmp.x = t;
+      return main(tmp, main);
+    }
+    function ev(expr) { return makeFn(expr, varNames, ['f'])(V, fOf); }
+    function draw() {
+      var f = frame(cv, spec.ratio || 0.52);
+      A = makeAxes(f.ctx, f.W, f.H, xr, yr);
+      var ctx = A.ctx;
+      // 叠加层（带 / 条）先画，压在曲线下
+      (spec.overlays || []).forEach(function (o) {
+        var col = o.color || '#f0a53a';
+        if (o.kind === 'hbar') {
+          var yc = ev(o.y);
+          var h = Math.abs(ev(o.half));
+          if (isFinite(yc) && isFinite(h)) {
+            ctx.fillStyle = col; ctx.globalAlpha = 0.18;
+            ctx.fillRect(A.pad.l, A.Y(yc + h), A.iw, A.Y(yc - h) - A.Y(yc + h));
+            ctx.globalAlpha = 1; ctx.strokeStyle = col; ctx.lineWidth = 1; ctx.setLineDash([5, 4]);
+            ctx.beginPath(); ctx.moveTo(A.pad.l, A.Y(yc + h)); ctx.lineTo(A.pad.l + A.iw, A.Y(yc + h));
+            ctx.moveTo(A.pad.l, A.Y(yc - h)); ctx.lineTo(A.pad.l + A.iw, A.Y(yc - h)); ctx.stroke();
+            ctx.setLineDash([]);
+            if (o.label) { ctx.fillStyle = col; ctx.font = '12px system-ui,sans-serif'; ctx.textAlign = 'right'; ctx.textBaseline = 'bottom'; ctx.fillText(o.label, A.pad.l + A.iw - 4, A.Y(yc + h) - 3); }
+          }
+        } else if (o.kind === 'vband') {
+          var xc = ev(o.x);
+          var hw = Math.abs(ev(o.half));
+          if (isFinite(xc) && isFinite(hw)) {
+            ctx.fillStyle = col; ctx.globalAlpha = 0.18;
+            ctx.fillRect(A.X(xc - hw), A.pad.t, A.X(xc + hw) - A.X(xc - hw), A.ih);
+            ctx.globalAlpha = 1; ctx.strokeStyle = col; ctx.lineWidth = 1; ctx.setLineDash([5, 4]);
+            ctx.beginPath(); ctx.moveTo(A.X(xc - hw), A.pad.t); ctx.lineTo(A.X(xc - hw), A.pad.t + A.ih);
+            ctx.moveTo(A.X(xc + hw), A.pad.t); ctx.lineTo(A.X(xc + hw), A.pad.t + A.ih); ctx.stroke();
+            ctx.setLineDash([]);
+          }
+        }
+      });
+      drawCurve(A, main, V, main, '#2f6fb3', 2.6);
+      // 线段（割线等）
+      (spec.segments || []).forEach(function (sg) {
+        var x1 = ev(sg.x1), y1 = ev(sg.y1), x2 = ev(sg.x2), y2 = ev(sg.y2);
+        if (!isFinite(x1) || !isFinite(x2)) return;
+        ctx.strokeStyle = sg.color || '#c2582a'; ctx.lineWidth = 2; ctx.setLineDash(sg.dash || []);
+        ctx.beginPath(); ctx.moveTo(A.X(x1), A.Y(y1)); ctx.lineTo(A.X(x2), A.Y(y2)); ctx.stroke();
+        ctx.setLineDash([]);
+      });
+      // 点
+      (spec.points || []).forEach(function (p) {
+        var x = ev(p.x), y = ev(p.y);
+        if (isFinite(x) && isFinite(y)) dot(A, x, y, p.color || '#c2582a', p.r || 4.5, p.label);
+      });
+      // 数值读出
+      if (ro) {
+        var vals = {};
+        (spec.readout || []).forEach(function (r) {
+          var v = ev(r.expr);
+          vals[r.label] = (r.digits != null) ? (isFinite(v) ? v.toFixed(r.digits) : '—') : fmtNum(v);
+        });
+        ro.update(vals);
+      }
+    }
+    var V = buildControls(box, spec.sliders, function () { draw(); });
+    ro = buildReadout(box, spec.readout);
+    if (spec.hint) box.appendChild(el('p', 'wb-hint', '👉 ' + spec.hint));
+    draw();
+    return function () { draw(); };
+  }
+
+  /* ---------------- 组件：seq（数列 ε-N） ---------------- */
+  function renderSeq(box, spec) {
+    var cv = el('canvas', 'wb-canvas'); cv.style.display = 'block';
+    box.appendChild(cv);
+    var varNames = (spec.sliders || []).map(function (s) { return s.name; }).concat(['n']);
+    var an = makeFn(spec.expr, varNames, []);
+    var n1 = spec.nrange[0], n2 = spec.nrange[1], target = spec.target;
+    var A, ro;
+    function draw() {
+      var V2 = {}; for (var k in V) V2[k] = V[k];
+      V2.x = undefined;
+      var vals = [];
+      for (var n = n1; n <= n2; n++) { V2.n = n; vals.push([n, an(V2, null)]); }
+      var lo = Math.min.apply(null, vals.map(function (p) { return isFinite(p[1]) ? p[1] : 0; }).concat([target]));
+      var hi = Math.max.apply(null, vals.map(function (p) { return isFinite(p[1]) ? p[1] : 0; }).concat([target]));
+      var pad = (hi - lo) * 0.25 || 1;
+      var yr = [lo - pad, hi + pad];
+      var f = frame(cv, 0.5);
+      A = makeAxes(f.ctx, f.W, f.H, [n1 - 1, n2 + 1], yr);
+      var ctx = A.ctx, eps = V.eps;
+      // ε 带
+      ctx.fillStyle = '#f0a53a'; ctx.globalAlpha = 0.18;
+      ctx.fillRect(A.pad.l, A.Y(target + eps), A.iw, A.Y(target - eps) - A.Y(target + eps));
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = '#f0a53a'; ctx.setLineDash([5, 4]); ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(A.pad.l, A.Y(target + eps)); ctx.lineTo(A.pad.l + A.iw, A.Y(target + eps));
+      ctx.moveTo(A.pad.l, A.Y(target - eps)); ctx.lineTo(A.pad.l + A.iw, A.Y(target - eps)); ctx.stroke();
+      ctx.setLineDash([]);
+      // 极限线
+      ctx.strokeStyle = '#1f8a63'; ctx.lineWidth = 1.6; ctx.setLineDash([6, 4]);
+      ctx.beginPath(); ctx.moveTo(A.pad.l, A.Y(target)); ctx.lineTo(A.pad.l + A.iw, A.Y(target)); ctx.stroke();
+      ctx.setLineDash([]);
+      // 找 N：所有 n>N 都落在带内
+      var N = null;
+      for (var i = vals.length - 1; i >= 0; i--) {
+        var ok = (Math.abs(vals[i][1] - target) < eps);
+        if (!ok) { N = vals[i][0]; break; }
+      }
+      if (N == null) N = n1 - 1;
+      var xN = A.X(N + 0.5);
+      ctx.strokeStyle = '#c2582a'; ctx.lineWidth = 1.8;
+      ctx.beginPath(); ctx.moveTo(xN, A.pad.t); ctx.lineTo(xN, A.pad.t + A.ih); ctx.stroke();
+      ctx.fillStyle = '#c2582a'; ctx.font = '600 12px system-ui,sans-serif';
+      ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+      ctx.fillText('N = ' + N + '（此后全部落入 ε 带）', xN + 4, A.pad.t + 2);
+      // 点
+      vals.forEach(function (p) {
+        if (!isFinite(p[1])) return;
+        var inside = Math.abs(p[1] - target) < eps;
+        ctx.fillStyle = inside ? '#1f8a63' : '#c2582a';
+        ctx.beginPath(); ctx.arc(A.X(p[0]), A.Y(p[1]), 3.2, 0, Math.PI * 2); ctx.fill();
+      });
+      if (ro) ro.update({ 'N': String(N), '第 N+1 项': fmtNum(vals[Math.max(0, N + 1 - n1)] ? vals[Math.max(0, N + 1 - n1)][1] : NaN) });
+    }
+    var V = buildControls(box, spec.sliders, function () { draw(); });
+    ro = buildReadout(box, [{ label: 'N' }, { label: '第 N+1 项' }]);
+    if (spec.hint) box.appendChild(el('p', 'wb-hint', '👉 ' + spec.hint));
+    draw();
+    return function () { draw(); };
+  }
+
+  /* ---------------- 组件：riemann ---------------- */
+  function renderRiemann(box, spec) {
+    var cv = el('canvas', 'wb-canvas'); cv.style.display = 'block';
+    box.appendChild(cv);
+    var main = makeFn(spec.expr, ['x'], []);
+    var V = { x: 0 };
+    var a = spec.xrange[0], b = spec.xrange[1];
+    var A, ro;
+    function draw() {
+      var f = frame(cv, 0.5);
+      A = makeAxes(f.ctx, f.W, f.H, spec.xrange, spec.yrange);
+      var ctx = A.ctx, n = V.n, dx = (b - a) / n, S = 0;
+      ctx.fillStyle = '#6aa3d5'; ctx.globalAlpha = 0.35; ctx.strokeStyle = '#2f6fb3'; ctx.lineWidth = 1;
+      for (var i = 0; i < n; i++) {
+        var xl = a + i * dx; V.x = xl;
+        var y = main(V, null); if (!isFinite(y)) continue;
+        S += y * dx;
+        var px = A.X(xl), pw = A.X(xl + dx) - A.X(xl), py = A.Y(y), ph = A.Y(0) - A.Y(y);
+        ctx.fillRect(px, py, pw, ph);
+        if (n <= 40) ctx.strokeRect(px, py, pw, ph);
+      }
+      ctx.globalAlpha = 1;
+      drawCurve(A, main, V, null, '#c2582a', 2.6);
+      if (ro) {
+        var ex = spec.exact;
+        ro.update({
+          'n': String(n),
+          'S_n': S.toFixed(5),
+          '精确值': (ex != null) ? ex.toFixed(5) : '—',
+          '误差': (ex != null) ? Math.abs(S - ex).toFixed(5) : '—'
+        });
+      }
+    }
+    var V2 = buildControls(box, [{
+      name: 'n', label: spec.nslider.label || 'n（分割份数）',
+      min: spec.nslider.min, max: spec.nslider.max, step: spec.nslider.step || 1, value: spec.nslider.value
+    }], function () { V.n = V2.n; draw(); });
+    V.n = V2.n;
+    ro = buildReadout(box, [{ label: 'n' }, { label: 'S_n' }, { label: '精确值' }, { label: '误差' }]);
+    if (spec.hint) box.appendChild(el('p', 'wb-hint', '👉 ' + spec.hint));
+    draw();
+    return function () { draw(); };
+  }
+
+  /* ---------------- 组件：matrix2（线性变换） ---------------- */
+  function renderMatrix2(box, spec) {
+    var cv = el('canvas', 'wb-canvas'); cv.style.display = 'block';
+    box.appendChild(cv);
+    var rng = spec.range || [-3, 3], A, ro;
+    function draw() {
+      var f = frame(cv, 0.72);
+      A = makeAxes(f.ctx, f.W, f.H, rng, rng, { square: true });
+      var ctx = A.ctx;
+      var a = V.a, b = V.b, c = V.c, d = V.d;
+      function T(x, y) { return [a * x + b * y, c * x + d * y]; }
+      var R = Math.max(Math.abs(rng[0]), Math.abs(rng[1])) * 2.2, S = 0.25;
+      // 原网格
+      ctx.strokeStyle = '#e6ebf0'; ctx.lineWidth = 1;
+      for (var k = -3; k <= 3; k += 1) {
+        ctx.beginPath(); ctx.moveTo(A.X(k), A.Y(rng[0])); ctx.lineTo(A.X(k), A.Y(rng[1])); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(A.X(rng[0]), A.Y(k)); ctx.lineTo(A.X(rng[1]), A.Y(k)); ctx.stroke();
+      }
+      // 变换后的网格
+      ctx.strokeStyle = '#6aa3d5'; ctx.lineWidth = 1.2;
+      for (var k2 = -3; k2 <= 3; k2 += 1) {
+        var p1 = T(k2, -R), p2 = T(k2, R);
+        ctx.beginPath(); ctx.moveTo(A.X(p1[0]), A.Y(p1[1])); ctx.lineTo(A.X(p2[0]), A.Y(p2[1])); ctx.stroke();
+        var q1 = T(-R, k2), q2 = T(R, k2);
+        ctx.beginPath(); ctx.moveTo(A.X(q1[0]), A.Y(q1[1])); ctx.lineTo(A.X(q2[0]), A.Y(q2[1])); ctx.stroke();
+      }
+      // 单位正方形 → 像
+      var O = T(0, 0), U = T(1, 0), W2 = T(1, 1), Z = T(0, 1);
+      ctx.fillStyle = '#c2582a'; ctx.globalAlpha = 0.22;
+      ctx.beginPath(); ctx.moveTo(A.X(O[0]), A.Y(O[1])); ctx.lineTo(A.X(U[0]), A.Y(U[1]));
+      ctx.lineTo(A.X(W2[0]), A.Y(W2[1])); ctx.lineTo(A.X(Z[0]), A.Y(Z[1])); ctx.closePath(); ctx.fill();
+      ctx.globalAlpha = 1; ctx.strokeStyle = '#c2582a'; ctx.lineWidth = 2; ctx.stroke();
+      // 列向量
+      vec(A, O, U, '#1f8a63', '列1');
+      vec(A, O, Z, '#7a4fb3', '列2');
+      if (ro) {
+        var det = a * d - b * c;
+        var rank = Math.abs(det) > 1e-9 ? 2 : (Math.abs(a) + Math.abs(b) + Math.abs(c) + Math.abs(d) > 1e-9 ? 1 : 0);
+        ro.update({
+          'det': det.toFixed(3),
+          '秩': String(rank),
+          '像': rank === 2 ? '整个平面（可逆）' : (rank === 1 ? '塌成一条直线' : '塌成一个点')
+        });
+      }
+    }
+    var V = buildControls(box, spec.sliders, function () { draw(); });
+    ro = buildReadout(box, [{ label: 'det' }, { label: '秩' }, { label: '像' }]);
+    if (spec.hint) box.appendChild(el('p', 'wb-hint', '👉 ' + spec.hint));
+    draw();
+    return function () { draw(); };
+  }
+
+  function vec(A, from, to, color, label) {
+    var ctx = A.ctx;
+    ctx.strokeStyle = color; ctx.lineWidth = 2.6;
+    ctx.beginPath(); ctx.moveTo(A.X(from[0]), A.Y(from[1])); ctx.lineTo(A.X(to[0]), A.Y(to[1])); ctx.stroke();
+    var ang = Math.atan2(-(to[1] - from[1]), to[0] - from[0]);
+    var px = A.X(to[0]), py = A.Y(to[1]), s = 9;
+    ctx.fillStyle = color; ctx.beginPath();
+    ctx.moveTo(px, py);
+    ctx.lineTo(px - s * Math.cos(ang - 0.4), py - s * Math.sin(ang - 0.4));
+    ctx.lineTo(px - s * Math.cos(ang + 0.4), py - s * Math.sin(ang + 0.4));
+    ctx.closePath(); ctx.fill();
+    if (label) {
+      ctx.font = '600 12px system-ui,sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+      ctx.fillText(label, px + 6, py - 4);
+    }
+  }
+
+  /* ---------------- 组件：vectors2（线性相关） ---------------- */
+  function renderVectors2(box, spec) {
+    var cv = el('canvas', 'wb-canvas'); cv.style.display = 'block';
+    box.appendChild(cv);
+    var rng = spec.range || [-3, 3], A, ro;
+    function draw() {
+      var f = frame(cv, 0.68);
+      A = makeAxes(f.ctx, f.W, f.H, rng, rng, { square: true });
+      var ctx = A.ctx, O = [0, 0];
+      var u = [V.u1, V.u2], v = [V.v1, V.v2];
+      var det = u[0] * v[1] - u[1] * v[0];
+      var dep = Math.abs(det) < 1e-6;
+      ctx.strokeStyle = '#e6ebf0'; ctx.lineWidth = 1;
+      for (var k = -3; k <= 3; k += 1) {
+        ctx.beginPath(); ctx.moveTo(A.X(k), A.Y(rng[0])); ctx.lineTo(A.X(k), A.Y(rng[1])); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(A.X(rng[0]), A.Y(k)); ctx.lineTo(A.X(rng[1]), A.Y(k)); ctx.stroke();
+      }
+      if (!dep) {
+        // 张成整个平面：淡色铺底
+        ctx.fillStyle = '#6aa3d5'; ctx.globalAlpha = 0.08;
+        ctx.fillRect(A.pad.l, A.pad.t, A.iw, A.ih); ctx.globalAlpha = 1;
+      } else {
+        // 共线：高亮这条直线
+        var L = 6, n0 = Math.hypot(u[0], u[1]) || 1;
+        var dx = u[0] / n0, dy = u[1] / n0;
+        ctx.strokeStyle = '#c2582a'; ctx.lineWidth = 8; ctx.globalAlpha = 0.18;
+        ctx.beginPath(); ctx.moveTo(A.X(-dx * L), A.Y(-dy * L)); ctx.lineTo(A.X(dx * L), A.Y(dy * L)); ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+      // 平行四边形（行列式的几何意义）
+      if (!dep) {
+        var S = [u[0] + v[0], u[1] + v[1]];
+        ctx.fillStyle = '#c2582a'; ctx.globalAlpha = 0.16;
+        ctx.beginPath(); ctx.moveTo(A.X(0), A.Y(0)); ctx.lineTo(A.X(u[0]), A.Y(u[1]));
+        ctx.lineTo(A.X(S[0]), A.Y(S[1])); ctx.lineTo(A.X(v[0]), A.Y(v[1])); ctx.closePath(); ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+      vec(A, O, u, '#1f8a63', 'u');
+      vec(A, O, v, '#7a4fb3', 'v');
+      if (ro) {
+        ro.update({
+          'det(u,v)': det.toFixed(3),
+          '判定': dep ? '线性相关（共线）' : '线性无关',
+          '张成空间': dep ? (Math.hypot(u[0], u[1]) + Math.hypot(v[0], v[1]) < 1e-9 ? '零空间 {0}' : '一条直线（1 维）') : '整个平面（2 维）'
+        });
+      }
+    }
+    var V = buildControls(box, spec.sliders, function () { draw(); });
+    ro = buildReadout(box, [{ label: 'det(u,v)' }, { label: '判定' }, { label: '张成空间' }]);
+    if (spec.hint) box.appendChild(el('p', 'wb-hint', '👉 ' + spec.hint));
+    draw();
+    return function () { draw(); };
+  }
+
+  /* ---------------- 复制按钮（GeoGebra 指令块） ---------------- */
+  function bindCopy() {
+    document.querySelectorAll('.gb-copy').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var blk = btn.closest('.gb-block');
+        var code = blk ? blk.querySelector('code') : null;
+        if (!code) return;
+        var txt = code.textContent;
+        var done = function () { btn.textContent = '已复制 ✓'; setTimeout(function () { btn.textContent = '复制指令'; }, 1600); };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(txt).then(done, function () { fallback(txt, done); });
+        } else fallback(txt, done);
+      });
+    });
+    function fallback(txt, done) {
+      var ta = document.createElement('textarea');
+      ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch (e) { }
+      document.body.removeChild(ta);
+    }
+  }
+
+  /* ---------------- 折叠面（渐进揭示） ---------------- */
+  function bindFacets(redrawAll) {
+    var all = document.querySelectorAll('details.facet');
+    if (!all.length) return;
+    document.querySelectorAll('.facet-toggle').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var isOpen = btn.getAttribute('data-open') === '1';
+        all.forEach(function (d) { d.open = !isOpen; });
+        btn.setAttribute('data-open', isOpen ? '0' : '1');
+        btn.textContent = isOpen ? '展开全部' : '收起全部';
+        if (redrawAll) setTimeout(redrawAll, 40);
+      });
+    });
+    // 折叠时 canvas 宽度为 0，展开后需重绘
+    all.forEach(function (d) {
+      d.addEventListener('toggle', function () { if (d.open && redrawAll) setTimeout(redrawAll, 40); });
+    });
+    // 打印前把所有折叠面打开，保证纸质版内容完整
+    window.addEventListener('beforeprint', function () {
+      document.querySelectorAll('details').forEach(function (d) { d.open = true; });
+      if (redrawAll) redrawAll();
+    });
+  }
+
+  /* ---------------- 初始化 ---------------- */
+  var RENDER = {
+    plot: renderPlot, seq: renderSeq, riemann: renderRiemann,
+    matrix2: renderMatrix2, vectors2: renderVectors2
+  };
+
+  function init() {
+    var widgets = [];
+    document.querySelectorAll('.wb-widget').forEach(function (box) {
+      var kind = box.getAttribute('data-wb');
+      var specStr = box.getAttribute('data-spec') || '';
+      var spec;
+      try { spec = JSON.parse(b64utf8(specStr)); }
+      catch (e) { box.innerHTML = '<p class="wb-err">组件参数解析失败：' + e.message + '</p>'; return; }
+      var fn = RENDER[kind];
+      if (!fn) { box.innerHTML = '<p class="wb-err">未知组件类型：' + kind + '</p>'; return; }
+      var redraw;
+      try { redraw = fn(box, spec); }
+      catch (e2) { box.innerHTML = '<p class="wb-err">组件渲染失败：' + e2.message + '</p>'; return; }
+      widgets.push(redraw);
+    });
+    if (widgets.length) {
+      var t = null;
+      window.addEventListener('resize', function () {
+        clearTimeout(t); t = setTimeout(function () { widgets.forEach(function (f) { try { f(); } catch (e) { } }); }, 160);
+      });
+    }
+    bindCopy();
+    bindFacets(function () {
+      widgets.forEach(function (f) { try { f(); } catch (e) { } });
+    });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+
+</script>
+</body>
+</html>
