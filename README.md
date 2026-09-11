@@ -11,6 +11,11 @@
 
 ![演示：数列极限概念卡——六棱镜逐面拆解 · 拖动 ε 看 N 怎么变 · 知识图谱](assets/demo.gif)
 
+**🌐 在线预览（免安装，点开即玩）**：<https://zhjx19.github.io/math-concept-coach/>
+—— 直接点开三张真实概念卡，拖滑块看「一致连续 / 数列极限 / 矩阵的秩」。
+
+[在线预览](#它会交付什么) · [快速开始](#快速开始) · [触发方式](#触发方式) · [它和同类有什么不同](#它和同类有什么不同) · [安全边界](#安全边界)
+
 **一行安装**
 
 ```bash
@@ -36,13 +41,13 @@ npx skills add zhjx19/math-concept-coach
 ## 它会交付什么？
 
 **不是一段讲解文字，是一张可复用的离线卡片。** 先看真实产物：
-打开 [`examples/index.html`](examples/index.html)（概念卡画廊），里面是 3 张**真实生成**的卡片：
+🌐 **在线画廊** <https://zhjx19.github.io/math-concept-coach/>（点开即玩，无需安装）；也可本地打开 [`examples/index.html`](examples/index.html)。里面是 3 张**真实生成**的卡片：
 
 | 卡片 | 课程 | 交互图形 | 你能拖什么 |
 |---|---|---|---|
-| [一致连续](examples/一致连续-概念卡.html) | 数学分析 | 函数图像 + ε 带 | 固定 δ 只移动位置，看哪里冲出 ε 带 |
-| [数列极限](examples/数列极限-概念卡.html) | 数学分析 | 数列 ε–N | 拖 ε，看 N 怎么变、带外的红点何时消失 |
-| [矩阵的秩](examples/矩阵的秩-概念卡.html) | 高等代数 | 线性变换 | 拖矩阵元素，看单位正方形何时被压扁、秩从 2 掉到 1 |
+| [一致连续](https://zhjx19.github.io/math-concept-coach/一致连续-概念卡.html) | 数学分析 | 函数图像 + ε 带 | 固定 δ 只移动位置，看哪里冲出 ε 带 |
+| [数列极限](https://zhjx19.github.io/math-concept-coach/数列极限-概念卡.html) | 数学分析 | 数列 ε–N | 拖 ε，看 N 怎么变、带外的红点何时消失 |
+| [矩阵的秩](https://zhjx19.github.io/math-concept-coach/矩阵的秩-概念卡.html) | 高等代数 | 线性变换 | 拖矩阵元素，看单位正方形何时被压扁、秩从 2 掉到 1 |
 
 每张卡片都包含：
 
@@ -172,7 +177,7 @@ python3 "<技能目录>/scripts/md2card.py" "examples/数列极限-概念卡.md"
 >
 > **F5**：（可拖动的 2×2 线性变换图）「把 a 和 c 都拖到 0，看单位正方形何时被压成线段、秩从 2 掉到 1。」
 
-完整产物见 [`examples/矩阵的秩-概念卡.html`](examples/矩阵的秩-概念卡.html)。
+完整产物见 [在线概念卡](https://zhjx19.github.io/math-concept-coach/矩阵的秩-概念卡.html)（或本地 `examples/矩阵的秩-概念卡.html`）。
 
 ---
 
