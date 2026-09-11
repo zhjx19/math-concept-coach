@@ -1,0 +1,443 @@
+/* ============================================================
+   概念卡样式（concept-card.css）
+   浅色主题 · 离线可用 · 可打印
+   ============================================================ */
+
+:root {
+  --ink: #1f2328;
+  --muted: #5b6570;
+  --line: #e4e8ec;
+  --line-strong: #cdd5dd;
+  --bg: #ffffff;
+  --soft: #f7f9fb;
+  --accent: #2f6fb3;
+  --accent-soft: #eaf2fa;
+
+  /* 六棱镜各面配色 */
+  --f1: #c2582a;  /* 正反 */
+  --f2: #1f8a63;  /* 直观 */
+  --f3: #2f6fb3;  /* 严格 */
+  --f4: #7a4fb3;  /* 意义 */
+  --f5: #a8791a;  /* 图形 */
+  --f6: #475569;  /* 联系 */
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  padding: 32px 16px 64px;
+  background: #f2f5f8;
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei",
+               "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", sans-serif;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+/* ---------- 卡片容器 ---------- */
+.card {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 40px 44px 56px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 0 6px 28px rgba(31, 35, 40, 0.07);
+}
+
+/* ---------- 标题 ---------- */
+.card > h1:first-child {
+  margin: 0 0 6px;
+  padding-bottom: 14px;
+  font-size: 26px;
+  line-height: 1.4;
+  border-bottom: 3px solid var(--accent);
+}
+.card > h1:first-child::after {
+  content: "概念卡 · 六棱镜拆解";
+  display: block;
+  margin-top: 8px;
+  font-size: 12.5px;
+  font-weight: 400;
+  letter-spacing: .12em;
+  color: var(--muted);
+}
+
+/* 非「面」的小节标题（自检、错位清单等） */
+.card > h2 {
+  margin: 40px 0 14px;
+  padding: 8px 0 8px 16px;
+  font-size: 19px;
+  line-height: 1.5;
+  border-left: 5px solid var(--accent);
+  background: linear-gradient(90deg, var(--accent-soft), transparent 72%);
+  border-radius: 0 6px 6px 0;
+}
+
+/* ---------- 六棱镜各面：折叠面板（渐进揭示） ---------- */
+.facet-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin: 30px 0 -10px;
+}
+.facet-toggle {
+  font: inherit;
+  font-size: 13px;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid #cddff0;
+  border-radius: 999px;
+  padding: 4px 14px;
+  cursor: pointer;
+}
+.facet-toggle:hover { background: #dceaf8; }
+
+details.facet {
+  margin: 26px 0 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+}
+details.facet[open] { box-shadow: 0 1px 6px rgba(31, 35, 40, 0.05); }
+
+.facet-h {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 12px 16px;
+  font-size: 18px;
+  line-height: 1.5;
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+  border-left: 5px solid var(--accent);
+  background: linear-gradient(90deg, var(--accent-soft), transparent 72%);
+}
+.facet-h::-webkit-details-marker { display: none; }
+.facet-h::before {
+  content: "▸";
+  flex: 0 0 auto;
+  font-size: 14px;
+  color: var(--muted);
+  transition: transform .15s ease;
+}
+details.facet[open] > .facet-h::before { transform: rotate(90deg); }
+
+.facet-h.f1 { border-left-color: var(--f1); background: linear-gradient(90deg,#fbeee8,transparent 72%); }
+.facet-h.f2 { border-left-color: var(--f2); background: linear-gradient(90deg,#e8f6f1,transparent 72%); }
+.facet-h.f3 { border-left-color: var(--f3); background: linear-gradient(90deg,#eaf2fa,transparent 72%); }
+.facet-h.f4 { border-left-color: var(--f4); background: linear-gradient(90deg,#f1ecfa,transparent 72%); }
+.facet-h.f5 { border-left-color: var(--f5); background: linear-gradient(90deg,#faf3e3,transparent 72%); }
+.facet-h.f6 { border-left-color: var(--f6); background: linear-gradient(90deg,#eef1f5,transparent 72%); }
+
+.facet-body { padding: 4px 18px 16px; }
+
+/* 面内的小节标题（### 定义、### 量词骨架 …） */
+.card h3 {
+  margin: 26px 0 10px;
+  font-size: 16.5px;
+  color: var(--accent);
+}
+
+/* ---------- 段落与列表 ---------- */
+.card p { margin: 10px 0; }
+.card ul, .card ol { margin: 10px 0; padding-left: 1.6em; }
+.card li { margin: 5px 0; }
+.card li::marker { color: var(--accent); }
+
+.card strong { color: #0f1419; }
+.card em { color: var(--muted); font-style: normal; background: #fff6d9; padding: 0 3px; border-radius: 3px; }
+
+/* ---------- 表格（三线表） ---------- */
+.card table {
+  width: 100%;
+  margin: 16px 0;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+.card table th, .card table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+.card table thead th {
+  background: var(--soft);
+  border-top: 2px solid var(--line-strong);
+  border-bottom: 1.5px solid var(--line-strong);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.card table tbody tr:last-child td { border-bottom: 2px solid var(--line-strong); }
+.card table tbody tr:hover { background: #fbfcfe; }
+
+/* ---------- 引用块 = 提示框 ---------- */
+.card blockquote {
+  margin: 16px 0;
+  padding: 12px 18px;
+  background: var(--accent-soft);
+  border-left: 4px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  color: #26333f;
+}
+.card blockquote p:first-child { margin-top: 0; }
+.card blockquote p:last-child { margin-bottom: 0; }
+
+/* ---------- 代码 ---------- */
+.card code {
+  padding: 2px 6px;
+  background: #f1f4f7;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+  font-size: .9em;
+}
+.card pre {
+  margin: 16px 0;
+  padding: 14px 16px;
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow-x: auto;
+  line-height: 1.6;
+}
+.card pre code { padding: 0; background: none; border: 0; }
+
+/* ---------- 分隔线 ---------- */
+.card hr {
+  margin: 36px 0;
+  border: 0;
+  border-top: 1px dashed var(--line-strong);
+}
+
+/* ---------- 公式（MathML） ---------- */
+.card math { font-size: 1.06em; }
+.card math[display="block"],
+.card .math.display {
+  display: block;
+  margin: 14px 0;
+  text-align: center;
+  overflow-x: auto;
+}
+
+/* ---------- 图形演示占位 ---------- */
+.card img { max-width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--line); }
+.card .hint {
+  margin: 10px 0;
+  padding: 10px 14px;
+  background: #fffaf0;
+  border: 1px dashed #e0b978;
+  border-radius: 8px;
+  font-size: 14.5px;
+  color: #6b4a12;
+}
+
+/* ============================================================
+   自绘交互组件（card-widgets.js）
+   ============================================================ */
+.wb-widget {
+  margin: 18px 0 22px;
+  padding: 14px 16px 12px;
+  background: #fcfdfe;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.wb-canvas {
+  display: block;
+  width: 100%;
+  border-radius: 8px;
+  background: #fff;
+  touch-action: none;
+}
+.wb-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  margin-top: 12px;
+}
+.wb-ctl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  color: var(--ink);
+  min-width: 210px;
+  flex: 1 1 210px;
+}
+.wb-ctl-name { font-weight: 600; white-space: nowrap; }
+.wb-ctl input[type="range"] {
+  flex: 1 1 auto;
+  min-width: 80px;
+  accent-color: var(--accent);
+  height: 20px;
+}
+.wb-ctl-out {
+  min-width: 56px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+  font-weight: 600;
+}
+.wb-readout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+  margin-top: 10px;
+  padding-top: 9px;
+  border-top: 1px dashed var(--line-strong);
+  font-size: 13.5px;
+  color: var(--muted);
+}
+.wb-ro b { color: var(--ink); font-weight: 600; }
+.wb-ro { font-variant-numeric: tabular-nums; }
+.wb-hint {
+  margin: 11px 0 0;
+  padding: 9px 13px;
+  background: #fffaf0;
+  border: 1px dashed #e0b978;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #6b4a12;
+}
+.wb-err {
+  margin: 0;
+  padding: 10px 14px;
+  background: #fdeeee;
+  border: 1px solid #e8b4b4;
+  border-radius: 8px;
+  color: #a33232;
+  font-size: 14px;
+}
+
+/* ============================================================
+   GeoGebra 指令块
+   ============================================================ */
+.gb-block {
+  margin: 18px 0;
+  border: 1px solid #cfe0d4;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fbfdfb;
+}
+.gb-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 14px;
+  background: #eef6f0;
+  border-bottom: 1px solid #d8e9dd;
+  font-size: 13.5px;
+  color: #1f6b4a;
+}
+.gb-copy {
+  flex: 0 0 auto;
+  padding: 5px 13px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #fff;
+  background: #1f8a63;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.gb-copy:hover { background: #176f4f; }
+.gb-block pre {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: #fbfdfb;
+  font-size: 13.5px;
+}
+
+/* ============================================================
+   知识图谱（knowledge_map.py 生成的内联 SVG）
+   ============================================================ */
+.km-svg {
+  display: block;
+  width: 100%;
+  margin: 20px 0;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei",
+               "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", sans-serif;
+}
+.km-bg { fill: #fff; }
+.km-ttl { font-size: 13px; font-weight: 700; fill: #1f2328; }
+.km-lg { font-size: 11px; fill: #5b6570; }
+.km-cap { font-size: 11px; fill: #7a8693; text-anchor: middle; }
+.km-note { font-size: 12px; fill: #5b6570; text-anchor: middle; }
+
+/* ---------- 打印 ---------- */
+/* ============================================================
+   降级模式（未安装 pandoc 时由内置转换器生成）
+   ============================================================ */
+.fb-note {
+  margin: 18px 0;
+  padding: 12px 16px;
+  background: #fff8e6;
+  border: 1px solid #f0d8a0;
+  border-left: 4px solid #e0a53a;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.75;
+  color: #6b551f;
+}
+.fb-note strong { color: #8a5a00; }
+
+/* 内置转换器解析不了的公式：原样显示 LaTeX 源码，绝不做半吊子猜测 */
+code.math-src {
+  font-family: "JetBrains Mono", Consolas, "Courier New", monospace;
+  font-size: 0.92em;
+  background: #f4f6f8;
+  border: 1px solid #e3e8ee;
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+math { font-size: 1.02em; }
+
+/* ---------- 窄屏（手机）适配 ---------- */
+@media (max-width: 640px) {
+  body { padding: 10px 6px; }
+  .card { padding: 16px 14px; border-radius: 10px; }
+  .card > h1:first-child { font-size: 1.45em; }
+  .card > h2 { font-size: 1.12em; }
+  .facet-h { font-size: 1.08em; padding: 10px 12px; }
+  .facet-body { padding: 2px 12px 14px; }
+  .card table { display: block; overflow-x: auto; white-space: nowrap; }
+  .wb-controls { flex-wrap: wrap; }
+}
+
+@media print {
+  @page { margin: 14mm 12mm; }
+  body { padding: 0; background: #fff; font-size: 11.5pt; line-height: 1.65; }
+  .card {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .card > h2 { page-break-after: avoid; break-after: avoid; }
+  /* 打印：折叠面全部展开（beforeprint 已打开），隐去折叠按钮与箭头 */
+  .facet-toolbar { display: none; }
+  details.facet { border: 0; border-radius: 0; margin: 20px 0 0; }
+  details.facet[open] { box-shadow: none; }
+  .facet-h { page-break-after: avoid; break-after: avoid; background: none; border-left-width: 4px; padding: 6px 0 6px 10px; }
+  .facet-h::before { display: none; }
+  .facet-body { padding: 0 0 0 10px; }
+  .card table, .card pre, .card blockquote, .card img { page-break-inside: avoid; break-inside: avoid; }
+  .card a { color: inherit; text-decoration: none; }
+  /* 打印时：交互组件保留图形、隐去滑块（滑块打印无意义） */
+  .wb-widget { page-break-inside: avoid; break-inside: avoid; border-color: #ccc; background: #fff; }
+  .wb-controls { display: none; }
+  .km-svg, .gb-block { page-break-inside: avoid; break-inside: avoid; }
+  .gb-copy { display: none; }
+}

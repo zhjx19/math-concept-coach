@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>概念卡画廊 · math-concept-coach</title>
+<style>
+:root { --line:#e3e8ee; --muted:#5b6570; --accent:#2f6fb3; }
+* { box-sizing: border-box; }
+body {
+  margin: 0; padding: 36px 20px 56px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei",
+               "PingFang SC", "Noto Sans CJK SC", sans-serif;
+  background: #f6f8fa; color: #1f2328; line-height: 1.7;
+}
+.wrap { max-width: 1040px; margin: 0 auto; }
+h1 { font-size: 1.8em; margin: 0 0 6px; }
+.sub { color: var(--muted); margin: 0 0 4px; }
+.howto {
+  margin: 20px 0 28px; padding: 14px 18px; background: #fff;
+  border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 10px;
+}
+.howto code { background:#f2f4f7; padding:1px 6px; border-radius:4px; font-size:.92em; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 18px; }
+.card {
+  background: #fff; border: 1px solid var(--line); border-radius: 12px;
+  padding: 18px 20px 16px; display: flex; flex-direction: column;
+  box-shadow: 0 1px 3px rgba(16,24,40,.05);
+}
+.card:hover { box-shadow: 0 4px 14px rgba(16,24,40,.09); }
+.card h2 { margin: 0 0 4px; font-size: 1.22em; }
+.card h2 a { color: #1f2328; text-decoration: none; }
+.card h2 a:hover { color: var(--accent); }
+.meta { color: var(--muted); font-size: 13px; margin-bottom: 10px; }
+.tag {
+  display:inline-block; padding: 2px 9px; border-radius: 999px; font-size: 12px;
+  color: #fff; margin-right: 6px;
+}
+.tag.course { background: #6b7684; }
+.tag.act { background: #eef2f7; color: #46505c; border: 1px solid var(--line); }
+.hook {
+  font-size: 14px; color: #333c46; background: #fbfcfe;
+  border-left: 3px solid #cfe0f2; padding: 8px 12px; border-radius: 6px; margin: 8px 0 12px;
+}
+.stats { margin-top: auto; font-size: 12.5px; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 10px; }
+.stats b { color: #333c46; font-weight: 600; }
+footer { margin-top: 34px; color: var(--muted); font-size: 13px; text-align: center; }
+@media (max-width: 640px) { body { padding: 20px 12px 36px; } }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>概念卡画廊</h1>
+    <p class="sub">下面是本技能的<b>真实产物</b>——不是截图，是可以直接点开、拖动、打印的离线 HTML。</p>
+
+    <div class="howto">
+      <b>怎么看</b>：点标题打开卡片 → 找到里面的图形 →
+      <b>先预测再拖动</b>（猜一下拖到某个值会发生什么，再拖，看猜得对不对）。<br>
+      <b>怎么造</b>：对 AI 说「怎么理解一致连续？」即可生成同款卡片；
+      或手写 Markdown 后跑
+      <code>python scripts/md2card.py "概念卡/XX-概念卡.md"</code>。<br>
+      <b>重建本页</b>：增删卡片后跑 <code>python scripts/make_gallery.py</code>。
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2><a href="一致连续-概念卡.html">一致连续</a></h2>
+        <div class="meta">
+          <span class="tag course">数学分析 · 函数连续性</span>
+          <span class="tag" style="background:#2f6fb3">函数图像</span>
+          <span class="tag act">认知动作：连续</span>
+        </div>
+        <div class="hook">💡 同一个 δ 要能管住整条区间，不能每换一个点就换一把尺子。</div>
+        <div class="stats">
+          <b>77 KB</b> 单文件 ·
+          公式 <b>72</b> 处 ·
+          交互组件 <b>1</b> 个 ·
+          知识图谱 <b>1</b> 张 ·
+          GeoGebra 指令 <b>1</b> 块
+        </div>
+      </div>
+      <div class="card">
+        <h2><a href="数列极限-概念卡.html">数列极限</a></h2>
+        <div class="meta">
+          <span class="tag course">数学分析 · 数列极限</span>
+          <span class="tag" style="background:#1f8a63">数列 ε–N</span>
+          <span class="tag act">认知动作：逼近（离散）</span>
+        </div>
+        <div class="hook">💡 不管你把尺子划多细，这个数列从某一项往后，全都待在尺子的范围内。</div>
+        <div class="stats">
+          <b>94 KB</b> 单文件 ·
+          公式 <b>138</b> 处 ·
+          交互组件 <b>1</b> 个 ·
+          知识图谱 <b>1</b> 张 ·
+          GeoGebra 指令 <b>1</b> 块
+        </div>
+      </div>
+      <div class="card">
+        <h2><a href="矩阵的秩-概念卡.html">矩阵的秩</a></h2>
+        <div class="meta">
+          <span class="tag course">高等代数 · 矩阵</span>
+          <span class="tag" style="background:#7a5ea8">线性变换</span>
+          <span class="tag act">认知动作：变换</span>
+        </div>
+        <div class="hook">💡 这个变换把空间压扁到了几维——压不扁就是满秩，压成一条线就是秩 1。</div>
+        <div class="stats">
+          <b>93 KB</b> 单文件 ·
+          公式 <b>100</b> 处 ·
+          交互组件 <b>1</b> 个 ·
+          知识图谱 <b>1</b> 张 ·
+          GeoGebra 指令 <b>1</b> 块
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      共 3 张卡片 · 全部单文件离线（0 外部依赖）· 由 math-concept-coach 生成
+    </footer>
+  </div>
+</body>
+</html>
