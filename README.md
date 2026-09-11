@@ -214,6 +214,7 @@ python3 "<技能目录>/scripts/md2card.py" "examples/数列极限-概念卡.md"
 math-concept-coach/
 ├── SKILL.md                       技能主文件（工作流、纪律红线、自检清单）
 ├── README.md                      本文件
+├── CHANGELOG.md                   更新日志（每个版本"为什么改"）
 ├── LICENSE                        MIT
 ├── .claude-plugin/
 │   └── marketplace.json           Claude Code 插件市场清单（双通道）
