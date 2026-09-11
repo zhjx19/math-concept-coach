@@ -1,0 +1,12 @@
+# 统一换行符：仓库内存 LF。
+# 否则在 Windows 上 checkout 成 CRLF 后，带 shebang 的 .py 脚本
+# 在 macOS / Linux 上直接 ./xxx.py 执行会失败（^M: bad interpreter）。
+* text=auto eol=lf
+
+*.gif binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ico binary
+*.pdf binary
+*.zip binary
