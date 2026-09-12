@@ -4,7 +4,7 @@
 # 录的是什么
 #   把一张 Markdown 概念卡渲染成「离线单文件可交互 HTML」这条真实命令行。
 #   演示 GIF 已移出仓库（曾被 SkillHub 禁传类型拦截），
-#   由 scripts/make_demo_gif.py 用 Chromium 真实渲染生成，两者互补。
+#   需要时由 scripts/make_demo_gif.py 重新生成。
 #
 # 怎么录
 #   在技能根目录执行：vhs assets/demo.tape
