@@ -9,7 +9,6 @@
 ![License](https://img.shields.io/badge/license-MIT-yellow)
 ![skills.sh](https://skills.sh/b/zhjx19/math-concept-coach)
 
-![演示：数列极限概念卡——六棱镜逐面拆解 · 拖动 ε 看 N 怎么变 · 知识图谱](assets/demo.gif)
 
 **🌐 在线预览（免安装，点开即玩）**：<https://zhjx19.github.io/math-concept-coach/>
 —— 直接点开三张真实概念卡，拖滑块看「一致连续 / 数列极限 / 矩阵的秩」。
@@ -239,12 +238,11 @@ math-concept-coach/
 │   ├── knowledge_map.py           知识图谱 SVG 生成（可单独自测）
 │   ├── texmath.py                 降级用的 LaTeX → MathML 转换器（可单独自测）
 │   ├── make_gallery.py            扫描 examples/ 重建画廊首页
-│   ├── make_demo_gif.py           用 Chromium 真实渲染生成 assets/demo.gif
+│   ├── make_demo_gif.py           可选：用 Chromium 渲染演示 GIF（已移出仓库，需要时再生成）
 │   └── (smoke_test_widgets.mjs)   交互组件回归测试 —— 仅开发用，未打进分发包
 ├── assets/
 │   ├── card-widgets.js            交互组件库（plot / seq / riemann / matrix2 / vectors2）
 │   ├── concept-card.css           概念卡样式（浅色、可打印、窄屏适配）
-│   ├── demo.gif                   README 首图演示（浏览器真实渲染回放）
 │   └── demo.tape                  vhs 录制脚本（终端流水线那一段）
 └── examples/
     ├── index.html                 画廊首页（可点开看真实产物）
