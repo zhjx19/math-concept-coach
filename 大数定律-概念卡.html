@@ -1,0 +1,1850 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>大数定律 · 六棱镜拆解</title>
+<style>
+/* ============================================================
+   概念卡样式（concept-card.css）
+   浅色主题 · 离线可用 · 可打印
+   ============================================================ */
+
+:root {
+  --ink: #1f2328;
+  --muted: #5b6570;
+  --line: #e4e8ec;
+  --line-strong: #cdd5dd;
+  --bg: #ffffff;
+  --soft: #f7f9fb;
+  --accent: #2f6fb3;
+  --accent-soft: #eaf2fa;
+
+  /* 六棱镜各面配色 */
+  --f1: #c2582a;  /* 正反 */
+  --f2: #1f8a63;  /* 直观 */
+  --f3: #2f6fb3;  /* 严格 */
+  --f4: #7a4fb3;  /* 意义 */
+  --f5: #a8791a;  /* 图形 */
+  --f6: #475569;  /* 联系 */
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  padding: 32px 16px 64px;
+  background: #f2f5f8;
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei",
+               "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", sans-serif;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+/* ---------- 卡片容器 ---------- */
+.card {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 40px 44px 56px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 0 6px 28px rgba(31, 35, 40, 0.07);
+}
+
+/* ---------- 标题 ---------- */
+.card > h1:first-child {
+  margin: 0 0 6px;
+  padding-bottom: 14px;
+  font-size: 26px;
+  line-height: 1.4;
+  border-bottom: 3px solid var(--accent);
+}
+.card > h1:first-child::after {
+  content: "概念卡 · 六棱镜拆解";
+  display: block;
+  margin-top: 8px;
+  font-size: 12.5px;
+  font-weight: 400;
+  letter-spacing: .12em;
+  color: var(--muted);
+}
+
+/* 非「面」的小节标题（自检、错位清单等） */
+.card > h2 {
+  margin: 40px 0 14px;
+  padding: 8px 0 8px 16px;
+  font-size: 19px;
+  line-height: 1.5;
+  border-left: 5px solid var(--accent);
+  background: linear-gradient(90deg, var(--accent-soft), transparent 72%);
+  border-radius: 0 6px 6px 0;
+}
+
+/* ---------- 六棱镜各面：折叠面板（渐进揭示） ---------- */
+.facet-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin: 30px 0 -10px;
+}
+.facet-toggle {
+  font: inherit;
+  font-size: 13px;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid #cddff0;
+  border-radius: 999px;
+  padding: 4px 14px;
+  cursor: pointer;
+}
+.facet-toggle:hover { background: #dceaf8; }
+
+details.facet {
+  margin: 26px 0 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+}
+details.facet[open] { box-shadow: 0 1px 6px rgba(31, 35, 40, 0.05); }
+
+.facet-h {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 12px 16px;
+  font-size: 18px;
+  line-height: 1.5;
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+  border-left: 5px solid var(--accent);
+  background: linear-gradient(90deg, var(--accent-soft), transparent 72%);
+}
+.facet-h::-webkit-details-marker { display: none; }
+.facet-h::before {
+  content: "▸";
+  flex: 0 0 auto;
+  font-size: 14px;
+  color: var(--muted);
+  transition: transform .15s ease;
+}
+details.facet[open] > .facet-h::before { transform: rotate(90deg); }
+
+.facet-h.f1 { border-left-color: var(--f1); background: linear-gradient(90deg,#fbeee8,transparent 72%); }
+.facet-h.f2 { border-left-color: var(--f2); background: linear-gradient(90deg,#e8f6f1,transparent 72%); }
+.facet-h.f3 { border-left-color: var(--f3); background: linear-gradient(90deg,#eaf2fa,transparent 72%); }
+.facet-h.f4 { border-left-color: var(--f4); background: linear-gradient(90deg,#f1ecfa,transparent 72%); }
+.facet-h.f5 { border-left-color: var(--f5); background: linear-gradient(90deg,#faf3e3,transparent 72%); }
+.facet-h.f6 { border-left-color: var(--f6); background: linear-gradient(90deg,#eef1f5,transparent 72%); }
+
+.facet-body { padding: 4px 18px 16px; }
+
+/* 面内的小节标题（### 定义、### 量词骨架 …） */
+.card h3 {
+  margin: 26px 0 10px;
+  font-size: 16.5px;
+  color: var(--accent);
+}
+
+/* ---------- 段落与列表 ---------- */
+.card p { margin: 10px 0; }
+.card ul, .card ol { margin: 10px 0; padding-left: 1.6em; }
+.card li { margin: 5px 0; }
+.card li::marker { color: var(--accent); }
+
+.card strong { color: #0f1419; }
+.card em { color: var(--muted); font-style: normal; background: #fff6d9; padding: 0 3px; border-radius: 3px; }
+
+/* ---------- 表格（三线表） ---------- */
+.card table {
+  width: 100%;
+  margin: 16px 0;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+.card table th, .card table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+.card table thead th {
+  background: var(--soft);
+  border-top: 2px solid var(--line-strong);
+  border-bottom: 1.5px solid var(--line-strong);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.card table tbody tr:last-child td { border-bottom: 2px solid var(--line-strong); }
+.card table tbody tr:hover { background: #fbfcfe; }
+
+/* ---------- 引用块 = 提示框 ---------- */
+.card blockquote {
+  margin: 16px 0;
+  padding: 12px 18px;
+  background: var(--accent-soft);
+  border-left: 4px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  color: #26333f;
+}
+.card blockquote p:first-child { margin-top: 0; }
+.card blockquote p:last-child { margin-bottom: 0; }
+
+/* ---------- 代码 ---------- */
+.card code {
+  padding: 2px 6px;
+  background: #f1f4f7;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+  font-size: .9em;
+}
+.card pre {
+  margin: 16px 0;
+  padding: 14px 16px;
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow-x: auto;
+  line-height: 1.6;
+}
+.card pre code { padding: 0; background: none; border: 0; }
+
+/* ---------- 分隔线 ---------- */
+.card hr {
+  margin: 36px 0;
+  border: 0;
+  border-top: 1px dashed var(--line-strong);
+}
+
+/* ---------- 公式（MathML） ---------- */
+.card math { font-size: 1.06em; }
+.card math[display="block"],
+.card .math.display {
+  display: block;
+  margin: 14px 0;
+  text-align: center;
+  overflow-x: auto;
+}
+
+/* ---------- 图形演示占位 ---------- */
+.card img { max-width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--line); }
+.card .hint {
+  margin: 10px 0;
+  padding: 10px 14px;
+  background: #fffaf0;
+  border: 1px dashed #e0b978;
+  border-radius: 8px;
+  font-size: 14.5px;
+  color: #6b4a12;
+}
+
+/* ============================================================
+   自绘交互组件（card-widgets.js）
+   ============================================================ */
+.wb-widget {
+  margin: 18px 0 22px;
+  padding: 14px 16px 12px;
+  background: #fcfdfe;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.wb-canvas {
+  display: block;
+  width: 100%;
+  border-radius: 8px;
+  background: #fff;
+  touch-action: none;
+}
+.wb-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  margin-top: 12px;
+}
+.wb-ctl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  color: var(--ink);
+  min-width: 210px;
+  flex: 1 1 210px;
+}
+.wb-ctl-name { font-weight: 600; white-space: nowrap; }
+.wb-ctl input[type="range"] {
+  flex: 1 1 auto;
+  min-width: 80px;
+  accent-color: var(--accent);
+  height: 20px;
+}
+.wb-ctl-out {
+  min-width: 56px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+  font-weight: 600;
+}
+.wb-readout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+  margin-top: 10px;
+  padding-top: 9px;
+  border-top: 1px dashed var(--line-strong);
+  font-size: 13.5px;
+  color: var(--muted);
+}
+.wb-ro b { color: var(--ink); font-weight: 600; }
+.wb-ro { font-variant-numeric: tabular-nums; }
+.wb-hint {
+  margin: 11px 0 0;
+  padding: 9px 13px;
+  background: #fffaf0;
+  border: 1px dashed #e0b978;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #6b4a12;
+}
+.wb-err {
+  margin: 0;
+  padding: 10px 14px;
+  background: #fdeeee;
+  border: 1px solid #e8b4b4;
+  border-radius: 8px;
+  color: #a33232;
+  font-size: 14px;
+}
+
+/* ============================================================
+   GeoGebra 指令块
+   ============================================================ */
+.gb-block {
+  margin: 18px 0;
+  border: 1px solid #cfe0d4;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fbfdfb;
+}
+.gb-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 14px;
+  background: #eef6f0;
+  border-bottom: 1px solid #d8e9dd;
+  font-size: 13.5px;
+  color: #1f6b4a;
+}
+.gb-copy {
+  flex: 0 0 auto;
+  padding: 5px 13px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #fff;
+  background: #1f8a63;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.gb-copy:hover { background: #176f4f; }
+.gb-block pre {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: #fbfdfb;
+  font-size: 13.5px;
+}
+
+/* ============================================================
+   Python / R 代码选项卡（sim 模拟 / calc 概念计算器：默认 Python，可切换 R）
+   ============================================================ */
+.sim-block {
+  margin: 18px 0;
+  border: 1px solid #d3dcea;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fcfdff;
+}
+.sim-block[data-kind="calc"] { border-color: #cfe6d8; }
+.sim-block[data-kind="calc"] .sim-head { background: #eaf6ef; border-bottom-color: #d3e8dc; }
+.sim-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 10px 7px 12px;
+  background: #eef2fa;
+  border-bottom: 1px solid #dbe3f0;
+}
+.sim-kind {
+  margin-right: auto;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #46505c;
+  white-space: nowrap;
+}
+.sim-tabs { display: flex; gap: 6px; }
+.sim-tab {
+  padding: 4px 14px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #5b6570;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.sim-tab:hover { color: #2f6fb3; }
+.sim-tab.is-active {
+  color: #1d5c9e;
+  background: #fff;
+  border-color: #c3d2e8;
+  font-weight: 600;
+}
+.sim-copy {
+  flex: 0 0 auto;
+  padding: 4px 12px;
+  font-size: 12.5px;
+  font-family: inherit;
+  color: #2f6fb3;
+  background: #fff;
+  border: 1px solid #c3d2e8;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.sim-copy:hover { background: #e3ecf8; }
+.sim-pane {
+  display: none;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: #fcfdff;
+  font-size: 13.5px;
+}
+.sim-pane.is-active { display: block; }
+.sim-pane code { display: block; padding: 12px 14px; }
+
+/* ============================================================
+   知识图谱（knowledge_map.py 生成的内联 SVG）
+   ============================================================ */
+.km-svg {
+  display: block;
+  width: 100%;
+  margin: 20px 0;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei",
+               "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", sans-serif;
+}
+.km-bg { fill: #fff; }
+.km-ttl { font-size: 13px; font-weight: 700; fill: #1f2328; }
+.km-lg { font-size: 11px; fill: #5b6570; }
+.km-cap { font-size: 11px; fill: #7a8693; text-anchor: middle; }
+.km-note { font-size: 12px; fill: #5b6570; text-anchor: middle; }
+
+/* ---------- 打印 ---------- */
+/* ============================================================
+   降级模式（未安装 pandoc 时由内置转换器生成）
+   ============================================================ */
+.fb-note {
+  margin: 18px 0;
+  padding: 12px 16px;
+  background: #fff8e6;
+  border: 1px solid #f0d8a0;
+  border-left: 4px solid #e0a53a;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.75;
+  color: #6b551f;
+}
+.fb-note strong { color: #8a5a00; }
+
+/* 内置转换器解析不了的公式：原样显示 LaTeX 源码，绝不做半吊子猜测 */
+code.math-src {
+  font-family: "JetBrains Mono", Consolas, "Courier New", monospace;
+  font-size: 0.92em;
+  background: #f4f6f8;
+  border: 1px solid #e3e8ee;
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+math { font-size: 1.02em; }
+
+/* ---------- 窄屏（手机）适配 ---------- */
+@media (max-width: 640px) {
+  body { padding: 10px 6px; }
+  .card { padding: 16px 14px; border-radius: 10px; }
+  .card > h1:first-child { font-size: 1.45em; }
+  .card > h2 { font-size: 1.12em; }
+  .facet-h { font-size: 1.08em; padding: 10px 12px; }
+  .facet-body { padding: 2px 12px 14px; }
+  .card table { display: block; overflow-x: auto; white-space: nowrap; }
+  .wb-controls { flex-wrap: wrap; }
+}
+
+@media print {
+  @page { margin: 14mm 12mm; }
+  body { padding: 0; background: #fff; font-size: 11.5pt; line-height: 1.65; }
+  .card {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .card > h2 { page-break-after: avoid; break-after: avoid; }
+  /* 打印：折叠面全部展开（beforeprint 已打开），隐去折叠按钮与箭头 */
+  .facet-toolbar { display: none; }
+  details.facet { border: 0; border-radius: 0; margin: 20px 0 0; }
+  details.facet[open] { box-shadow: none; }
+  .facet-h { page-break-after: avoid; break-after: avoid; background: none; border-left-width: 4px; padding: 6px 0 6px 10px; }
+  .facet-h::before { display: none; }
+  .facet-body { padding: 0 0 0 10px; }
+  .card table, .card pre, .card blockquote, .card img { page-break-inside: avoid; break-inside: avoid; }
+  .card a { color: inherit; text-decoration: none; }
+  /* 打印时：交互组件保留图形、隐去滑块（滑块打印无意义） */
+  .wb-widget { page-break-inside: avoid; break-inside: avoid; border-color: #ccc; background: #fff; }
+  .wb-controls { display: none; }
+  .km-svg, .gb-block { page-break-inside: avoid; break-inside: avoid; }
+  .gb-copy { display: none; }
+  /* 打印：模拟代码不显示选项卡，Python / R 两段全部展示，用标签行区分 */
+  .sim-block { page-break-inside: avoid; break-inside: avoid; border-color: #ccc; background: #fff; }
+  .sim-head { display: none; }
+  .sim-pane { display: block !important; border-top: 1px dashed #ccc; font-size: 10.5pt; }
+  .sim-pane:first-of-type { border-top: 0; }
+  .sim-pane::before {
+    content: attr(data-label);
+    display: block;
+    padding: 6px 14px 0;
+    font-weight: 700;
+    font-size: 10.5pt;
+    color: #1d5c9e;
+  }
+}
+
+</style>
+</head>
+<body>
+<main class="card">
+<h1 id="大数定律-六棱镜拆解">大数定律 · 六棱镜拆解</h1>
+<blockquote>
+<p>📌 所属：概率论与数理统计 · 极限定理 | 教材：以你教材对应章节为准 🎯
+<strong>学完你应该能</strong>：写出「依概率收敛」的定义、说出它与「数列收敛」的差别、默写切比雪夫不等式两步证明、解释「频率稳定到概率」到底稳定了什么。
+💡
+<strong>一句话钩子</strong>：单次结果没法预测，但大量重复的<strong>平均结果</strong>却出奇地稳——混乱中有铁律。
+🧱 <strong>假设基底（待你确认）</strong>：我猜你已经会「随机变量、期望
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>X</mi><mo>=</mo><mi>μ</mi></mrow><annotation encoding="application/x-tex">E X=\mu</annotation></semantics></math>、方差
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>σ</mi><mn>2</mn></msup><annotation encoding="application/x-tex">\sigma^2</annotation></semantics></math>、独立性」——<strong>你觉得自己会吗？</strong>
+→ 缺「<strong>怎样把『平均结果越来越稳』说成一句能证明的话</strong>」→
+本概念补上这一步。</p>
+</blockquote>
+<hr />
+<div class="facet-toolbar"><button type="button" class="facet-toggle" data-open="1">收起全部</button></div><details class="facet" open><summary class="facet-h f1">F1 正反拆解：边界在哪</summary><div class="facet-body">
+<h3 id="正例">正例</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>现象</th>
+<th>稳到哪</th>
+<th>为什么稳</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>抛硬币的正面频率
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ν</mi><mi>n</mi></msub><mi>/</mi><mi>n</mi></mrow><annotation encoding="application/x-tex">\nu_n/n</annotation></semantics></math></td>
+<td>概率
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math></td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+越大，频率与
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math>
+偏差超过
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ε</mi><annotation encoding="application/x-tex">\varepsilon</annotation></semantics></math>
+的概率越小（伯努利大数定律）</td>
+</tr>
+<tr>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+个
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>U</mi><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>10</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">U(0,10)</annotation></semantics></math>
+随机数的均值
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mi>n</mi></msub><mi>/</mi><mi>n</mi></mrow><annotation encoding="application/x-tex">S_n/n</annotation></semantics></math></td>
+<td>期望
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>5</mn><annotation encoding="application/x-tex">5</annotation></semantics></math></td>
+<td>iid + 期望存在（辛钦大数定律，见 F5 模拟实测）</td>
+</tr>
+<tr>
+<td>保险公司一年赔付总额 / 保单数</td>
+<td>户均期望赔付</td>
+<td>大量近似独立的保单「平均」掉了偶然性</td>
+</tr>
+</tbody>
+</table>
+<h3 id="边界例-最容易暴露误解">边界例 ⭐（最容易暴露误解）</h3>
+<p>无论
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ε</mi><mo>&gt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\varepsilon&gt;0</annotation></semantics></math>
+多大，取
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>X</mi><mi>n</mi></msub><annotation encoding="application/x-tex">X_n</annotation></semantics></math>
+以概率
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mi>/</mi><mi>n</mi></mrow><annotation encoding="application/x-tex">1/n</annotation></semantics></math>
+等于
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>n</mi><mn>2</mn></msup><annotation encoding="application/x-tex">n^2</annotation></semantics></math>、以概率
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>−</mo><mn>1</mn><mi>/</mi><mi>n</mi></mrow><annotation encoding="application/x-tex">1-1/n</annotation></semantics></math>
+等于
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>（各
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>X</mi><mi>n</mi></msub><annotation encoding="application/x-tex">X_n</annotation></semantics></math>
+独立）： 则
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo stretchy="false" form="prefix">(</mo><mo stretchy="false" form="prefix">|</mo><msub><mi>X</mi><mi>n</mi></msub><mo>−</mo><mn>0</mn><mo stretchy="false" form="postfix">|</mo><mo>≥</mo><mi>ε</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mn>1</mn><mi>/</mi><mi>n</mi><mo>→</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">P(\lvert X_n-0\rvert\ge\varepsilon)=1/n\to 0</annotation></semantics></math>，<strong>依概率收敛于
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math></strong>；
+但它<strong>无穷多次</strong>取到巨大值——「从某项起永远贴住
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>」并不成立。</p>
+<blockquote>
+<p>这一条专打字眼漏读：<strong>依概率收敛压的是「概率」，不是「取值本身」</strong>。
+「从某项起全部贴住」是更强的要求（几乎必然收敛，强大数定律的事）。</p>
+</blockquote>
+<h3 id="反例">反例</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>说法</th>
+<th>反例</th>
+<th>它错在哪</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+大时频率就<strong>等于</strong>概率」</td>
+<td>抛
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>100000</mn><annotation encoding="application/x-tex">100000</annotation></semantics></math>
+次硬币，频率
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.5014</mn><mo>≠</mo><mn>0.5</mn></mrow><annotation encoding="application/x-tex">0.5014\ne 0.5</annotation></semantics></math>（F5
+模拟实测）</td>
+<td>大数定律保证偏差<strong>大概率变小</strong>，不保证「等于」</td>
+</tr>
+<tr>
+<td>「样本均值随
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+<strong>单调</strong>靠近期望」</td>
+<td>掷骰子：前两次得
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>,</mo><mn>6</mn></mrow><annotation encoding="application/x-tex">1,6</annotation></semantics></math>，均值
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>3.5</mn><annotation encoding="application/x-tex">3.5</annotation></semantics></math>
+恰等于期望；第三次掷出
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>，均值变
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2.67</mn><annotation encoding="application/x-tex">2.67</annotation></semantics></math>——<strong>反而更远</strong></td>
+<td>收敛不挑路径；「变远」完全可能，只是越来越罕见</td>
+</tr>
+<tr>
+<td>「任何随机变量的平均都稳」</td>
+<td>柯西分布没有期望，其样本均值的分布<strong>仍是柯西</strong>，永远不稳</td>
+<td>前提缺了「期望存在」，结论直接失效</td>
+</tr>
+</tbody>
+</table>
+<hr />
+</div></details><details class="facet"><summary class="facet-h f2">F2 通俗理解</summary><div class="facet-body">
+<p><strong>一句人话</strong>：单次看不透，就多看几次取平均——次数够多时，平均结果<strong>几乎不再看运气</strong>。</p>
+<p><strong>一个类比</strong>：民意调查。问一个人支持不支持，噪声很大；问
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1000</mn><annotation encoding="application/x-tex">1000</annotation></semantics></math>
+个人取比例，结论就稳了。 &gt;
+大数定律说的是：只要被访者是<strong>独立</strong>来的、每个人「支持与否」有确定的概率
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math>，
+&gt; 那么样本比例与
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math>
+偏差超过
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ε</mi><annotation encoding="application/x-tex">\varepsilon</annotation></semantics></math>
+的概率，随样本量增大被压向
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>。</p>
+<p><strong>失效边界（类比在哪儿不灵）</strong>： -
+只调查<strong>同一间办公室</strong>——样本不独立，问一万人也只是一个人的意见放大，不稳。
+-
+要平均的量<strong>没有期望</strong>（如柯西分布那种被极端值主导的「平均」）——没有锚点，谈不上稳。
+-
+「稳」是<strong>概率意义</strong>的稳：仍有可能（概率很小）抽出一批极端样本让比例偏远。</p>
+<p><strong>为什么需要它</strong>：它是<strong>概率论通向现实的桥</strong>——频率解释概率、保险定价、蒙特卡洛方法、
+统计里「估计量的相合性」，全部站在它上面。没有它，「概率」只是一个自洽的公理游戏。</p>
+<hr />
+</div></details><details class="facet"><summary class="facet-h f3">F3 严格数学表述</summary><div class="facet-body">
+<h3 id="定义依概率收敛">定义（依概率收敛）</h3>
+<blockquote>
+<p>设
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>X</mi><mn>1</mn></msub><mo>,</mo><msub><mi>X</mi><mn>2</mn></msub><mo>,</mo><mi>…</mi></mrow><annotation encoding="application/x-tex">X_1,X_2,\dots</annotation></semantics></math>
+为随机变量列，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>X</mi><annotation encoding="application/x-tex">X</annotation></semantics></math>
+为随机变量（或常数）。若
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∀</mo><mi>ε</mi><mo>&gt;</mo><mn>0</mn><mo>:</mo><mspace width="1.0em"></mspace><munder><mi mathvariant="normal">lim</mi><mrow><mi>n</mi><mo>→</mo><mi>∞</mi></mrow></munder><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo stretchy="false" form="prefix">|</mo><msub><mi>X</mi><mi>n</mi></msub><mo>−</mo><mi>X</mi><mo stretchy="false" form="postfix">|</mo><mo>≥</mo><mi>ε</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\forall\varepsilon&gt;0:\quad \lim_{n\to\infty}P\left(\lvert X_n-X\rvert\ge\varepsilon\right)=0</annotation></semantics></math>
+则称
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>X</mi><mi>n</mi></msub><annotation encoding="application/x-tex">X_n</annotation></semantics></math>
+<strong>依概率收敛</strong>于
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>X</mi><annotation encoding="application/x-tex">X</annotation></semantics></math>，记作
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>X</mi><mi>n</mi></msub><mo>→</mo><mi>X</mi><mspace width="0.222em"></mspace><mo stretchy="false" form="prefix">(</mo><mi>n</mi><mo>→</mo><mi>∞</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">X_n\to X\ (n\to\infty)</annotation></semantics></math>〔教材口径〕。</p>
+</blockquote>
+<h3 id="量词骨架三个人物">量词骨架（三个人物）</h3>
+<ul>
+<li><strong><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ε</mi><annotation encoding="application/x-tex">\varepsilon</annotation></semantics></math>（对手出的精度）</strong>：不管你要多小的容许偏差；</li>
+<li><strong><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>（你手中的样本量）</strong>：足够大之后；</li>
+<li><strong><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo stretchy="false" form="prefix">(</mo><mi>⋅</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">P(\cdot)</annotation></semantics></math>（概率的尺子）</strong>：「偏差超过
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ε</mi><annotation encoding="application/x-tex">\varepsilon</annotation></semantics></math>」这一事件的<strong>概率</strong>被压到
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>。</li>
+</ul>
+<blockquote>
+<p>与 ε–N 的关键差别：ε–N
+压的是「<strong>项</strong>」（带外只剩有限多项），这里压的是「<strong>概率</strong>」
+（带外事件变得罕见，但仍<strong>可能</strong>发生）。对象从确定的数换成了随机变量，量词骨架不变。</p>
+</blockquote>
+<h3 id="这是定义还是定理">这是定义还是定理</h3>
+<ul>
+<li><strong>依概率收敛</strong>是<strong>定义</strong>；</li>
+<li><strong>大数定律是定理</strong>（三条常见版本，见文末核对提示）：
+<ul>
+<li><strong>伯努利</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>ν</mi><mi>n</mi></msub><annotation encoding="application/x-tex">\nu_n</annotation></semantics></math>
+为
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+次独立重复试验中成功的次数，则频率
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ν</mi><mi>n</mi></msub><mi>/</mi><mi>n</mi></mrow><annotation encoding="application/x-tex">\nu_n/n</annotation></semantics></math>
+依概率收敛于成功概率
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math>；</li>
+<li><strong>切比雪夫</strong>：iid（或方差一致有界）且方差存在，则
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mi>n</mi></msub><mi>/</mi><mi>n</mi></mrow><annotation encoding="application/x-tex">S_n/n</annotation></semantics></math>
+依概率收敛于
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>μ</mi><annotation encoding="application/x-tex">\mu</annotation></semantics></math>；</li>
+<li><strong>辛钦</strong>：iid
+且<strong>期望存在</strong>（不必有方差），则
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mi>n</mi></msub><mi>/</mi><mi>n</mi></mrow><annotation encoding="application/x-tex">S_n/n</annotation></semantics></math>
+依概率收敛于
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><msub><mi>X</mi><mn>1</mn></msub><mo>=</mo><mi>μ</mi></mrow><annotation encoding="application/x-tex">E X_1=\mu</annotation></semantics></math>。</li>
+</ul></li>
+</ul>
+<h3 id="删条件实验-前提为什么一个都不能少">删条件实验
+⭐（前提为什么一个都不能少）</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>删掉哪个</th>
+<th>会冒出什么</th>
+<th>后果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>删「<strong>独立</strong>」</td>
+<td>取
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>X</mi><mn>1</mn></msub><mo>=</mo><msub><mi>X</mi><mn>2</mn></msub><mo>=</mo><mi>⋯</mi><mo>=</mo><msub><mi>X</mi><mi>n</mi></msub><mo>=</mo><mi>⋯</mi><mo>=</mo><msub><mi>X</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">X_1=X_2=\cdots=X_n=\cdots=X_1</annotation></semantics></math>（完全相关）：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mi>n</mi></msub><mi>/</mi><mi>n</mi><mo>=</mo><msub><mi>X</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">S_n/n=X_1</annotation></semantics></math></td>
+<td>样本均值仍是<strong>随机变量</strong>，不收敛于常数
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>μ</mi><annotation encoding="application/x-tex">\mu</annotation></semantics></math>——<strong>崩</strong></td>
+</tr>
+<tr>
+<td>删「<strong>期望存在</strong>」</td>
+<td>柯西分布：样本均值的分布仍是柯西</td>
+<td>没有锚点
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>μ</mi><annotation encoding="application/x-tex">\mu</annotation></semantics></math>，「稳定到哪」无从谈起——<strong>崩</strong></td>
+</tr>
+<tr>
+<td>弱化「<strong>同分布</strong>」为「方差一致有界」</td>
+<td>各
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>X</mi><mi>i</mi></msub><annotation encoding="application/x-tex">X_i</annotation></semantics></math>
+分布可以不同</td>
+<td>结论<strong>仍成立</strong>（这就是切比雪夫大数定律）——<strong>换条件，另立定理</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>亲手做过这三条，你才会明白：前提不是吓唬人的门禁，<strong>每一条都对应一类反例或一类推广</strong>。</p>
+</blockquote>
+<h3
+id="操作骨架怎么用大数定律证估计是相合的">操作骨架：怎么用大数定律证「估计是相合的」</h3>
+<p>① 把统计量写成<strong>样本均值的形状</strong>（如频率
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>=</mo><mstyle displaystyle="true"><mfrac><mn>1</mn><mi>n</mi></mfrac></mstyle><mo>∑</mo><msub><mi>X</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">=\dfrac{1}{n}\sum X_i</annotation></semantics></math>，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>X</mi><mi>i</mi></msub><annotation encoding="application/x-tex">X_i</annotation></semantics></math>
+为示性变量）； ② 验证前提（iid？期望存在？）； ③ 引用对应的大数定律； ④
+结论：该估计<strong>依概率收敛</strong>于目标量（相合）。</p>
+<h3
+id="读证明切比雪夫不等式是大数定律的发动机定理不能只背结论">读证明：切比雪夫不等式是大数定律的发动机（定理不能只背结论）</h3>
+<p><strong>切比雪夫不等式</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo stretchy="false" form="prefix">(</mo><mo stretchy="false" form="prefix">|</mo><mi>Z</mi><mo stretchy="false" form="postfix">|</mo><mo>≥</mo><mi>ε</mi><mo stretchy="false" form="postfix">)</mo><mo>≤</mo><mstyle displaystyle="true"><mfrac><mrow><mi>E</mi><msup><mi>Z</mi><mn>2</mn></msup></mrow><msup><mi>ε</mi><mn>2</mn></msup></mfrac></mstyle></mrow><annotation encoding="application/x-tex">P(\lvert Z\rvert\ge\varepsilon)\le\dfrac{E Z^2}{\varepsilon^2}</annotation></semantics></math>。
+两步读完它的证明：① 对非负随机变量
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>Z</mi><mn>2</mn></msup><annotation encoding="application/x-tex">Z^2</annotation></semantics></math>
+用马尔可夫不等式：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo stretchy="false" form="prefix">(</mo><msup><mi>Z</mi><mn>2</mn></msup><mo>≥</mo><msup><mi>ε</mi><mn>2</mn></msup><mo stretchy="false" form="postfix">)</mo><mo>≤</mo><mstyle displaystyle="true"><mfrac><mrow><mi>E</mi><msup><mi>Z</mi><mn>2</mn></msup></mrow><msup><mi>ε</mi><mn>2</mn></msup></mfrac></mstyle></mrow><annotation encoding="application/x-tex">P(Z^2\ge\varepsilon^2)\le\dfrac{E Z^2}{\varepsilon^2}</annotation></semantics></math>；
+② 事件
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><mo stretchy="false" form="prefix">|</mo><mi>Z</mi><mo stretchy="false" form="postfix">|</mo><mo>≥</mo><mi>ε</mi><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\{\lvert Z\rvert\ge\varepsilon\}</annotation></semantics></math>
+与
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msup><mi>Z</mi><mn>2</mn></msup><mo>≥</mo><msup><mi>ε</mi><mn>2</mn></msup><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\{Z^2\ge\varepsilon^2\}</annotation></semantics></math>
+是<strong>同一事件</strong>。∎</p>
+<p><strong>用它证切比雪夫大数定律</strong>：取
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Z</mi><mo>=</mo><msub><mi>S</mi><mi>n</mi></msub><mi>/</mi><mi>n</mi><mo>−</mo><mi>μ</mi></mrow><annotation encoding="application/x-tex">Z=S_n/n-\mu</annotation></semantics></math>。由<strong>独立性</strong>，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><msub><mi>S</mi><mi>n</mi></msub><mo>=</mo><mi>n</mi><msup><mi>σ</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">D S_n=n\sigma^2</annotation></semantics></math>，故
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mrow><mo stretchy="true" form="prefix">|</mo><mstyle displaystyle="true"><mfrac><msub><mi>S</mi><mi>n</mi></msub><mi>n</mi></mfrac></mstyle><mo>−</mo><mi>μ</mi><mo stretchy="true" form="postfix">|</mo></mrow><mo>≥</mo><mi>ε</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>≤</mo><mstyle displaystyle="true"><mfrac><msup><mi>σ</mi><mn>2</mn></msup><mrow><mi>n</mi><msup><mi>ε</mi><mn>2</mn></msup></mrow></mfrac></mstyle><mspace width="0.222em"></mspace><mo>→</mo><mspace width="0.222em"></mspace><mn>0</mn><mspace width="1.0em"></mspace><mo stretchy="false" form="prefix">(</mo><mi>n</mi><mo>→</mo><mi>∞</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">P\left(\left\lvert\dfrac{S_n}{n}-\mu\right\rvert\ge\varepsilon\right)\le\dfrac{\sigma^2}{n\varepsilon^2}\ \longrightarrow\ 0\quad(n\to\infty)</annotation></semantics></math>
+&gt;
+读证明时盯住两处：<strong>方差相加</strong>（<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><msub><mi>S</mi><mi>n</mi></msub><mo>=</mo><mi>n</mi><msup><mi>σ</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">D S_n=n\sigma^2</annotation></semantics></math>）靠的是独立；<strong><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+落在分母</strong>—— &gt; 这就是「越平均越稳」的全部代数来源。</p>
+<p><strong>这个界有多保守？跑一遍看看</strong>（模拟本身就是大数定律的一次现场演出）：</p>
+<div class="sim-block" data-lang="python" data-kind="sim">
+<div class="sim-head">
+<span class="sim-kind">模拟 · 跑起来才看得见</span>
+<div class="sim-tabs" role="tablist">
+<button type="button" class="sim-tab is-active" data-lang="python">
+Python
+</button>
+<button type="button" class="sim-tab" data-lang="r">
+R
+</button>
+</div>
+<button type="button" class="sim-copy">
+复制代码
+</button>
+</div>
+<pre class="sim-pane is-active" data-lang="python" data-label="Python"><code># 切比雪夫的上界有多保守？伯努利 p=0.5，重复 B=2000 次实验，每次 n=1000 枚
+import numpy as np
+rng = np.random.default_rng(42)
+B, n, eps = 2000, 1000, 0.05
+# —— 计算：一条指令得到切比雪夫上界 ——
+print(f&quot;切比雪夫上界 = {0.25 / (n * eps**2):.4f}&quot;)
+# —— 模拟：重复 B 次，看经验频率离上界多远 ——
+freq = rng.binomial(n, 0.5, B) / n
+emp = np.mean(np.abs(freq - 0.5) &gt;= eps)
+print(f&quot;P(|频率 - 0.5| &gt;= {eps}) 经验 ≈ {emp:.4f}&quot;)
+# 预期输出:
+# 切比雪夫上界 = 0.1000
+# P(|频率 - 0.5| &gt;= 0.05) 经验 ≈ 0.0040</code></pre>
+<pre class="sim-pane" data-lang="r" data-label="R"><code>suppressMessages(library(tidyverse))
+set.seed(42)
+B = 2000; n = 1000; eps = 0.05
+# —— 计算：一条指令得到切比雪夫上界 ——
+print(0.25 / (n * eps^2))
+# —— 模拟：重复 B 次，看经验频率离上界多远 ——
+freq = rbinom(B, n, 0.5) / n
+print(mean(abs(freq - 0.5) &gt;= eps))
+# 预期输出:（R 4.6.1 实跑；随机数生成器与 Python 不同，经验频率不必相同）
+# [1] 0.1
+# [1] 0.0015</code></pre>
+</div>
+<blockquote>
+<p>先猜再跑：上界
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.1</mn><annotation encoding="application/x-tex">0.1</annotation></semantics></math>
+与经验值差了<strong>几十倍</strong>——切比雪夫界只用了方差信息（不挑分布），
+换来的正是这种「对一切都成立」的保守。另外，两种语言的经验频率本身也不同：
+<strong>蒙特卡洛估计自身也是随机变量</strong>——对它，大数定律照样适用（<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>B</mi><annotation encoding="application/x-tex">B</annotation></semantics></math>
+越大越稳）。</p>
+</blockquote>
+<hr />
+</div></details><details class="facet"><summary class="facet-h f4">F4 几何 / 物理意义</summary><div class="facet-body">
+<p><strong>漏斗图景</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mi>n</mi></msub><mi>/</mi><mi>n</mi></mrow><annotation encoding="application/x-tex">S_n/n</annotation></semantics></math>
+的分布以
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>μ</mi><annotation encoding="application/x-tex">\mu</annotation></semantics></math>
+为中心，标准差为
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>σ</mi><mi>/</mi><msqrt><mi>n</mi></msqrt></mrow><annotation encoding="application/x-tex">\sigma/\sqrt{n}</annotation></semantics></math>——
+把
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+逐次放大，分布像<strong>漏斗</strong>一样向
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>μ</mi><annotation encoding="application/x-tex">\mu</annotation></semantics></math>
+收拢。<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+在分母，就是「越平均越稳」的形状来源。</p>
+<blockquote>
+<p>回指 F3：漏斗的收缩速度来自
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mstyle displaystyle="true"><mfrac><msup><mi>σ</mi><mn>2</mn></msup><mrow><mi>n</mi><msup><mi>ε</mi><mn>2</mn></msup></mrow></mfrac></mstyle><annotation encoding="application/x-tex">\dfrac{\sigma^2}{n\varepsilon^2}</annotation></semantics></math>
+里的
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>——代数与图景对上了。
+诚实说明：漏斗的<strong>精确形状</strong>（钟形）是中心极限定理的结论，大数定律只管「散开程度被压住」，
+不管「压成什么形状」。想精度翻倍，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+要翻<strong>百倍</strong>（<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mi>/</mi><msqrt><mi>n</mi></msqrt></mrow><annotation encoding="application/x-tex">1/\sqrt{n}</annotation></semantics></math>
+的代价）。</p>
+</blockquote>
+<p><strong>物理对应</strong>：测量取平均。单次测量有噪声，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+次独立测量的平均误差按
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mi>/</mi><msqrt><mi>n</mi></msqrt></mrow><annotation encoding="application/x-tex">1/\sqrt{n}</annotation></semantics></math>
+缩小—— 实验物理里「多测几次取平均」的全部合法性，就是这条定理。</p>
+<hr />
+</div></details><details class="facet"><summary class="facet-h f5">F5 图形化演示（模拟代码版）</summary><div class="facet-body">
+<p><strong>认知动作：逼近（随机）</strong> ——
+它要回答的是「大量重复的平均结果稳定到哪里」。</p>
+<blockquote>
+<p><strong>为什么本卡不画滑块图</strong>：大数定律是<strong>随机规律</strong>——要演示的是「随机的样本均值如何随
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+稳定」，
+滑块只能拖出<strong>确定性</strong>曲线，画不出随机性；按「不硬凑」原则，本面用模拟代码承担（跑起来才能看见）。
+示例取景与张敬信《【Tidyverse优雅编程】概率论：两行代码模拟大数定律》一致。</p>
+</blockquote>
+<div class="sim-block" data-lang="python" data-kind="sim">
+<div class="sim-head">
+<span class="sim-kind">模拟 · 跑起来才看得见</span>
+<div class="sim-tabs" role="tablist">
+<button type="button" class="sim-tab is-active" data-lang="python">
+Python
+</button>
+<button type="button" class="sim-tab" data-lang="r">
+R
+</button>
+</div>
+<button type="button" class="sim-copy">
+复制代码
+</button>
+</div>
+<pre class="sim-pane is-active" data-lang="python" data-label="Python"><code>import numpy as np
+rng = np.random.default_rng(1)
+# —— 计算：一条指令得到理论值 ——
+print(&quot;U(0,10) 的期望 =&quot;, (0 + 10) / 2)
+# —— 模拟：样本均值随 n 怎么走（改编自张敬信《两行代码模拟大数定律》） ——
+for n in (100, 1000, 10000, 100000):
+    print(f&quot;n = {n:&gt;6}   样本均值 = {rng.uniform(0, 10, n).mean():.4f}&quot;)
+# 预期输出:
+# U(0,10) 的期望 = 5.0
+# n =    100 样本均值 = 5.1307
+# n =   1000 样本均值 = 5.0408
+# n =  10000 样本均值 = 5.0196
+# n = 100000 样本均值 = 4.9973</code></pre>
+<pre class="sim-pane" data-lang="r" data-label="R"><code>suppressMessages(library(tidyverse))
+# —— 计算：一条指令得到理论值 ——
+print((0 + 10) / 2)
+# —— 模拟：样本均值随 n 怎么走 ——
+set.seed(1)
+print(tibble(n = c(100, 1000, 10000, 100000),
+       `样本均值` = map_dbl(n, \(k) mean(runif(k, 0, 10)))))
+# 预期输出:（R 4.6.1 实跑；随机数生成器与 Python 不同，数值不必相同，均贴近 5）
+# [1] 5
+# # A tibble: 4 × 2
+#       n 样本均值
+#   &lt;dbl&gt;    &lt;dbl&gt;
+# 1   100     5.18
+# 2  1000     4.97
+# 3 10000     5.00
+# 4 100000    4.99</code></pre>
+</div>
+<blockquote>
+<p><strong>先预测再跑</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>U</mi><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>10</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">U(0,10)</annotation></semantics></math>
+的
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>σ</mi><mo>=</mo><mn>10</mn><mi>/</mi><msqrt><mn>12</mn></msqrt><mo>≈</mo><mn>2.89</mn></mrow><annotation encoding="application/x-tex">\sigma=10/\sqrt{12}\approx 2.89</annotation></semantics></math>，按
+F4 的
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>σ</mi><mi>/</mi><msqrt><mi>n</mi></msqrt></mrow><annotation encoding="application/x-tex">\sigma/\sqrt{n}</annotation></semantics></math>
+算：
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>10000</mn></mrow><annotation encoding="application/x-tex">n=10000</annotation></semantics></math>
+时均值的典型波动约
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.03</mn><annotation encoding="application/x-tex">0.03</annotation></semantics></math>——对照实测偏差
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.0196</mn><annotation encoding="application/x-tex">0.0196</annotation></semantics></math>，在
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>
+倍标准差之内吗？ 再看
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+扩大
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>100</mn><annotation encoding="application/x-tex">100</annotation></semantics></math>
+倍（<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>10</mn><mn>3</mn></msup><mo>→</mo><msup><mn>10</mn><mn>5</mn></msup></mrow><annotation encoding="application/x-tex">10^3\to 10^5</annotation></semantics></math>），偏差缩小了几倍？（答案应是约
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>10</mn><annotation encoding="application/x-tex">10</annotation></semantics></math>
+倍——<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mi>/</mi><msqrt><mi>n</mi></msqrt></mrow><annotation encoding="application/x-tex">1/\sqrt{n}</annotation></semantics></math>
+的代价。）</p>
+</blockquote>
+<hr />
+</div></details><h2 id="概念计算器输入-输出">🧮 概念计算器（输入 → 输出）</h2>
+<p>把「大数定律保证多稳」做成一个可以反复调用的<strong>函数</strong>：给定样本量
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+与容许偏差
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ε</mi><annotation encoding="application/x-tex">\varepsilon</annotation></semantics></math>，
+切比雪夫界
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mstyle displaystyle="true"><mfrac><msup><mi>σ</mi><mn>2</mn></msup><mrow><mi>n</mi><msup><mi>ε</mi><mn>2</mn></msup></mrow></mfrac></mstyle><annotation encoding="application/x-tex">\dfrac{\sigma^2}{n\varepsilon^2}</annotation></semantics></math>
+给出「偏差超限概率」的上界；反过来，也能解出 「要把上界压到
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>r</mi><annotation encoding="application/x-tex">r</annotation></semantics></math>，至少需要多少样本」。</p>
+<div class="sim-block" data-lang="python" data-kind="calc">
+<div class="sim-head">
+<span class="sim-kind">计算器 · 输入 → 输出</span>
+<div class="sim-tabs" role="tablist">
+<button type="button" class="sim-tab is-active" data-lang="python">
+Python
+</button>
+<button type="button" class="sim-tab" data-lang="r">
+R
+</button>
+</div>
+<button type="button" class="sim-copy">
+复制代码
+</button>
+</div>
+<pre class="sim-pane is-active" data-lang="python" data-label="Python"><code>import math
+def chebyshev_bound(n, eps, sigma2=0.25):   # Bernoulli(0.5) 的方差 = 0.25
+    return sigma2 / (n * eps**2)
+def n_needed(r, eps, sigma2=0.25):          # 上界压到 r 所需的最小样本量
+    return math.ceil(sigma2 / (r * eps**2))
+print(f&quot;切比雪夫上界(n=1000, eps=0.05) = {chebyshev_bound(1000, 0.05):.4f}&quot;)
+print(f&quot;上界压到 0.01 需要 n = {n_needed(0.01, 0.05)}&quot;)
+print(f&quot;eps 减半后需要 n = {n_needed(0.01, 0.025)}&quot;)
+# 预期输出:
+# 切比雪夫上界(n=1000, eps=0.05) = 0.1000
+# 上界压到 0.01 需要 n = 10000
+# eps 减半后需要 n = 40000</code></pre>
+<pre class="sim-pane" data-lang="r" data-label="R"><code>chebyshev_bound = \(n, eps, sigma2 = 0.25) sigma2 / (n * eps^2)
+n_needed = \(r, eps, sigma2 = 0.25) ceiling(sigma2 / (r * eps^2))
+cat(sprintf(&quot;切比雪夫上界(n=1000, eps=0.05) = %.4f\n&quot;, chebyshev_bound(1000, 0.05)))
+cat(&quot;上界压到 0.01 需要 n =&quot;, n_needed(0.01, 0.05), &quot;\n&quot;)
+cat(&quot;eps 减半后需要 n =&quot;, n_needed(0.01, 0.025), &quot;\n&quot;)
+# 预期输出:
+# 切比雪夫上界(n=1000, eps=0.05) = 0.1000
+# 上界压到 0.01 需要 n = 10000
+# eps 减半后需要 n = 40000</code></pre>
+</div>
+<blockquote>
+<p><strong>读法</strong>：<code>eps</code> 减半，所需样本量变成
+<strong>4
+倍</strong>（<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>ε</mi><mn>2</mn></msup><annotation encoding="application/x-tex">\varepsilon^2</annotation></semantics></math>
+在分母）——这就是
+F4「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mi>/</mi><msqrt><mi>n</mi></msqrt></mrow><annotation encoding="application/x-tex">1/\sqrt{n}</annotation></semantics></math>
+的代价」的代数版。
+注意切比雪夫界只用到方差、对一切分布成立，所以它比真实偏差<strong>保守得多</strong>：
+F3 的模拟已实测——上界
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.1</mn><annotation encoding="application/x-tex">0.1</annotation></semantics></math>，而实际偏差超限频率只有约
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.004</mn><annotation encoding="application/x-tex">0.004</annotation></semantics></math>。</p>
+</blockquote>
+<hr />
+<details class="facet"><summary class="facet-h f6">F6 联系其它概念</summary><div class="facet-body">
+<p><strong>先自己列 3
+个前置概念，再往下看图谱</strong>（你列的和图里一致吗？少了哪个？）：</p>
+<svg class="km-svg" viewBox="0 0 680 344" width="100%" role="img" aria-label="大数定律 的知识图谱">
+<rect class="km-bg" x="0" y="0" width="680" height="344"/>
+<defs><marker id="km-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8a97a3"/></marker><marker id="km-ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#a693cc"/></marker></defs>
+<text class="km-ttl" x="18" y="20">大数定律 · 知识图谱</text>
+<rect x="18" y="25" width="11" height="11" rx="3" fill="#eef2f6" stroke="#b9c4cf"/>
+<text class="km-lg" x="34" y="35">下楼 · 前置</text>
+<rect x="116.48" y="25" width="11" height="11" rx="3" fill="#2f6fb3" stroke="#20507f"/>
+<text class="km-lg" x="132.48000000000002" y="35">本概念</text>
+<rect x="185.48000000000002" y="25" width="11" height="11" rx="3" fill="#e8f5ef" stroke="#a9d3c1"/>
+<text class="km-lg" x="201.48000000000002" y="35">上楼 · 后续</text>
+<rect x="283.96000000000004" y="25" width="11" height="11" rx="3" fill="#f1ecfa" stroke="#c3b0e0"/>
+<text class="km-lg" x="299.96000000000004" y="35">平移 · 对偶</text>
+<rect x="19.0" y="42.0" width="178.0" height="36.0" rx="9" fill="#eef2f6" stroke="#b9c4cf" stroke-width="1.4"/>
+<text x="108.0" y="60.0" font-size="13.5" font-weight="600" fill="#33414d" text-anchor="middle" dominant-baseline="central">随机变量</text>
+<path d="M197.0,60.0 H216.0" fill="none" stroke="#8a97a3" stroke-width="1.4"/>
+<rect x="19.0" y="92.0" width="178.0" height="36.0" rx="9" fill="#eef2f6" stroke="#b9c4cf" stroke-width="1.4"/>
+<text x="108.0" y="110.0" font-size="13.5" font-weight="600" fill="#33414d" text-anchor="middle" dominant-baseline="central">数学期望</text>
+<path d="M197.0,110.0 H216.0" fill="none" stroke="#8a97a3" stroke-width="1.4"/>
+<rect x="19.0" y="142.0" width="178.0" height="36.0" rx="9" fill="#eef2f6" stroke="#b9c4cf" stroke-width="1.4"/>
+<text x="108.0" y="160.0" font-size="13.5" font-weight="600" fill="#33414d" text-anchor="middle" dominant-baseline="central">独立同分布</text>
+<path d="M197.0,160.0 H216.0" fill="none" stroke="#8a97a3" stroke-width="1.4"/>
+<rect x="19.0" y="192.0" width="178.0" height="36.0" rx="9" fill="#eef2f6" stroke="#b9c4cf" stroke-width="1.4"/>
+<text x="108.0" y="210.0" font-size="13.5" font-weight="600" fill="#33414d" text-anchor="middle" dominant-baseline="central">切比雪夫不等式</text>
+<path d="M197.0,210.0 H216.0" fill="none" stroke="#8a97a3" stroke-width="1.4"/>
+<rect x="483.0" y="42.0" width="178.0" height="36.0" rx="9" fill="#e8f5ef" stroke="#a9d3c1" stroke-width="1.4"/>
+<text x="572.0" y="60.0" font-size="13.5" font-weight="600" fill="#17674a" text-anchor="middle" dominant-baseline="central">中心极限定理</text>
+<path d="M464.0,60.0 H483.0" fill="none" stroke="#8a97a3" stroke-width="1.4" marker-end="url(#km-ar)"/>
+<rect x="483.0" y="92.0" width="178.0" height="36.0" rx="9" fill="#e8f5ef" stroke="#a9d3c1" stroke-width="1.4"/>
+<text x="572.0" y="110.0" font-size="13.5" font-weight="600" fill="#17674a" text-anchor="middle" dominant-baseline="central">强大数定律</text>
+<path d="M464.0,110.0 H483.0" fill="none" stroke="#8a97a3" stroke-width="1.4" marker-end="url(#km-ar)"/>
+<rect x="483.0" y="142.0" width="178.0" height="36.0" rx="9" fill="#e8f5ef" stroke="#a9d3c1" stroke-width="1.4"/>
+<text x="572.0" y="160.0" font-size="13.5" font-weight="600" fill="#17674a" text-anchor="middle" dominant-baseline="central">相合估计</text>
+<path d="M464.0,160.0 H483.0" fill="none" stroke="#8a97a3" stroke-width="1.4" marker-end="url(#km-ar)"/>
+<rect x="483.0" y="192.0" width="178.0" height="36.0" rx="9" fill="#e8f5ef" stroke="#a9d3c1" stroke-width="1.4"/>
+<text x="572.0" y="210.0" font-size="13.5" font-weight="600" fill="#17674a" text-anchor="middle" dominant-baseline="central">蒙特卡洛方法</text>
+<path d="M464.0,210.0 H483.0" fill="none" stroke="#8a97a3" stroke-width="1.4" marker-end="url(#km-ar)"/>
+<path d="M216.0,42.0 V228.0" fill="none" stroke="#8a97a3" stroke-width="1.4"/>
+<path d="M216.0,135.0 H242.0" fill="none" stroke="#8a97a3" stroke-width="1.6" marker-end="url(#km-ar)"/>
+<path d="M464.0,42.0 V228.0" fill="none" stroke="#8a97a3" stroke-width="1.4"/>
+<path d="M438.0,135.0 H464.0" fill="none" stroke="#8a97a3" stroke-width="1.6" marker-end="url(#km-ar)"/>
+<text class="km-cap" x="340.0" y="102.0">概率论与数理统计 ·
+极限定理</text>
+<rect x="242.0" y="112.0" width="196.0" height="46.0" rx="9" fill="#2f6fb3" stroke="#20507f" stroke-width="1.4"/>
+<text x="340.0" y="135.0" font-size="15.0" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">大数定律</text>
+<text class="km-cap" x="340.0" y="248.0">平移 ·
+同类或对偶概念（双向）</text>
+<rect x="251.0" y="256.0" width="178.0" height="36.0" rx="9" fill="#f1ecfa" stroke="#c3b0e0" stroke-width="1.4"/>
+<text x="340.0" y="274.0" font-size="13.5" font-weight="600" fill="#5b3f8f" text-anchor="middle" dominant-baseline="central">依概率收敛</text>
+<path d="M340.0,252.0 V162.0" fill="none" stroke="#a693cc" stroke-width="1.4" stroke-dasharray="5 4" marker-start="url(#km-ar2)" marker-end="url(#km-ar2)"/>
+<text class="km-note" x="340.0" y="334">「平均的稳定性」把概率论接到现实世界</text>
+</svg>
+<ul>
+<li><strong>下楼（前置）</strong>：<strong>依概率收敛</strong>是「稳」的精确定义；<strong>期望</strong>是稳定的目标；<strong>独立性</strong>让方差可加（<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><msub><mi>S</mi><mi>n</mi></msub><mo>=</mo><mi>n</mi><msup><mi>σ</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">D S_n=n\sigma^2</annotation></semantics></math>）；<strong>切比雪夫不等式</strong>是证明的发动机。缺任何一块，定理证不动。</li>
+<li><strong>上楼（后续）</strong>：<strong>中心极限定理</strong>接着回答「漏斗是什么形状」（正态）；<strong>强大数定律</strong>把「依概率」升级为「几乎必然」（回答边界例的遗憾）；<strong>相合估计</strong>是它在统计学里的直接应用；<strong>蒙特卡洛方法</strong>反过来把它当工具用（用平均逼近积分与期望）。</li>
+<li><strong>平移（对偶）</strong>：数列极限的 ε–N
+是「确定的项」被压；依概率收敛是「事件的概率」被压——<strong>同一套量词骨架，对象从数换成了随机变量</strong>。</li>
+<li><strong>辨析高频</strong>：大数定律管「<strong>落在哪</strong>」（均值
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>→</mo><mi>μ</mi></mrow><annotation encoding="application/x-tex">\to\mu</annotation></semantics></math>），中心极限定理管「<strong>怎么散</strong>」（波动幅度
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msqrt><mi>n</mi></msqrt><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">(</mo><msub><mi>S</mi><mi>n</mi></msub><mi>/</mi><mi>n</mi><mo>−</mo><mi>μ</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\sqrt{n}\,(S_n/n-\mu)</annotation></semantics></math>
+近似正态）。二者是分工，不是强弱版本。</li>
+</ul>
+<hr />
+</div></details><h2
+id="说到大数定律你要想到闭卷能一口气说出-4-条才算过">说到「大数定律」，你要想到……（闭卷能一口气说出
+≥4 条才算过）</h2>
+<ol type="1">
+<li><strong>依概率收敛</strong>的定义：压的是<strong>概率</strong>，不是取值本身；</li>
+<li><strong>前提三件套</strong>：独立、同分布（或方差一致有界）、期望存在——每条对应一类反例或推广；</li>
+<li><strong>证明发动机</strong>：切比雪夫不等式
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>⇒</mo><annotation encoding="application/x-tex">\Rightarrow</annotation></semantics></math>
+界
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>σ</mi><mn>2</mn></msup><mi>/</mi><mo stretchy="false" form="prefix">(</mo><mi>n</mi><msup><mi>ε</mi><mn>2</mn></msup><mo stretchy="false" form="postfix">)</mo><mo>→</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\sigma^2/(n\varepsilon^2)\to 0</annotation></semantics></math>；</li>
+<li><strong>偏差量级</strong>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>σ</mi><mi>/</mi><msqrt><mi>n</mi></msqrt></mrow><annotation encoding="application/x-tex">\sigma/\sqrt{n}</annotation></semantics></math>：精度翻倍，样本量要翻<strong>百倍</strong>；</li>
+<li><strong>分工</strong>：大数定律管「落在哪」，中心极限定理管「怎么散」。</li>
+</ol>
+<blockquote>
+<p>检验线：闭卷给自己 60 秒。只说得出第 1 条，说明还没把它挂进体系。</p>
+</blockquote>
+<hr />
+<h2
+id="自检你学会了吗先自己想再看答案">自检：你学会了吗？（先自己想，再看答案）</h2>
+<ol type="1">
+<li>判断真假并说明依据：「抛
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>10000</mn><annotation encoding="application/x-tex">10000</annotation></semantics></math>
+次硬币正面频率为
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.5014</mn><annotation encoding="application/x-tex">0.5014</annotation></semantics></math>，所以这枚硬币正面朝上的概率就是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.5014</mn><annotation encoding="application/x-tex">0.5014</annotation></semantics></math>。」</li>
+<li>举一个反例：「若
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>X</mi><mi>n</mi></msub><annotation encoding="application/x-tex">X_n</annotation></semantics></math>
+依概率收敛于
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>，则从某项起
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>X</mi><mi>n</mi></msub><annotation encoding="application/x-tex">X_n</annotation></semantics></math>
+的取值都贴住
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>。」</li>
+<li>写出「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mi>n</mi></msub><mi>/</mi><mi>n</mi></mrow><annotation encoding="application/x-tex">S_n/n</annotation></semantics></math>
+<strong>不</strong>依概率收敛于
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>μ</mi><annotation encoding="application/x-tex">\mu</annotation></semantics></math>」的否定式（量词逐个翻转）。</li>
+<li><strong>（自己造一个）</strong>
+删掉「独立」这个前提，构造一个样本均值不收敛于期望的具体例子。</li>
+</ol>
+<blockquote>
+<p><strong>迁移练习</strong>：用「假设基底 +
+删条件实验」这两招，试着自己拆<strong>中心极限定理</strong>——
+先写一句「我猜你已经会……」，再问：把「独立」或「同分布」删掉，会冒出什么？
+<strong>会用这套学法，比多背一个定理更重要。</strong></p>
+</blockquote>
+<details>
+<summary>
+答案与提示（先自己做完再看 ↓）
+</summary>
+<ol type="1">
+<li><strong>对一半，错在后半句</strong>。<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.5014</mn><annotation encoding="application/x-tex">0.5014</annotation></semantics></math>
+是对
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math>
+的<strong>一次估计</strong>（依概率收敛保证
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+大时估计大概率贴近
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math>），
+但它<strong>不等于</strong>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math>——频率与
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>p</mi><annotation encoding="application/x-tex">p</annotation></semantics></math>
+有偏差（本例约
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.0014</mn><annotation encoding="application/x-tex">0.0014</annotation></semantics></math>）是常态；且这句话把「一次实现」当成了参数本身。</li>
+<li>取
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>X</mi><mi>n</mi></msub><annotation encoding="application/x-tex">X_n</annotation></semantics></math>
+以概率
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mi>/</mi><mi>n</mi></mrow><annotation encoding="application/x-tex">1/n</annotation></semantics></math>
+等于
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>n</mi><mn>2</mn></msup><annotation encoding="application/x-tex">n^2</annotation></semantics></math>、否则为
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>（各
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>X</mi><mi>n</mi></msub><annotation encoding="application/x-tex">X_n</annotation></semantics></math>
+独立）：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo stretchy="false" form="prefix">(</mo><mo stretchy="false" form="prefix">|</mo><msub><mi>X</mi><mi>n</mi></msub><mo stretchy="false" form="postfix">|</mo><mo>≥</mo><mi>ε</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mn>1</mn><mi>/</mi><mi>n</mi><mo>→</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">P(\lvert X_n\rvert\ge\varepsilon)=1/n\to 0</annotation></semantics></math>，
+依概率收敛于
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>；但
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>n</mi><mn>2</mn></msup><annotation encoding="application/x-tex">n^2</annotation></semantics></math>
+的那些「巨值点」无穷多次出现，永不「从某项起贴住」。</li>
+<li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∃</mo><msub><mi>ε</mi><mn>0</mn></msub><mo>&gt;</mo><mn>0</mn><mo>:</mo><mspace width="0.222em"></mspace><munder><mi mathvariant="normal">lim</mi><mrow><mi>n</mi><mo>→</mo><mi>∞</mi></mrow></munder><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo stretchy="false" form="prefix">|</mo><msub><mi>S</mi><mi>n</mi></msub><mi>/</mi><mi>n</mi><mo>−</mo><mi>μ</mi><mo stretchy="false" form="postfix">|</mo><mo>≥</mo><msub><mi>ε</mi><mn>0</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>≠</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\exists\varepsilon_0&gt;0:\ \lim\limits_{n\to\infty}P\left(\lvert S_n/n-\mu\rvert\ge\varepsilon_0\right)\ne 0</annotation></semantics></math>
+（「极限为
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>」被否定后，极限也可以<strong>不存在</strong>；若教材要求区分，请按你教材的口径写〔教材口径〕）。</li>
+<li>取
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>X</mi><mn>1</mn></msub><mo>=</mo><msub><mi>X</mi><mn>2</mn></msub><mo>=</mo><mi>⋯</mi><mo>=</mo><msub><mi>X</mi><mi>n</mi></msub><mo>=</mo><mi>⋯</mi></mrow><annotation encoding="application/x-tex">X_1=X_2=\cdots=X_n=\cdots</annotation></semantics></math>（完全相关，全部等于同一个随机变量
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>X</mi><mn>1</mn></msub><annotation encoding="application/x-tex">X_1</annotation></semantics></math>）：
+则
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mi>n</mi></msub><mi>/</mi><mi>n</mi><mo>=</mo><msub><mi>X</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">S_n/n=X_1</annotation></semantics></math>
+对一切
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>，它是随机变量而非常数——样本均值<strong>不</strong>依概率收敛于
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>μ</mi><annotation encoding="application/x-tex">\mu</annotation></semantics></math>
+（除非
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>X</mi><mn>1</mn></msub><annotation encoding="application/x-tex">X_1</annotation></semantics></math>
+退化）。对照 F3 删条件实验第一行。</li>
+</ol>
+</details>
+<hr />
+<h2
+id="常见错位清单这里最容易翻车内是错误来源">常见错位清单（这里最容易翻车，〔〕内是<strong>错误来源</strong>）</h2>
+<ol type="1">
+<li>〔<strong>中学残留</strong>〕「频率稳定 = 最终等于概率」——实测
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>100000</mn></mrow><annotation encoding="application/x-tex">n=100000</annotation></semantics></math>
+时频率
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.5014</mn><mo>≠</mo><mn>0.5</mn></mrow><annotation encoding="application/x-tex">0.5014\ne 0.5</annotation></semantics></math>；
+大数定律保证的是偏差<strong>大概率</strong>小，不是「等于」。</li>
+<li>〔<strong>定理当定义</strong>〕把「大数定律」当一个定义来背——它是<strong>定理</strong>，前提（iid、期望存在）是证明的承重墙；
+真正的定义是<strong>依概率收敛</strong>。</li>
+<li>〔<strong>类比越界</strong>〕「民意调查稳 =
+样本量大就行」——前提是<strong>独立同分布</strong>抽样；只测同一间办公室，
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+再大也是一个人的意见放大。</li>
+<li>〔<strong>量词顺序</strong>〕把「依概率收敛」读成「从某项起都贴住」——后者是几乎必然收敛（强大数定律），
+边界例里那个无穷多次爆巨值的
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>X</mi><mi>n</mi></msub><annotation encoding="application/x-tex">X_n</annotation></semantics></math>
+就是分界线。</li>
+</ol>
+<hr />
+<h2
+id="学完自测对照勾选勾不满就回去重读">学完自测（对照勾选，勾不满就回去重读）</h2>
+<ul class="task-list">
+<li><label><input
+type="checkbox" /><strong>字字清</strong>：依概率收敛定义里每个字眼都说得清（「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∀</mo><mi>ε</mi></mrow><annotation encoding="application/x-tex">\forall\varepsilon</annotation></semantics></math>」「极限」「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo stretchy="false" form="prefix">(</mo><mi>⋅</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">P(\cdot)</annotation></semantics></math>」分别在防哪个反例）；</label></li>
+<li><label><input
+type="checkbox" /><strong>证得明</strong>：能合上书<strong>默写</strong>切比雪夫不等式的两步证明，并指出「方差可加」用在哪一步；</label></li>
+<li><label><input
+type="checkbox" /><strong>画得出</strong>：能在白纸上画出「漏斗图景」（标注
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>σ</mi><mi>/</mi><msqrt><mi>n</mi></msqrt></mrow><annotation encoding="application/x-tex">\sigma/\sqrt{n}</annotation></semantics></math>）与知识图谱（前置
+/ 后续 / 对偶），并说清关系方向。</label></li>
+</ul>
+<blockquote>
+<p>三条<strong>至少完成一半</strong>，再去做题也不迟。做题是<strong>验证</strong>掌握，不是掌握本身。</p>
+</blockquote>
+<hr />
+<h2 id="核对提示请以你所用教材为准">⚠️
+核对提示（请以你所用教材为准）</h2>
+<ol type="1">
+<li><p><strong>「大数定律」指哪一条</strong> 〔教材口径〕
+常见三条：<strong>伯努利</strong>（频率
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>→</mo><mi>p</mi></mrow><annotation encoding="application/x-tex">\to p</annotation></semantics></math>）、<strong>切比雪夫</strong>（方差一致有界）、<strong>辛钦</strong>（iid
++ 期望存在即可，无需方差）。
+不同教材以不同一条为「主角」：本卡主线取<strong>辛钦</strong>（条件最弱、最常用），伯努利作特例与切比雪夫的推论。
+依概率收敛的箭头记号（字母
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>P</mi><annotation encoding="application/x-tex">P</annotation></semantics></math>
+标在箭头上方）各教材写法不一，本卡统一用文字。</p></li>
+<li><p><strong>切比雪夫不等式的常数</strong> 〔教材口径〕 本卡用
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo stretchy="false" form="prefix">(</mo><mo stretchy="false" form="prefix">|</mo><mi>Z</mi><mo stretchy="false" form="postfix">|</mo><mo>≥</mo><mi>ε</mi><mo stretchy="false" form="postfix">)</mo><mo>≤</mo><mi>E</mi><msup><mi>Z</mi><mn>2</mn></msup><mi>/</mi><msup><mi>ε</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">P(\lvert Z\rvert\ge\varepsilon)\le E Z^2/\varepsilon^2</annotation></semantics></math>（马尔可夫不等式直接推）。
+有的教材对方差另写为
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo stretchy="false" form="prefix">(</mo><mo stretchy="false" form="prefix">|</mo><mi>Z</mi><mo>−</mo><mi>E</mi><mi>Z</mi><mo stretchy="false" form="postfix">|</mo><mo>≥</mo><mi>ε</mi><mo stretchy="false" form="postfix">)</mo><mo>≤</mo><mi>D</mi><mi>Z</mi><mi>/</mi><msup><mi>ε</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">P(\lvert Z-E Z\rvert\ge\varepsilon)\le D Z/\varepsilon^2</annotation></semantics></math>，两者等价。</p></li>
+<li><p><strong>边界例的「无穷多次」</strong> 〔待核〕
+「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>X</mi><mi>n</mi></msub><annotation encoding="application/x-tex">X_n</annotation></semantics></math>
+以概率
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mi>/</mi><mi>n</mi></mrow><annotation encoding="application/x-tex">1/n</annotation></semantics></math>
+取
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>n</mi><mn>2</mn></msup><annotation encoding="application/x-tex">n^2</annotation></semantics></math>
+仍无穷多次爆巨值」用到了 <strong>Borel–Cantelli
+第二引理</strong>（独立性 + 概率级数发散）。
+本卡只引用不证明；若你的教材把这条放在强大数定律之后，可先只记住「依概率收敛
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>≠</mo><annotation encoding="application/x-tex">\neq</annotation></semantics></math>
+从某项起贴住」这半句。</p></li>
+</ol>
+
+</main>
+<script>
+/* ============================================================
+   card-widgets.js — 概念卡自绘交互组件（零依赖 / 离线可用）
+   由 md2card.py 自动注入。扫描 .wb-widget[data-wb][data-spec] 并渲染。
+   data-spec = base64(UTF-8 JSON)
+   ============================================================ */
+(function () {
+  'use strict';
+
+  /* ---------------- 表达式编译 ---------------- */
+  var FN = {
+    sin: 'Math.sin', cos: 'Math.cos', tan: 'Math.tan',
+    asin: 'Math.asin', acos: 'Math.acos', atan: 'Math.atan',
+    sinh: 'Math.sinh', cosh: 'Math.cosh', tanh: 'Math.tanh',
+    exp: 'Math.exp', log: 'Math.log', ln: 'Math.log', sqrt: 'Math.sqrt',
+    abs: 'Math.abs', floor: 'Math.floor', ceil: 'Math.ceil', sign: 'Math.sign',
+    min: 'Math.min', max: 'Math.max', pow: 'Math.pow',
+    pi: 'Math.PI', PI: 'Math.PI', e: 'Math.E', E: 'Math.E'
+  };
+
+  // 把一个数学表达式编译为 fn(V, f)；V 含变量值，f 为主函数（供叠加层使用）
+  function makeFn(expr, vars, funcs) {
+    vars = vars || []; funcs = funcs || [];
+    var body = String(expr).replace(/[A-Za-z_][A-Za-z_0-9]*/g, function (t) {
+      if (funcs.indexOf(t) >= 0) return t;
+      if (FN[t]) return FN[t];
+      return 'V.' + t;
+    }).replace(/\^/g, '**');
+    var raw;
+    try { raw = new Function('V', 'f', 'return (' + body + ');'); }
+    catch (err) { throw new Error('表达式无法解析：' + expr); }
+    return function (V, f) {
+      var r;
+      try { r = raw(V, f); } catch (e2) { return NaN; }
+      return (typeof r === 'number' && isFinite(r)) ? r : NaN;
+    };
+  }
+
+  /* ---------------- 小工具 ---------------- */
+  function el(tag, cls, txt) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (txt != null) n.textContent = txt;
+    return n;
+  }
+  function fmtNum(v) {
+    if (!isFinite(v)) return '—';
+    if (v === 0) return '0';
+    var a = Math.abs(v);
+    if (a >= 1e5 || a < 1e-4) return v.toExponential(2);
+    return String(Math.round(v * 1e4) / 1e4);
+  }
+  function niceTicks(a, b, count) {
+    var span = b - a;
+    if (!(span > 0)) return [a];
+    var step = Math.pow(10, Math.floor(Math.log10(span / count)));
+    var err = span / count / step;
+    if (err >= 7.5) step *= 10; else if (err >= 3.5) step *= 5; else if (err >= 1.5) step *= 2;
+    var out = [], v = Math.ceil(a / step) * step, guard = 0;
+    while (v <= b + step * 1e-6 && guard++ < 200) {
+      out.push(Math.abs(v) < step * 1e-6 ? 0 : v);
+      v += step;
+    }
+    return out;
+  }
+  function b64utf8(s) {
+    var bin = atob(s);
+    var bytes = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return new TextDecoder('utf-8').decode(bytes);
+  }
+  function frame(cv, ratio) {
+    var dpr = window.devicePixelRatio || 1;
+    var w = cv.clientWidth || 640;
+    if (w < 220) w = 640;
+    var h = Math.round(w * (ratio || 0.52));
+    cv.width = Math.round(w * dpr);
+    cv.height = Math.round(h * dpr);
+    cv.style.height = h + 'px';
+    var ctx = cv.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    return { ctx: ctx, W: w, H: h };
+  }
+
+  /* ---------------- 坐标系 ---------------- */
+  function makeAxes(ctx, W, H, xr, yr, opts) {
+    opts = opts || {};
+    var pad = opts.square ? { l: 18, r: 18, t: 18, b: 18 } : { l: 50, r: 18, t: 16, b: 34 };
+    var iw = W - pad.l - pad.r, ih = H - pad.t - pad.b;
+    function X(x) { return pad.l + (x - xr[0]) / (xr[1] - xr[0]) * iw; }
+    function Y(y) { return pad.t + (yr[1] - y) / (yr[1] - yr[0]) * ih; }
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
+    if (!opts.square) {
+      ctx.strokeStyle = '#eef2f6'; ctx.lineWidth = 1;
+      niceTicks(xr[0], xr[1], 6).forEach(function (v) {
+        ctx.beginPath(); ctx.moveTo(X(v), pad.t); ctx.lineTo(X(v), pad.t + ih); ctx.stroke();
+      });
+      niceTicks(yr[0], yr[1], 5).forEach(function (v) {
+        ctx.beginPath(); ctx.moveTo(pad.l, Y(v)); ctx.lineTo(pad.l + iw, Y(v)); ctx.stroke();
+      });
+    }
+    // 坐标轴
+    ctx.strokeStyle = opts.axisColor || '#9aa6b2'; ctx.lineWidth = 1.4;
+    var y0 = Math.max(pad.t, Math.min(pad.t + ih, Y(0)));
+    var x0 = Math.max(pad.l, Math.min(pad.l + iw, X(0)));
+    ctx.beginPath(); ctx.moveTo(pad.l, y0); ctx.lineTo(pad.l + iw, y0); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x0, pad.t); ctx.lineTo(x0, pad.t + ih); ctx.stroke();
+    if (!opts.square) {
+      ctx.fillStyle = '#5b6570'; ctx.font = '11px system-ui,-apple-system,sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      niceTicks(xr[0], xr[1], 6).forEach(function (v) { ctx.fillText(fmtNum(v), X(v), pad.t + ih + 6); });
+      ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+      niceTicks(yr[0], yr[1], 5).forEach(function (v) { ctx.fillText(fmtNum(v), pad.l - 6, Y(v)); });
+    }
+    return { X: X, Y: Y, pad: pad, iw: iw, ih: ih, xr: xr, yr: yr, ctx: ctx };
+  }
+
+  function drawCurve(A, fn, V, main, color, width, dash) {
+    var ctx = A.ctx, xr = A.xr, yr = A.yr;
+    var span = yr[1] - yr[0];
+    ctx.save();
+    ctx.strokeStyle = color; ctx.lineWidth = width || 2.4;
+    if (dash) ctx.setLineDash(dash);
+    ctx.beginPath();
+    var started = false, N = Math.max(A.iw, 2);
+    for (var i = 0; i <= N; i++) {
+      var x = xr[0] + (xr[1] - xr[0]) * i / N;
+      V.x = x;
+      var y = fn(V, main);
+      if (!isFinite(y) || y < yr[0] - span * 3 || y > yr[1] + span * 3) { started = false; continue; }
+      var px = A.X(x), py = A.Y(y);
+      if (!started) { ctx.moveTo(px, py); started = true; } else ctx.lineTo(px, py);
+    }
+    ctx.stroke(); ctx.restore();
+  }
+
+  function dot(A, x, y, color, r, label) {
+    var ctx = A.ctx;
+    ctx.fillStyle = color; ctx.beginPath();
+    ctx.arc(A.X(x), A.Y(y), r || 4, 0, Math.PI * 2); ctx.fill();
+    if (label) {
+      ctx.fillStyle = color; ctx.font = '600 12px system-ui,-apple-system,sans-serif';
+      ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+      ctx.fillText(label, A.X(x) + 6, A.Y(y) - 4);
+    }
+  }
+
+  /* ---------------- 控件 ---------------- */
+  function buildControls(box, sliders, onChange) {
+    var V = {};
+    var wrap = el('div', 'wb-controls');
+    (sliders || []).forEach(function (s) {
+      V[s.name] = (s.value != null) ? s.value : (s.min + s.max) / 2;
+      var lab = el('label', 'wb-ctl');
+      lab.appendChild(el('span', 'wb-ctl-name', s.label || s.name));
+      var inp = document.createElement('input');
+      inp.type = 'range';
+      inp.min = s.min; inp.max = s.max; inp.step = s.step || 0.01; inp.value = V[s.name];
+      var out = el('span', 'wb-ctl-out', fmtNum(V[s.name]));
+      inp.addEventListener('input', function () {
+        V[s.name] = parseFloat(inp.value);
+        out.textContent = fmtNum(V[s.name]);
+        onChange();
+      });
+      lab.appendChild(inp); lab.appendChild(out);
+      wrap.appendChild(lab);
+    });
+    box.appendChild(wrap);
+    return V;
+  }
+
+  function buildReadout(box, rows) {
+    if (!rows || !rows.length) return null;
+    var d = el('div', 'wb-readout');
+    d.innerHTML = '';
+    box.appendChild(d);
+    return {
+      el: d,
+      update: function (vals) {
+        d.innerHTML = '';
+        rows.forEach(function (r) {
+          var s = el('span', 'wb-ro');
+          s.appendChild(el('b', null, r.label + ' = '));
+          s.appendChild(document.createTextNode(vals[r.label] != null ? vals[r.label] : '—'));
+          d.appendChild(s);
+        });
+      }
+    };
+  }
+
+  /* ---------------- 组件：plot ---------------- */
+  function renderPlot(box, spec) {
+    var cv = el('canvas', 'wb-canvas'); cv.style.display = 'block';
+    box.appendChild(cv);
+    var varNames = (spec.sliders || []).map(function (s) { return s.name; }).concat(['x']);
+    var main = makeFn(spec.expr, varNames, ['f']);
+    var xr = spec.xrange, yr = spec.yrange;
+    var A, ro;
+    // f(t)：把 t 作为自变量求主函数值（不能在叠加层里直接复用 V.x）
+    function fOf(t) {
+      var tmp = {}; for (var k in V) tmp[k] = V[k];
+      tmp.x = t;
+      return main(tmp, main);
+    }
+    function ev(expr) { return makeFn(expr, varNames, ['f'])(V, fOf); }
+    function draw() {
+      var f = frame(cv, spec.ratio || 0.52);
+      A = makeAxes(f.ctx, f.W, f.H, xr, yr);
+      var ctx = A.ctx;
+      // 叠加层（带 / 条）先画，压在曲线下
+      (spec.overlays || []).forEach(function (o) {
+        var col = o.color || '#f0a53a';
+        if (o.kind === 'hbar') {
+          var yc = ev(o.y);
+          var h = Math.abs(ev(o.half));
+          if (isFinite(yc) && isFinite(h)) {
+            ctx.fillStyle = col; ctx.globalAlpha = 0.18;
+            ctx.fillRect(A.pad.l, A.Y(yc + h), A.iw, A.Y(yc - h) - A.Y(yc + h));
+            ctx.globalAlpha = 1; ctx.strokeStyle = col; ctx.lineWidth = 1; ctx.setLineDash([5, 4]);
+            ctx.beginPath(); ctx.moveTo(A.pad.l, A.Y(yc + h)); ctx.lineTo(A.pad.l + A.iw, A.Y(yc + h));
+            ctx.moveTo(A.pad.l, A.Y(yc - h)); ctx.lineTo(A.pad.l + A.iw, A.Y(yc - h)); ctx.stroke();
+            ctx.setLineDash([]);
+            if (o.label) { ctx.fillStyle = col; ctx.font = '12px system-ui,sans-serif'; ctx.textAlign = 'right'; ctx.textBaseline = 'bottom'; ctx.fillText(o.label, A.pad.l + A.iw - 4, A.Y(yc + h) - 3); }
+          }
+        } else if (o.kind === 'vband') {
+          var xc = ev(o.x);
+          var hw = Math.abs(ev(o.half));
+          if (isFinite(xc) && isFinite(hw)) {
+            ctx.fillStyle = col; ctx.globalAlpha = 0.18;
+            ctx.fillRect(A.X(xc - hw), A.pad.t, A.X(xc + hw) - A.X(xc - hw), A.ih);
+            ctx.globalAlpha = 1; ctx.strokeStyle = col; ctx.lineWidth = 1; ctx.setLineDash([5, 4]);
+            ctx.beginPath(); ctx.moveTo(A.X(xc - hw), A.pad.t); ctx.lineTo(A.X(xc - hw), A.pad.t + A.ih);
+            ctx.moveTo(A.X(xc + hw), A.pad.t); ctx.lineTo(A.X(xc + hw), A.pad.t + A.ih); ctx.stroke();
+            ctx.setLineDash([]);
+          }
+        }
+      });
+      drawCurve(A, main, V, main, '#2f6fb3', 2.6);
+      // 线段（割线等）
+      (spec.segments || []).forEach(function (sg) {
+        var x1 = ev(sg.x1), y1 = ev(sg.y1), x2 = ev(sg.x2), y2 = ev(sg.y2);
+        if (!isFinite(x1) || !isFinite(x2)) return;
+        ctx.strokeStyle = sg.color || '#c2582a'; ctx.lineWidth = 2; ctx.setLineDash(sg.dash || []);
+        ctx.beginPath(); ctx.moveTo(A.X(x1), A.Y(y1)); ctx.lineTo(A.X(x2), A.Y(y2)); ctx.stroke();
+        ctx.setLineDash([]);
+      });
+      // 点
+      (spec.points || []).forEach(function (p) {
+        var x = ev(p.x), y = ev(p.y);
+        if (isFinite(x) && isFinite(y)) dot(A, x, y, p.color || '#c2582a', p.r || 4.5, p.label);
+      });
+      // 数值读出
+      if (ro) {
+        var vals = {};
+        (spec.readout || []).forEach(function (r) {
+          var v = ev(r.expr);
+          vals[r.label] = (r.digits != null) ? (isFinite(v) ? v.toFixed(r.digits) : '—') : fmtNum(v);
+        });
+        ro.update(vals);
+      }
+    }
+    var V = buildControls(box, spec.sliders, function () { draw(); });
+    ro = buildReadout(box, spec.readout);
+    if (spec.hint) box.appendChild(el('p', 'wb-hint', '👉 ' + spec.hint));
+    draw();
+    return function () { draw(); };
+  }
+
+  /* ---------------- 组件：seq（数列 ε-N） ---------------- */
+  function renderSeq(box, spec) {
+    var cv = el('canvas', 'wb-canvas'); cv.style.display = 'block';
+    box.appendChild(cv);
+    var varNames = (spec.sliders || []).map(function (s) { return s.name; }).concat(['n']);
+    var an = makeFn(spec.expr, varNames, []);
+    var n1 = spec.nrange[0], n2 = spec.nrange[1], target = spec.target;
+    var A, ro;
+    function draw() {
+      var V2 = {}; for (var k in V) V2[k] = V[k];
+      V2.x = undefined;
+      var vals = [];
+      for (var n = n1; n <= n2; n++) { V2.n = n; vals.push([n, an(V2, null)]); }
+      var lo = Math.min.apply(null, vals.map(function (p) { return isFinite(p[1]) ? p[1] : 0; }).concat([target]));
+      var hi = Math.max.apply(null, vals.map(function (p) { return isFinite(p[1]) ? p[1] : 0; }).concat([target]));
+      var pad = (hi - lo) * 0.25 || 1;
+      var yr = [lo - pad, hi + pad];
+      var f = frame(cv, 0.5);
+      A = makeAxes(f.ctx, f.W, f.H, [n1 - 1, n2 + 1], yr);
+      var ctx = A.ctx, eps = V.eps;
+      // ε 带
+      ctx.fillStyle = '#f0a53a'; ctx.globalAlpha = 0.18;
+      ctx.fillRect(A.pad.l, A.Y(target + eps), A.iw, A.Y(target - eps) - A.Y(target + eps));
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = '#f0a53a'; ctx.setLineDash([5, 4]); ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(A.pad.l, A.Y(target + eps)); ctx.lineTo(A.pad.l + A.iw, A.Y(target + eps));
+      ctx.moveTo(A.pad.l, A.Y(target - eps)); ctx.lineTo(A.pad.l + A.iw, A.Y(target - eps)); ctx.stroke();
+      ctx.setLineDash([]);
+      // 极限线
+      ctx.strokeStyle = '#1f8a63'; ctx.lineWidth = 1.6; ctx.setLineDash([6, 4]);
+      ctx.beginPath(); ctx.moveTo(A.pad.l, A.Y(target)); ctx.lineTo(A.pad.l + A.iw, A.Y(target)); ctx.stroke();
+      ctx.setLineDash([]);
+      // 找 N：所有 n>N 都落在带内
+      var N = null;
+      for (var i = vals.length - 1; i >= 0; i--) {
+        var ok = (Math.abs(vals[i][1] - target) < eps);
+        if (!ok) { N = vals[i][0]; break; }
+      }
+      if (N == null) N = n1 - 1;
+      var xN = A.X(N + 0.5);
+      ctx.strokeStyle = '#c2582a'; ctx.lineWidth = 1.8;
+      ctx.beginPath(); ctx.moveTo(xN, A.pad.t); ctx.lineTo(xN, A.pad.t + A.ih); ctx.stroke();
+      ctx.fillStyle = '#c2582a'; ctx.font = '600 12px system-ui,sans-serif';
+      ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+      ctx.fillText('N = ' + N + '（此后全部落入 ε 带）', xN + 4, A.pad.t + 2);
+      // 点
+      vals.forEach(function (p) {
+        if (!isFinite(p[1])) return;
+        var inside = Math.abs(p[1] - target) < eps;
+        ctx.fillStyle = inside ? '#1f8a63' : '#c2582a';
+        ctx.beginPath(); ctx.arc(A.X(p[0]), A.Y(p[1]), 3.2, 0, Math.PI * 2); ctx.fill();
+      });
+      if (ro) ro.update({ 'N': String(N), '第 N+1 项': fmtNum(vals[Math.max(0, N + 1 - n1)] ? vals[Math.max(0, N + 1 - n1)][1] : NaN) });
+    }
+    var V = buildControls(box, spec.sliders, function () { draw(); });
+    ro = buildReadout(box, [{ label: 'N' }, { label: '第 N+1 项' }]);
+    if (spec.hint) box.appendChild(el('p', 'wb-hint', '👉 ' + spec.hint));
+    draw();
+    return function () { draw(); };
+  }
+
+  /* ---------------- 组件：riemann ---------------- */
+  function renderRiemann(box, spec) {
+    var cv = el('canvas', 'wb-canvas'); cv.style.display = 'block';
+    box.appendChild(cv);
+    var main = makeFn(spec.expr, ['x'], []);
+    var V = { x: 0 };
+    var a = spec.xrange[0], b = spec.xrange[1];
+    var A, ro;
+    function draw() {
+      var f = frame(cv, 0.5);
+      A = makeAxes(f.ctx, f.W, f.H, spec.xrange, spec.yrange);
+      var ctx = A.ctx, n = V.n, dx = (b - a) / n, S = 0;
+      ctx.fillStyle = '#6aa3d5'; ctx.globalAlpha = 0.35; ctx.strokeStyle = '#2f6fb3'; ctx.lineWidth = 1;
+      for (var i = 0; i < n; i++) {
+        var xl = a + i * dx; V.x = xl;
+        var y = main(V, null); if (!isFinite(y)) continue;
+        S += y * dx;
+        var px = A.X(xl), pw = A.X(xl + dx) - A.X(xl), py = A.Y(y), ph = A.Y(0) - A.Y(y);
+        ctx.fillRect(px, py, pw, ph);
+        if (n <= 40) ctx.strokeRect(px, py, pw, ph);
+      }
+      ctx.globalAlpha = 1;
+      drawCurve(A, main, V, null, '#c2582a', 2.6);
+      if (ro) {
+        var ex = spec.exact;
+        ro.update({
+          'n': String(n),
+          'S_n': S.toFixed(5),
+          '精确值': (ex != null) ? ex.toFixed(5) : '—',
+          '误差': (ex != null) ? Math.abs(S - ex).toFixed(5) : '—'
+        });
+      }
+    }
+    var V2 = buildControls(box, [{
+      name: 'n', label: spec.nslider.label || 'n（分割份数）',
+      min: spec.nslider.min, max: spec.nslider.max, step: spec.nslider.step || 1, value: spec.nslider.value
+    }], function () { V.n = V2.n; draw(); });
+    V.n = V2.n;
+    ro = buildReadout(box, [{ label: 'n' }, { label: 'S_n' }, { label: '精确值' }, { label: '误差' }]);
+    if (spec.hint) box.appendChild(el('p', 'wb-hint', '👉 ' + spec.hint));
+    draw();
+    return function () { draw(); };
+  }
+
+  /* ---------------- 组件：matrix2（线性变换） ---------------- */
+  function renderMatrix2(box, spec) {
+    var cv = el('canvas', 'wb-canvas'); cv.style.display = 'block';
+    box.appendChild(cv);
+    var rng = spec.range || [-3, 3], A, ro;
+    function draw() {
+      var f = frame(cv, 0.72);
+      A = makeAxes(f.ctx, f.W, f.H, rng, rng, { square: true });
+      var ctx = A.ctx;
+      var a = V.a, b = V.b, c = V.c, d = V.d;
+      function T(x, y) { return [a * x + b * y, c * x + d * y]; }
+      var R = Math.max(Math.abs(rng[0]), Math.abs(rng[1])) * 2.2, S = 0.25;
+      // 原网格
+      ctx.strokeStyle = '#e6ebf0'; ctx.lineWidth = 1;
+      for (var k = -3; k <= 3; k += 1) {
+        ctx.beginPath(); ctx.moveTo(A.X(k), A.Y(rng[0])); ctx.lineTo(A.X(k), A.Y(rng[1])); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(A.X(rng[0]), A.Y(k)); ctx.lineTo(A.X(rng[1]), A.Y(k)); ctx.stroke();
+      }
+      // 变换后的网格
+      ctx.strokeStyle = '#6aa3d5'; ctx.lineWidth = 1.2;
+      for (var k2 = -3; k2 <= 3; k2 += 1) {
+        var p1 = T(k2, -R), p2 = T(k2, R);
+        ctx.beginPath(); ctx.moveTo(A.X(p1[0]), A.Y(p1[1])); ctx.lineTo(A.X(p2[0]), A.Y(p2[1])); ctx.stroke();
+        var q1 = T(-R, k2), q2 = T(R, k2);
+        ctx.beginPath(); ctx.moveTo(A.X(q1[0]), A.Y(q1[1])); ctx.lineTo(A.X(q2[0]), A.Y(q2[1])); ctx.stroke();
+      }
+      // 单位正方形 → 像
+      var O = T(0, 0), U = T(1, 0), W2 = T(1, 1), Z = T(0, 1);
+      ctx.fillStyle = '#c2582a'; ctx.globalAlpha = 0.22;
+      ctx.beginPath(); ctx.moveTo(A.X(O[0]), A.Y(O[1])); ctx.lineTo(A.X(U[0]), A.Y(U[1]));
+      ctx.lineTo(A.X(W2[0]), A.Y(W2[1])); ctx.lineTo(A.X(Z[0]), A.Y(Z[1])); ctx.closePath(); ctx.fill();
+      ctx.globalAlpha = 1; ctx.strokeStyle = '#c2582a'; ctx.lineWidth = 2; ctx.stroke();
+      // 列向量
+      vec(A, O, U, '#1f8a63', '列1');
+      vec(A, O, Z, '#7a4fb3', '列2');
+      if (ro) {
+        var det = a * d - b * c;
+        var rank = Math.abs(det) > 1e-9 ? 2 : (Math.abs(a) + Math.abs(b) + Math.abs(c) + Math.abs(d) > 1e-9 ? 1 : 0);
+        ro.update({
+          'det': det.toFixed(3),
+          '秩': String(rank),
+          '像': rank === 2 ? '整个平面（可逆）' : (rank === 1 ? '塌成一条直线' : '塌成一个点')
+        });
+      }
+    }
+    var V = buildControls(box, spec.sliders, function () { draw(); });
+    ro = buildReadout(box, [{ label: 'det' }, { label: '秩' }, { label: '像' }]);
+    if (spec.hint) box.appendChild(el('p', 'wb-hint', '👉 ' + spec.hint));
+    draw();
+    return function () { draw(); };
+  }
+
+  function vec(A, from, to, color, label) {
+    var ctx = A.ctx;
+    ctx.strokeStyle = color; ctx.lineWidth = 2.6;
+    ctx.beginPath(); ctx.moveTo(A.X(from[0]), A.Y(from[1])); ctx.lineTo(A.X(to[0]), A.Y(to[1])); ctx.stroke();
+    var ang = Math.atan2(-(to[1] - from[1]), to[0] - from[0]);
+    var px = A.X(to[0]), py = A.Y(to[1]), s = 9;
+    ctx.fillStyle = color; ctx.beginPath();
+    ctx.moveTo(px, py);
+    ctx.lineTo(px - s * Math.cos(ang - 0.4), py - s * Math.sin(ang - 0.4));
+    ctx.lineTo(px - s * Math.cos(ang + 0.4), py - s * Math.sin(ang + 0.4));
+    ctx.closePath(); ctx.fill();
+    if (label) {
+      ctx.font = '600 12px system-ui,sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+      ctx.fillText(label, px + 6, py - 4);
+    }
+  }
+
+  /* ---------------- 组件：vectors2（线性相关） ---------------- */
+  function renderVectors2(box, spec) {
+    var cv = el('canvas', 'wb-canvas'); cv.style.display = 'block';
+    box.appendChild(cv);
+    var rng = spec.range || [-3, 3], A, ro;
+    function draw() {
+      var f = frame(cv, 0.68);
+      A = makeAxes(f.ctx, f.W, f.H, rng, rng, { square: true });
+      var ctx = A.ctx, O = [0, 0];
+      var u = [V.u1, V.u2], v = [V.v1, V.v2];
+      var det = u[0] * v[1] - u[1] * v[0];
+      var dep = Math.abs(det) < 1e-6;
+      ctx.strokeStyle = '#e6ebf0'; ctx.lineWidth = 1;
+      for (var k = -3; k <= 3; k += 1) {
+        ctx.beginPath(); ctx.moveTo(A.X(k), A.Y(rng[0])); ctx.lineTo(A.X(k), A.Y(rng[1])); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(A.X(rng[0]), A.Y(k)); ctx.lineTo(A.X(rng[1]), A.Y(k)); ctx.stroke();
+      }
+      if (!dep) {
+        // 张成整个平面：淡色铺底
+        ctx.fillStyle = '#6aa3d5'; ctx.globalAlpha = 0.08;
+        ctx.fillRect(A.pad.l, A.pad.t, A.iw, A.ih); ctx.globalAlpha = 1;
+      } else {
+        // 共线：高亮这条直线
+        var L = 6, n0 = Math.hypot(u[0], u[1]) || 1;
+        var dx = u[0] / n0, dy = u[1] / n0;
+        ctx.strokeStyle = '#c2582a'; ctx.lineWidth = 8; ctx.globalAlpha = 0.18;
+        ctx.beginPath(); ctx.moveTo(A.X(-dx * L), A.Y(-dy * L)); ctx.lineTo(A.X(dx * L), A.Y(dy * L)); ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+      // 平行四边形（行列式的几何意义）
+      if (!dep) {
+        var S = [u[0] + v[0], u[1] + v[1]];
+        ctx.fillStyle = '#c2582a'; ctx.globalAlpha = 0.16;
+        ctx.beginPath(); ctx.moveTo(A.X(0), A.Y(0)); ctx.lineTo(A.X(u[0]), A.Y(u[1]));
+        ctx.lineTo(A.X(S[0]), A.Y(S[1])); ctx.lineTo(A.X(v[0]), A.Y(v[1])); ctx.closePath(); ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+      vec(A, O, u, '#1f8a63', 'u');
+      vec(A, O, v, '#7a4fb3', 'v');
+      if (ro) {
+        ro.update({
+          'det(u,v)': det.toFixed(3),
+          '判定': dep ? '线性相关（共线）' : '线性无关',
+          '张成空间': dep ? (Math.hypot(u[0], u[1]) + Math.hypot(v[0], v[1]) < 1e-9 ? '零空间 {0}' : '一条直线（1 维）') : '整个平面（2 维）'
+        });
+      }
+    }
+    var V = buildControls(box, spec.sliders, function () { draw(); });
+    ro = buildReadout(box, [{ label: 'det(u,v)' }, { label: '判定' }, { label: '张成空间' }]);
+    if (spec.hint) box.appendChild(el('p', 'wb-hint', '👉 ' + spec.hint));
+    draw();
+    return function () { draw(); };
+  }
+
+  /* ---------------- 复制到剪贴板（GeoGebra 指令块 / 模拟代码块共用） ---------------- */
+  function copyToClipboard(txt, done) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).then(done, function () { fallbackCopy(txt, done); });
+    } else fallbackCopy(txt, done);
+  }
+  function fallbackCopy(txt, done) {
+    var ta = document.createElement('textarea');
+    ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) { }
+    document.body.removeChild(ta);
+  }
+
+  function bindCopy() {
+    document.querySelectorAll('.gb-copy').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var blk = btn.closest('.gb-block');
+        var code = blk ? blk.querySelector('code') : null;
+        if (!code) return;
+        copyToClipboard(code.textContent, function () {
+          btn.textContent = '已复制 ✓'; setTimeout(function () { btn.textContent = '复制指令'; }, 1600);
+        });
+      });
+    });
+  }
+
+  /* ---------------- 模拟代码选项卡（sim 块：默认 Python，可切换 R） ---------------- */
+  function bindSimTabs() {
+    document.querySelectorAll('.sim-block').forEach(function (blk) {
+      var tabs = blk.querySelectorAll('.sim-tab');
+      tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          var lang = tab.getAttribute('data-lang');
+          tabs.forEach(function (t) { t.classList.toggle('is-active', t === tab); });
+          blk.querySelectorAll('.sim-pane').forEach(function (p) {
+            p.classList.toggle('is-active', p.getAttribute('data-lang') === lang);
+          });
+          var c = blk.querySelector('.sim-copy');
+          if (c) c.textContent = '复制代码';
+        });
+      });
+    });
+    document.querySelectorAll('.sim-copy').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var blk = btn.closest('.sim-block');
+        var code = blk ? blk.querySelector('.sim-pane.is-active code') : null;
+        if (!code) return;
+        copyToClipboard(code.textContent, function () {
+          btn.textContent = '已复制 ✓'; setTimeout(function () { btn.textContent = '复制代码'; }, 1600);
+        });
+      });
+    });
+  }
+
+  /* ---------------- 折叠面（渐进揭示） ---------------- */
+  function bindFacets(redrawAll) {
+    var all = document.querySelectorAll('details.facet');
+    if (!all.length) return;
+    document.querySelectorAll('.facet-toggle').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var isOpen = btn.getAttribute('data-open') === '1';
+        all.forEach(function (d) { d.open = !isOpen; });
+        btn.setAttribute('data-open', isOpen ? '0' : '1');
+        btn.textContent = isOpen ? '展开全部' : '收起全部';
+        if (redrawAll) setTimeout(redrawAll, 40);
+      });
+    });
+    // 折叠时 canvas 宽度为 0，展开后需重绘
+    all.forEach(function (d) {
+      d.addEventListener('toggle', function () { if (d.open && redrawAll) setTimeout(redrawAll, 40); });
+    });
+    // 打印前把所有折叠面打开，保证纸质版内容完整
+    window.addEventListener('beforeprint', function () {
+      document.querySelectorAll('details').forEach(function (d) { d.open = true; });
+      if (redrawAll) redrawAll();
+    });
+  }
+
+  /* ---------------- 初始化 ---------------- */
+  var RENDER = {
+    plot: renderPlot, seq: renderSeq, riemann: renderRiemann,
+    matrix2: renderMatrix2, vectors2: renderVectors2
+  };
+
+  function init() {
+    var widgets = [];
+    document.querySelectorAll('.wb-widget').forEach(function (box) {
+      var kind = box.getAttribute('data-wb');
+      var specStr = box.getAttribute('data-spec') || '';
+      var spec;
+      try { spec = JSON.parse(b64utf8(specStr)); }
+      catch (e) { box.innerHTML = '<p class="wb-err">组件参数解析失败：' + e.message + '</p>'; return; }
+      var fn = RENDER[kind];
+      if (!fn) { box.innerHTML = '<p class="wb-err">未知组件类型：' + kind + '</p>'; return; }
+      var redraw;
+      try { redraw = fn(box, spec); }
+      catch (e2) { box.innerHTML = '<p class="wb-err">组件渲染失败：' + e2.message + '</p>'; return; }
+      widgets.push(redraw);
+    });
+    if (widgets.length) {
+      var t = null;
+      window.addEventListener('resize', function () {
+        clearTimeout(t); t = setTimeout(function () { widgets.forEach(function (f) { try { f(); } catch (e) { } }); }, 160);
+      });
+    }
+    bindCopy();
+    bindSimTabs();
+    bindFacets(function () {
+      widgets.forEach(function (f) { try { f(); } catch (e) { } });
+    });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+
+</script>
+</body>
+</html>

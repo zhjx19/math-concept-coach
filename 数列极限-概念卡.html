@@ -363,6 +363,75 @@ details.facet[open] > .facet-h::before { transform: rotate(90deg); }
 }
 
 /* ============================================================
+   Python / R 代码选项卡（sim 模拟 / calc 概念计算器：默认 Python，可切换 R）
+   ============================================================ */
+.sim-block {
+  margin: 18px 0;
+  border: 1px solid #d3dcea;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fcfdff;
+}
+.sim-block[data-kind="calc"] { border-color: #cfe6d8; }
+.sim-block[data-kind="calc"] .sim-head { background: #eaf6ef; border-bottom-color: #d3e8dc; }
+.sim-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 10px 7px 12px;
+  background: #eef2fa;
+  border-bottom: 1px solid #dbe3f0;
+}
+.sim-kind {
+  margin-right: auto;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #46505c;
+  white-space: nowrap;
+}
+.sim-tabs { display: flex; gap: 6px; }
+.sim-tab {
+  padding: 4px 14px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #5b6570;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.sim-tab:hover { color: #2f6fb3; }
+.sim-tab.is-active {
+  color: #1d5c9e;
+  background: #fff;
+  border-color: #c3d2e8;
+  font-weight: 600;
+}
+.sim-copy {
+  flex: 0 0 auto;
+  padding: 4px 12px;
+  font-size: 12.5px;
+  font-family: inherit;
+  color: #2f6fb3;
+  background: #fff;
+  border: 1px solid #c3d2e8;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.sim-copy:hover { background: #e3ecf8; }
+.sim-pane {
+  display: none;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: #fcfdff;
+  font-size: 13.5px;
+}
+.sim-pane.is-active { display: block; }
+.sim-pane code { display: block; padding: 12px 14px; }
+
+/* ============================================================
    知识图谱（knowledge_map.py 生成的内联 SVG）
    ============================================================ */
 .km-svg {
@@ -447,6 +516,19 @@ math { font-size: 1.02em; }
   .wb-controls { display: none; }
   .km-svg, .gb-block { page-break-inside: avoid; break-inside: avoid; }
   .gb-copy { display: none; }
+  /* 打印：模拟代码不显示选项卡，Python / R 两段全部展示，用标签行区分 */
+  .sim-block { page-break-inside: avoid; break-inside: avoid; border-color: #ccc; background: #fff; }
+  .sim-head { display: none; }
+  .sim-pane { display: block !important; border-top: 1px dashed #ccc; font-size: 10.5pt; }
+  .sim-pane:first-of-type { border-top: 0; }
+  .sim-pane::before {
+    content: attr(data-label);
+    display: block;
+    padding: 6px 14px 0;
+    font-weight: 700;
+    font-size: 10.5pt;
+    color: #1d5c9e;
+  }
 }
 
 </style>
@@ -829,7 +911,60 @@ SetColor(up, 0.82, 0.35, 0.16)
 SetColor(dn, 0.82, 0.35, 0.16)</code></pre>
 </div>
 <hr />
-</div></details><details class="facet"><summary class="facet-h f6">F6 联系其它概念</summary><div class="facet-body">
+</div></details><h2 id="概念计算器输入-输出">🧮 概念计算器（输入 → 输出）</h2>
+<p>把 ε–N 定义里「反求
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math>」那一步做成函数：对
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>a</mi><mi>n</mi></msub><mo>=</mo><mstyle displaystyle="true"><mfrac><mn>1</mn><mi>n</mi></mfrac></mstyle></mrow><annotation encoding="application/x-tex">a_n=\dfrac1n</annotation></semantics></math>，任给
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ε</mi><mo>&gt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\varepsilon&gt;0</annotation></semantics></math>，
+返回一个使
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>&gt;</mo><mi>N</mi></mrow><annotation encoding="application/x-tex">n&gt;N</annotation></semantics></math>
+时
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">|</mo><msub><mi>a</mi><mi>n</mi></msub><mo>−</mo><mn>0</mn><mo stretchy="false" form="postfix">|</mo><mo>&lt;</mo><mi>ε</mi></mrow><annotation encoding="application/x-tex">\lvert a_n-0\rvert&lt;\varepsilon</annotation></semantics></math>
+的
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math>。</p>
+<div class="sim-block" data-lang="python" data-kind="calc">
+<div class="sim-head">
+<span class="sim-kind">计算器 · 输入 → 输出</span>
+<div class="sim-tabs" role="tablist">
+<button type="button" class="sim-tab is-active" data-lang="python">
+Python
+</button>
+<button type="button" class="sim-tab" data-lang="r">
+R
+</button>
+</div>
+<button type="button" class="sim-copy">
+复制代码
+</button>
+</div>
+<pre class="sim-pane is-active" data-lang="python" data-label="Python"><code>import math
+def N_for(eps):              # a_n = 1/n：使 n &gt; N 时 1/n &lt; eps
+    return math.ceil(1 / eps)
+for eps in (0.1, 0.01, 0.001):
+    print(f&quot;eps={eps:&lt;6} N={N_for(eps)}&quot;)
+# 预期输出:
+# eps=0.1    N=10
+# eps=0.01   N=100
+# eps=0.001  N=1000</code></pre>
+<pre class="sim-pane" data-lang="r" data-label="R"><code>N_for = \(eps) ceiling(1 / eps)
+for (eps in c(0.1, 0.01, 0.001)) cat(sprintf(&quot;eps=%-6g N=%d\n&quot;, eps, N_for(eps)))
+# 预期输出:
+# eps=0.1    N=10
+# eps=0.01   N=100
+# eps=0.001  N=1000</code></pre>
+</div>
+<blockquote>
+<p><strong>读法</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ε</mi><annotation encoding="application/x-tex">\varepsilon</annotation></semantics></math>
+缩小 10
+倍，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math>
+就放大 10 倍——这就是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>a</mi><mi>n</mi></msub><mo>=</mo><mstyle displaystyle="true"><mfrac><mn>1</mn><mi>n</mi></mfrac></mstyle></mrow><annotation encoding="application/x-tex">a_n=\dfrac1n</annotation></semantics></math>
+收敛「有多快」的量化答案。 换一个数列（如
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>a</mi><mi>n</mi></msub><mo>=</mo><msup><mi>q</mi><mi>n</mi></msup></mrow><annotation encoding="application/x-tex">a_n=q^n</annotation></semantics></math>）只需改
+<code>N_for</code> 里的表达式，其余不动。</p>
+</blockquote>
+<hr />
+<details class="facet"><summary class="facet-h f6">F6 联系其它概念</summary><div class="facet-body">
 <svg class="km-svg" viewBox="0 0 680 394" width="100%" role="img" aria-label="数列极限 的知识图谱">
 <rect class="km-bg" x="0" y="0" width="680" height="394"/>
 <defs><marker id="km-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8a97a3"/></marker><marker id="km-ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#a693cc"/></marker></defs>
@@ -896,7 +1031,7 @@ SetColor(dn, 0.82, 0.35, 0.16)</code></pre>
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mo>→</mo><msub><mi>x</mi><mn>0</mn></msub></mrow><annotation encoding="application/x-tex">x\to x_0</annotation></semantics></math>，量词骨架<strong>完全一样</strong>。学会一个，另一个只要换符号。</li>
 </ul>
 <hr />
-<h2
+</div></details><h2
 id="说到数列极限你要想到闭卷能一口气说出-4-条才算过">说到「数列极限」，你要想到……（闭卷能一口气说出
 ≥4 条才算过）</h2>
 <ol type="1">
@@ -1038,7 +1173,7 @@ type="checkbox" /><strong>画得出</strong>：能在白纸上画出它的知识
 <strong>至少两个聚点</strong>），有的把<strong>振荡</strong>再细分。
 本卡<strong>不依赖</strong>这个分类；若题目要求你判断类型，<strong>请以你教材的分类为准</strong>。</p></li>
 </ol>
-</div></details>
+
 </main>
 <script>
 /* ============================================================
@@ -1537,27 +1672,59 @@ type="checkbox" /><strong>画得出</strong>：能在白纸上画出它的知识
     return function () { draw(); };
   }
 
-  /* ---------------- 复制按钮（GeoGebra 指令块） ---------------- */
+  /* ---------------- 复制到剪贴板（GeoGebra 指令块 / 模拟代码块共用） ---------------- */
+  function copyToClipboard(txt, done) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).then(done, function () { fallbackCopy(txt, done); });
+    } else fallbackCopy(txt, done);
+  }
+  function fallbackCopy(txt, done) {
+    var ta = document.createElement('textarea');
+    ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) { }
+    document.body.removeChild(ta);
+  }
+
   function bindCopy() {
     document.querySelectorAll('.gb-copy').forEach(function (btn) {
       btn.addEventListener('click', function () {
         var blk = btn.closest('.gb-block');
         var code = blk ? blk.querySelector('code') : null;
         if (!code) return;
-        var txt = code.textContent;
-        var done = function () { btn.textContent = '已复制 ✓'; setTimeout(function () { btn.textContent = '复制指令'; }, 1600); };
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(txt).then(done, function () { fallback(txt, done); });
-        } else fallback(txt, done);
+        copyToClipboard(code.textContent, function () {
+          btn.textContent = '已复制 ✓'; setTimeout(function () { btn.textContent = '复制指令'; }, 1600);
+        });
       });
     });
-    function fallback(txt, done) {
-      var ta = document.createElement('textarea');
-      ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
-      document.body.appendChild(ta); ta.select();
-      try { document.execCommand('copy'); done(); } catch (e) { }
-      document.body.removeChild(ta);
-    }
+  }
+
+  /* ---------------- 模拟代码选项卡（sim 块：默认 Python，可切换 R） ---------------- */
+  function bindSimTabs() {
+    document.querySelectorAll('.sim-block').forEach(function (blk) {
+      var tabs = blk.querySelectorAll('.sim-tab');
+      tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          var lang = tab.getAttribute('data-lang');
+          tabs.forEach(function (t) { t.classList.toggle('is-active', t === tab); });
+          blk.querySelectorAll('.sim-pane').forEach(function (p) {
+            p.classList.toggle('is-active', p.getAttribute('data-lang') === lang);
+          });
+          var c = blk.querySelector('.sim-copy');
+          if (c) c.textContent = '复制代码';
+        });
+      });
+    });
+    document.querySelectorAll('.sim-copy').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var blk = btn.closest('.sim-block');
+        var code = blk ? blk.querySelector('.sim-pane.is-active code') : null;
+        if (!code) return;
+        copyToClipboard(code.textContent, function () {
+          btn.textContent = '已复制 ✓'; setTimeout(function () { btn.textContent = '复制代码'; }, 1600);
+        });
+      });
+    });
   }
 
   /* ---------------- 折叠面（渐进揭示） ---------------- */
@@ -1612,6 +1779,7 @@ type="checkbox" /><strong>画得出</strong>：能在白纸上画出它的知识
       });
     }
     bindCopy();
+    bindSimTabs();
     bindFacets(function () {
       widgets.forEach(function (f) { try { f(); } catch (e) { } });
     });
