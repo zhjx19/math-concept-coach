@@ -25,6 +25,19 @@
 """
 
 import re
+import sys
+
+
+# ---------------- 控制台编码（跨平台） ----------------
+# Windows 下标准输出被管道/重定向捕获时 Python 默认用本地编码（简体中文为 GBK），
+# 自测里打印的 ✓ / ↘ 会抛 UnicodeEncodeError。统一切到 UTF-8。
+def _configure_console():
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except Exception:
+            pass
+
 
 # ---------------- 符号表 ----------------
 _SYMBOLS = {
@@ -325,6 +338,7 @@ def tex_to_mathml(tex, display=False):
 
 # ---------------- 自测 ----------------
 if __name__ == "__main__":
+    _configure_console()
     cases = [
         (r"\varepsilon", False),
         (r"\forall \varepsilon > 0,\ \exists N", False),

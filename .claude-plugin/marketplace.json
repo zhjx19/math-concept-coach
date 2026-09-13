@@ -5,14 +5,14 @@
   },
   "metadata": {
     "description": "大学数学概念拆解教练（六棱镜）——把学生的「这个定义怎么理解」变成一张可离线阅读的概念卡。",
-    "version": "1.3.0"
+    "version": "1.5.0"
   },
   "plugins": [
     {
       "name": "math-concept-coach",
       "source": "./",
       "description": "把大学数学概念按「六棱镜」拆解（正反拆解 / 通俗理解 / 严格表述 / 几何物理意义 / 图形化演示 / 联系其它概念），先引导学生自己动手再给完整拆解，最后产出可离线阅读的 HTML 概念卡；卡内自带 Canvas 交互图形、知识图谱与 GeoGebra 复现指令。",
-      "version": "1.3.0",
+      "version": "1.5.0",
       "author": {
         "name": "张敬信"
       },

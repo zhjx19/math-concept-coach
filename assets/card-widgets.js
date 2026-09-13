@@ -494,27 +494,59 @@
     return function () { draw(); };
   }
 
-  /* ---------------- 复制按钮（GeoGebra 指令块） ---------------- */
+  /* ---------------- 复制到剪贴板（GeoGebra 指令块 / 模拟代码块共用） ---------------- */
+  function copyToClipboard(txt, done) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).then(done, function () { fallbackCopy(txt, done); });
+    } else fallbackCopy(txt, done);
+  }
+  function fallbackCopy(txt, done) {
+    var ta = document.createElement('textarea');
+    ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) { }
+    document.body.removeChild(ta);
+  }
+
   function bindCopy() {
     document.querySelectorAll('.gb-copy').forEach(function (btn) {
       btn.addEventListener('click', function () {
         var blk = btn.closest('.gb-block');
         var code = blk ? blk.querySelector('code') : null;
         if (!code) return;
-        var txt = code.textContent;
-        var done = function () { btn.textContent = '已复制 ✓'; setTimeout(function () { btn.textContent = '复制指令'; }, 1600); };
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(txt).then(done, function () { fallback(txt, done); });
-        } else fallback(txt, done);
+        copyToClipboard(code.textContent, function () {
+          btn.textContent = '已复制 ✓'; setTimeout(function () { btn.textContent = '复制指令'; }, 1600);
+        });
       });
     });
-    function fallback(txt, done) {
-      var ta = document.createElement('textarea');
-      ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
-      document.body.appendChild(ta); ta.select();
-      try { document.execCommand('copy'); done(); } catch (e) { }
-      document.body.removeChild(ta);
-    }
+  }
+
+  /* ---------------- 模拟代码选项卡（sim 块：默认 Python，可切换 R） ---------------- */
+  function bindSimTabs() {
+    document.querySelectorAll('.sim-block').forEach(function (blk) {
+      var tabs = blk.querySelectorAll('.sim-tab');
+      tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          var lang = tab.getAttribute('data-lang');
+          tabs.forEach(function (t) { t.classList.toggle('is-active', t === tab); });
+          blk.querySelectorAll('.sim-pane').forEach(function (p) {
+            p.classList.toggle('is-active', p.getAttribute('data-lang') === lang);
+          });
+          var c = blk.querySelector('.sim-copy');
+          if (c) c.textContent = '复制代码';
+        });
+      });
+    });
+    document.querySelectorAll('.sim-copy').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var blk = btn.closest('.sim-block');
+        var code = blk ? blk.querySelector('.sim-pane.is-active code') : null;
+        if (!code) return;
+        copyToClipboard(code.textContent, function () {
+          btn.textContent = '已复制 ✓'; setTimeout(function () { btn.textContent = '复制代码'; }, 1600);
+        });
+      });
+    });
   }
 
   /* ---------------- 折叠面（渐进揭示） ---------------- */
@@ -569,6 +601,7 @@
       });
     }
     bindCopy();
+    bindSimTabs();
     bindFacets(function () {
       widgets.forEach(function (f) { try { f(); } catch (e) { } });
     });
