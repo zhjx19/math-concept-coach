@@ -13,7 +13,7 @@
 **🌐 在线预览（免安装，点开即玩）**：<https://zhjx19.github.io/math-concept-coach/>
 
 ![演示：数列极限概念卡——六棱镜逐面拆解 · 拖动 ε 看 N 怎么变 · 知识图谱](https://zhjx19.github.io/math-concept-coach/demo.gif)
-—— 直接点开三张真实概念卡，拖滑块看「一致连续 / 数列极限 / 矩阵的秩」。
+—— 直接点开真实概念卡，拖滑块看「一致连续 / 数列极限 / 矩阵的秩」，跑模拟看「大数定律」。
 
 [在线预览](#它会交付什么) · [快速开始](#快速开始) · [触发方式](#触发方式) · [它和同类有什么不同](#它和同类有什么不同) · [安全边界](#安全边界)
 
@@ -42,18 +42,21 @@ npx skills add zhjx19/math-concept-coach
 ## 它会交付什么？
 
 **不是一段讲解文字，是一张可复用的离线卡片。** 先看真实产物：
-🌐 **在线画廊** <https://zhjx19.github.io/math-concept-coach/>（点开即玩，无需安装）；也可本地打开 [`examples/index.html`](examples/index.html)。里面是 3 张**真实生成**的卡片：
+🌐 **在线画廊** <https://zhjx19.github.io/math-concept-coach/>（点开即玩，无需安装）；也可本地打开 [`examples/index.html`](examples/index.html)。里面是 4 张**真实生成**的卡片：
 
-| 卡片 | 课程 | 交互图形 | 你能拖什么 |
+| 卡片 | 课程 | 交互形式 | 你能玩什么 |
 |---|---|---|---|
-| [一致连续](https://zhjx19.github.io/math-concept-coach/一致连续-概念卡.html) | 数学分析 | 函数图像 + ε 带 | 固定 δ 只移动位置，看哪里冲出 ε 带 |
-| [数列极限](https://zhjx19.github.io/math-concept-coach/数列极限-概念卡.html) | 数学分析 | 数列 ε–N | 拖 ε，看 N 怎么变、带外的红点何时消失 |
-| [矩阵的秩](https://zhjx19.github.io/math-concept-coach/矩阵的秩-概念卡.html) | 高等代数 | 线性变换 | 拖矩阵元素，看单位正方形何时被压扁、秩从 2 掉到 1 |
+| [一致连续](https://zhjx19.github.io/math-concept-coach/一致连续-概念卡.html) | 数学分析 | 函数图像 + ε 带（拖滑块） | 固定 δ 只移动位置，看哪里冲出 ε 带 |
+| [数列极限](https://zhjx19.github.io/math-concept-coach/数列极限-概念卡.html) | 数学分析 | 数列 ε–N（拖滑块）＋ 🧮 计算器 | 拖 ε 看 N 怎么变；跑函数直接算 ε→N |
+| [矩阵的秩](https://zhjx19.github.io/math-concept-coach/矩阵的秩-概念卡.html) | 高等代数 | 线性变换（拖滑块） | 拖矩阵元素，看单位正方形何时被压扁、秩从 2 掉到 1 |
+| [大数定律](https://zhjx19.github.io/math-concept-coach/大数定律-概念卡.html) | 概率论 | **Python / R 模拟 ＋ 🧮 概念计算器** | 跑代码看频率稳定到概率；用函数算「样本量 ↔ 上界」 |
 
 每张卡片都包含：
 
 - ✅ **网页内可拖动的交互图形**（自绘 Canvas，零依赖，不装 GeoGebra 也能用）
 - ✅ **可复制到 GeoGebra 的复现指令**（想用软件自己玩也行）
+- ✅ **Python / R 模拟代码选项卡**（默认 Python，一键切换 R、一键复制；跑一遍就能看见「频率稳定到概率」这类滑块画不出来的统计规律）
+- ✅ **🧮 概念计算器（Python / R）**：给「一个函数 + 一次示例调用」，输入参数就直接算出概念里的量——ε→N、n→上界、矩阵→秩……改一个参数，看结果怎么变；手算易错的量交给它
 - ✅ **知识图谱**（前置 / 后续 / 对偶概念）
 - ✅ **公式**（MathML，离线渲染）
 - ✅ **自检小题 + 折叠答案**、常见错位清单（**标注误区来源**）、**一道「换你拆一个新概念」迁移题**
@@ -63,7 +66,7 @@ npx skills add zhjx19/math-concept-coach
 - ✅ **渐进揭示**：六个面默认只展开 F1，其余点开看（右上角一键展开）；**打印时自动全部展开**
 - ✅ **⚠️ 核对提示**：凡讲法与教材口径不同的地方都**显式标注**（`〔教材口径〕` / `〔待核〕`），并在文末集中列出——
   存疑结论**不会静默写进卡片**（`check_card.py` 强制检查，有〔待核〕无核对提示直接报错）
-- ✅ **单文件、0 外部依赖、可打印**（约 60–90 KB）
+- ✅ **单文件、0 外部依赖、可打印**（约 75–100 KB）
 
 > 断网、没装任何软件、双击就能打开；打印时自动隐去滑块与折叠按钮、展开全部内容，只留图形与文字。
 
@@ -236,14 +239,14 @@ math-concept-coach/
 │   └── widget-spec.md             交互组件 / 知识图谱 / GeoGebra 指令的参数规范
 ├── scripts/
 │   ├── md2card.py                 Markdown → 单文件离线可交互 HTML
-│   ├── check_card.py              概念卡质检（格式 + 存疑标注）+ 举证清单（交付前逐条验算）
+│   ├── check_card.py              概念卡质检（格式 + 存疑标注 + sim / calc 代码）+ 举证清单；--run 可实跑代码
 │   ├── knowledge_map.py           知识图谱 SVG 生成（可单独自测）
 │   ├── texmath.py                 降级用的 LaTeX → MathML 转换器（可单独自测）
 │   ├── make_gallery.py            扫描 examples/ 重建画廊首页
-│   ├── make_demo_gif.py           可选：用 Chromium 渲染演示 GIF（已移出仓库，需要时再生成）
-│   └── (smoke_test_widgets.mjs)   交互组件回归测试 —— 仅开发用，未打进分发包
+│   ├── make_demo_gif.py           可选：用 Chromium 渲染演示 GIF（需另装 Chromium，非必需）
+│   └── smoke_test_widgets.mjs     交互组件回归测试（开发用，Node 运行，无需浏览器）
 ├── assets/
-│   ├── card-widgets.js            交互组件库（plot / seq / riemann / matrix2 / vectors2）
+│   ├── card-widgets.js            交互组件库（plot / seq / riemann / matrix2 / vectors2）+ sim 选项卡
 │   ├── concept-card.css           概念卡样式（浅色、可打印、窄屏适配）
 │   └── demo.tape                  vhs 录制脚本（终端流水线那一段）
 └── examples/
@@ -251,7 +254,8 @@ math-concept-coach/
     ├── 核心概念清单.md            按课程列出的大学数学核心概念
     ├── 一致连续-概念卡.md/.html   样例：数学分析 · plot 组件
     ├── 数列极限-概念卡.md/.html   样例：数学分析 · seq 组件
-    └── 矩阵的秩-概念卡.md/.html   样例：高等代数 · matrix2 组件
+    ├── 矩阵的秩-概念卡.md/.html   样例：高等代数 · matrix2 组件
+    └── 大数定律-概念卡.md/.html   样例：概率论 · Python/R sim 选项卡
 ```
 
 ---
@@ -271,6 +275,9 @@ python3 scripts/knowledge_map.py
 # 4. 生成卡片 + 质检（质检会输出「举证清单」，交付前逐条验算）
 python3 scripts/md2card.py "examples/数列极限-概念卡.md"
 python3 scripts/check_card.py "examples/数列极限-概念卡.md"
+
+# 4b. 卡里有 sim 块时，--run 会实跑 Python/R 并核对「预期输出」（有解释器才跑）
+python3 scripts/check_card.py "examples/大数定律-概念卡.md" --run
 
 # 5. 重建画廊
 python3 scripts/make_gallery.py
@@ -306,6 +313,9 @@ Markdown 表格单元格里的 `|x|` 会被当成列分隔符。一律写成 `\l
 **Q：卡片需要联网吗？**
 不需要。CSS / JS / 公式（MathML）/ 图形（SVG + Canvas）全部内联。
 
+**Q：Python / R 模拟代码要装什么才能跑？**
+Python 段用 **numpy**（科学计算的事实标准，`pip install numpy` 即有）；R 段用 **tidyverse**（或等价的基础包写法）。两个都不装也完全不影响阅读——代码里的「预期输出」注释是生成卡片时**实跑验证过的**。不装 R 就看 Python 选项卡，讲的是同一件事。
+
 **Q：交互图形拖不动？**
 用现代浏览器（Chrome / Edge / Firefox / Safari）打开；不要用 Word、WPS 或旧版 IE。
 
@@ -336,4 +346,4 @@ Markdown 表格单元格里的 `|x|` 会被当成列分隔符。一律写成 `\l
 因此本技能不输出「遇到这种题就套这个」式的题型总结，也不代写作业与论文；
 它只做一件事：**帮学生把定义真正读懂，并把概念挂进知识体系。**
 
-版本：v1.3（2026-09-11）｜更新记录见 [CHANGELOG.md](CHANGELOG.md)
+版本：v1.5（2026-09-13）｜更新记录见 [CHANGELOG.md](CHANGELOG.md)

@@ -18,18 +18,38 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 EXAMPLES = HERE.parent / "examples"
 
-CARDS = [
-    ("一致连续-概念卡", "数学分析", "连续"),
-    ("数列极限-概念卡", "数学分析", "逼近（离散）"),
-    ("矩阵的秩-概念卡", "高等代数", "变换"),
-]
 
+# ---------------- 控制台编码（跨平台） ----------------
+# Windows 下输出被管道/重定向捕获时 Python 默认用本地编码（简体中文为 GBK），中文会乱码。
+def _configure_console():
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except Exception:
+            pass
+
+
+# 展示顺序（只定顺序、不定成员）：把新卡片放进 examples/ 后重跑本脚本即自动收录；
+# 未列进 ORDER 的卡片按文件名排序追加到末尾——画廊成员来自目录扫描，不再手工维护。
+ORDER = ["一致连续-概念卡", "数列极限-概念卡", "矩阵的秩-概念卡", "大数定律-概念卡"]
+
+# 组件 key → 徽章文案与配色（key 取自卡片 HTML 的 data-wb；sim 卡片由 sim 块推断）
 BADGE = {
     "plot": ("函数图像", "#2f6fb3"),
     "seq": ("数列 ε–N", "#1f8a63"),
     "riemann": ("黎曼和", "#c2582a"),
     "matrix2": ("线性变换", "#7a5ea8"),
     "vectors2": ("向量/张成", "#b23a2e"),
+    "sim": ("Python / R 模拟", "#1f8a63"),
+    "calc": ("概念计算器", "#2e8b6f"),
+    "codes": ("Python / R 代码", "#1f8a63"),
+}
+
+# 卡片正文没写「认知动作」时的兜底（按组件类型推断）
+DEFAULT_ACTION = {
+    "plot": "连续", "seq": "逼近（离散）", "riemann": "累积",
+    "matrix2": "变换", "vectors2": "分解/张成",
+    "sim": "逼近（随机）", "calc": "计算", "codes": "计算",
 }
 
 CSS = """
@@ -82,8 +102,8 @@ def read(p):
 
 
 def meta_from_md(md_path):
-    """从 .md 提取一句话钩子与所属课程。"""
-    hook = course = ""
+    """从 .md 提取一句话钩子、所属课程与认知动作——信息全部来自卡片正文，不另维护清单。"""
+    hook = course = action = ""
     if md_path.exists():
         t = read(md_path)
         m = re.search(r"一句话钩子[」\*]*[:：]\s*(.+)$", t, re.M)
@@ -92,17 +112,24 @@ def meta_from_md(md_path):
         m = re.search(r"所属[:：]\s*(.+?)\s*[|｜]", t)
         if m:
             course = m.group(1).strip()
-    return hook, course
+        m = re.search(r"认知动作[:：]\s*\**\s*([^\n*]+)", t)
+        if m:
+            action = m.group(1).strip().rstrip("—- ").strip()
+    return hook, course, action
 
 
 def stats_from_html(html_path):
     """从生成的 .html 统计真实产物指标（跳过 <style> 段，避免把 CSS 选择器算进去）。"""
     h = read(html_path)
     body = h.split("</style>", 1)[-1]
-    m = re.search(r'data-wb="(\w+)"', body)
+    # 只在真正的组件容器里取 data-wb，避免命中文档脚本里的属性名
+    m = re.search(r'class="wb-widget" data-wb="([^"]*)"', body)
     return {
         "kb": len(h.encode("utf-8")) / 1024,
-        "widget": m.group(1) if m else "",
+        "wb": m.group(1) if m else "",
+        "widgets": len(re.findall(r'class="wb-widget"', body)),
+        "sims": len(re.findall(r'data-kind="sim"', body)),
+        "calcs": len(re.findall(r'data-kind="calc"', body)),
         "maps": body.count('class="km-svg"'),
         "ggb": body.count('class="gb-block"'),
         "maths": body.count("<math"),
@@ -110,27 +137,54 @@ def stats_from_html(html_path):
 
 
 def main():
+    _configure_console()
     if not EXAMPLES.exists():
         print(f"[x] 找不到目录：{EXAMPLES}", file=sys.stderr)
         return 1
 
+    # 目录扫描：以 examples/*-概念卡.md 为准，按 ORDER 排前、其余按名排序追加
+    stems = [p.name[: -len(".md")] for p in sorted(EXAMPLES.glob("*-概念卡.md"))]
+    ordered = [s for s in ORDER if s in stems] + [s for s in stems if s not in ORDER]
+
     items, missing = [], []
-    for stem, course_fb, action in CARDS:
+    for stem in ordered:
         html, md = EXAMPLES / f"{stem}.html", EXAMPLES / f"{stem}.md"
         if not html.exists():
             missing.append(stem)
             continue
         st = stats_from_html(html)
-        hook, course = meta_from_md(md)
+        hook, course, action = meta_from_md(md)
+        # 徽章优先展示卡片的「主交互」（interactive 组件）；没有 interactive 才回落到代码块类型。
+        # 完整清单（交互组件 / 模拟 / 计算器）在下方统计栏逐项列出。
+        if st["wb"]:
+            widget = st["wb"]
+        elif st["sims"] and st["calcs"]:
+            widget = "codes"
+        elif st["sims"]:
+            widget = "sim"
+        elif st["calcs"]:
+            widget = "calc"
+        else:
+            widget = ""
         items.append({
             "file": html.name, "title": stem.replace("-概念卡", ""),
-            "course": course or course_fb, "action": action,
+            "course": course or "大学数学", "widget": widget,
+            "action": action or DEFAULT_ACTION.get(widget, "—"),
             "hook": hook, **st,
         })
 
     cards = []
     for it in items:
         wname, wcolor = BADGE.get(it["widget"], ("—", "#6b7684"))
+        parts = []
+        if it["widgets"]:
+            parts.append(f"交互组件 <b>{it['widgets']}</b> 个")
+        if it["sims"]:
+            parts.append(f"模拟代码 <b>{it['sims']}</b> 块")
+        if it["calcs"]:
+            parts.append(f"概念计算器 <b>{it['calcs']}</b> 段")
+        interaction = " · ".join(parts) if parts else "无交互（结构概念）"
+        ggb = f" ·\n          GeoGebra 指令 <b>{it['ggb']}</b> 块" if it["ggb"] else ""
         cards.append(f"""      <div class="card">
         <h2><a href="{it['file']}">{it['title']}</a></h2>
         <div class="meta">
@@ -142,9 +196,8 @@ def main():
         <div class="stats">
           <b>{it['kb']:.0f} KB</b> 单文件 ·
           公式 <b>{it['maths']}</b> 处 ·
-          交互组件 <b>1</b> 个 ·
-          知识图谱 <b>{it['maps']}</b> 张 ·
-          GeoGebra 指令 <b>{it['ggb']}</b> 块
+          {interaction} ·
+          知识图谱 <b>{it['maps']}</b> 张{ggb}
         </div>
       </div>""")
 

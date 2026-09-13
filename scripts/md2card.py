@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
+r"""
 md2card.py — 把 Markdown 概念卡转成「单文件、离线可读、可交互」的 HTML。
 
-三类特殊代码块会被自动渲染（不是原样显示）：
+五类特殊代码块会被自动渲染（不是原样显示）：
 
   ```interactive        → 自绘交互组件（Canvas + 滑块，可拖动）
   {"type":"plot", ...}
@@ -16,6 +16,22 @@ md2card.py — 把 Markdown 概念卡转成「单文件、离线可读、可交�
   ```geogebra           → GeoGebra 复现指令（带「复制指令」按钮）
   f(x)=sin(1/x)
   d=Slider(0.01,1,0.01)
+
+  ```sim                → Python / R 模拟代码选项卡（默认 Python，可切换 R）
+  # PYTHON
+  import random
+  ...
+  # R
+  set.seed(1)
+  ...
+
+  ```calc               → 概念计算器选项卡（确定性函数 + 一次调用，同一套选项卡 UI）
+  # PYTHON
+  def N_for(eps): return math.ceil(1 / eps)
+  print(N_for(0.01))
+  # R
+  N_for = \(eps) ceiling(1 / eps)
+  print(N_for(0.01))
 
 其余内容按正常 Markdown 处理；公式用 pandoc --mathml 转 MathML（离线可渲染）。
 
@@ -34,6 +50,17 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
+
+# ---------------- 控制台编码（跨平台） ----------------
+# Windows 下输出被管道/重定向捕获时 Python 默认用本地编码（简体中文为 GBK），
+# 中文与符号会乱码、个别字符会抛 UnicodeEncodeError。统一切到 UTF-8。
+def _configure_console():
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except Exception:
+            pass
+
 
 HERE = Path(__file__).resolve().parent
 SKILL_DIR = HERE.parent
@@ -97,9 +124,9 @@ __JS__
 </html>
 """
 
-# ```interactive / ```concept-map / ```geogebra 代码块
+# ```interactive / ```concept-map / ```geogebra / ```sim / ```calc 代码块
 BLOCK_RE = re.compile(
-    r"^[ \t]*```[ \t]*(interactive|concept-map|concept_map|geogebra|ggb)[ \t]*\r?\n"
+    r"^[ \t]*```[ \t]*(interactive|concept-map|concept_map|geogebra|ggb|sim|calc)[ \t]*\r?\n"
     r"(.*?)\r?\n[ \t]*```[ \t]*$",
     re.MULTILINE | re.DOTALL,
 )
@@ -163,9 +190,73 @@ def geogebra_html(body):
     )
 
 
+# ```sim 块的语言段标记：独占一行的 `# PYTHON` / `# R`（大小写不敏感）
+_SIM_MARKERS = {
+    "python": re.compile(r"^[ \t]*#[ \t]*PYTHON[ \t]*$", re.IGNORECASE),
+    "r": re.compile(r"^[ \t]*#[ \t]*R[ \t]*$", re.IGNORECASE),
+}
+
+
+def _sim_pane(lang, label, lines, active):
+    """单语言代码面板。空行改写为 `#`（两种语言里都是注释，语义不变）——
+    预渲染 HTML 块内出现空行会被 pandoc 当作原始 HTML 块的结束，截断渲染。"""
+    code = "\n".join(l if l.strip() else "#" for l in lines).strip("\n")
+    cls = "sim-pane is-active" if active else "sim-pane"
+    return (
+        f'<pre class="{cls}" data-lang="{lang}" data-label="{label}">'
+        f'<code>{html.escape(code)}</code></pre>'
+    )
+
+
+# 代码选项卡块：sim（随机/迭代模拟）与 calc（确定性概念计算器）共用同一套选项卡 UI
+_CODE_KIND_LABEL = {
+    "sim": "模拟 · 跑起来才看得见",
+    "calc": "计算器 · 输入 → 输出",
+}
+
+
+def code_tabs_html(body, kind):
+    """```sim / ```calc → Python / R 代码选项卡（默认 Python，点标签切 R）。
+
+    块内用独占一行的 `# PYTHON` / `# R` 划分语言段；两段都给。
+    缺标记时降级为普通代码块（不丢内容），由 check_card.py 报错纠正。
+    """
+    sections = {"python": [], "r": []}
+    current = None
+    for line in body.split("\n"):
+        if _SIM_MARKERS["python"].match(line):
+            current = "python"
+            continue
+        if _SIM_MARKERS["r"].match(line):
+            current = "r"
+            continue
+        if current is not None:
+            sections[current].append(line)
+    if not sections["python"] and not sections["r"]:
+        return f'<pre><code>{html.escape(body.strip())}</code></pre>'
+    tabs, panes = [], []
+    for lang, label in (("python", "Python"), ("r", "R")):
+        if not sections[lang]:
+            continue
+        active = lang == "python"
+        tab_cls = "sim-tab is-active" if active else "sim-tab"
+        tabs.append(f'<button type="button" class="{tab_cls}" data-lang="{lang}">{label}</button>')
+        panes.append(_sim_pane(lang, label, sections[lang], active))
+    return (
+        f'<div class="sim-block" data-lang="python" data-kind="{kind}">'
+        '<div class="sim-head">'
+        f'<span class="sim-kind">{_CODE_KIND_LABEL.get(kind, kind)}</span>'
+        f'<div class="sim-tabs" role="tablist">{"".join(tabs)}</div>'
+        '<button type="button" class="sim-copy">复制代码</button>'
+        '</div>'
+        f'{"".join(panes)}'
+        '</div>'
+    )
+
+
 def preprocess(md_text):
-    """把三类特殊块替换为真实 HTML。"""
-    stats = {"widget": 0, "map": 0, "ggb": 0, "err": 0}
+    """把五类特殊块（interactive / concept-map / geogebra / sim / calc）替换为真实 HTML。"""
+    stats = {"widget": 0, "map": 0, "ggb": 0, "sim": 0, "calc": 0, "err": 0}
 
     def repl(m):
         lang = m.group(1).lower()
@@ -176,6 +267,9 @@ def preprocess(md_text):
         if lang in ("concept-map", "concept_map"):
             stats["map"] += 1
             return concept_map_html(body)
+        if lang in ("sim", "calc"):
+            stats[lang] += 1
+            return code_tabs_html(body, lang)
         stats["ggb"] += 1
         return geogebra_html(body)
 
@@ -206,7 +300,7 @@ def first_heading(md_text):
 # ---------------- 降级转换器（未安装 pandoc 时启用） ----------------
 # 设计原则：任何机器上都「跑得出东西」。交互组件与知识图谱由本脚本自己渲染，
 # 不依赖 pandoc，因此降级模式下依然完全可用；只有数学公式退化为 LaTeX 源码。
-_PRERENDERED_ONE = ('<div class="wb-widget"', '<div class="gb-block">', '<p class="wb-err">')
+_PRERENDERED_ONE = ('<div class="wb-widget"', '<div class="gb-block">', '<div class="sim-block"', '<p class="wb-err">')
 _PRERENDERED_MULTI_START = ('<svg',)
 _PRERENDERED_MULTI_END = ('</svg>',)
 
@@ -400,8 +494,10 @@ def apply_progressive_disclosure(body_html):
     out, cursor = [], 0
     for m, num in facets:
         start = m.start()
+        # 每个面的正文止于「下一个任意 <h2>」——非「面」的小节（如概念计算器、自检、
+        # 核对提示）据此原样保留在折叠之外，不被最后一面吞进去（与本文档 docstring 一致）。
         nxt = None
-        for m2, _n2 in facets:
+        for m2, _n2 in heads:
             if m2.start() > start:
                 nxt = m2.start()
                 break
@@ -432,6 +528,7 @@ def apply_progressive_disclosure(body_html):
 
 
 def main():
+    _configure_console()
     ap = argparse.ArgumentParser(description="Markdown 概念卡 → 离线单文件可交互 HTML")
     ap.add_argument("input", help="输入 Markdown 文件")
     ap.add_argument("-o", "--output", help="输出 HTML 路径（默认同名 .html）")
@@ -489,7 +586,8 @@ def main():
 
     print(f"[OK] 概念卡已生成：{out_path}")
     print(f"     交互组件 {stats['widget']} 个 | 知识图谱 {stats['map']} 张 | "
-          f"GeoGebra 指令块 {stats['ggb']} 个 | "
+          f"GeoGebra 指令块 {stats['ggb']} 个 | 模拟代码块 {stats['sim']} 个 | "
+          f"概念计算器 {stats['calc']} 段 | "
           f"折叠面板 {out_text.count('<details class=\"facet\"')} 个（默认展开 F1，打印自动全展开）")
     if pandoc:
         print(f"     公式(MathML) {out_text.count('<math')} 处 | "
