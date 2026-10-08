@@ -1,0 +1,2145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>秩零化定理 · 六棱镜拆解</title>
+<style>
+/* ============================================================
+   概念卡样式（concept-card.css）
+   浅色主题 · 离线可用 · 可打印
+   ============================================================ */
+
+:root {
+  --ink: #1f2328;
+  --muted: #5b6570;
+  --line: #e4e8ec;
+  --line-strong: #cdd5dd;
+  --bg: #ffffff;
+  --soft: #f7f9fb;
+  --accent: #2f6fb3;
+  --accent-soft: #eaf2fa;
+
+  /* 六棱镜各面配色 */
+  --f1: #c2582a;  /* 正反 */
+  --f2: #1f8a63;  /* 直观 */
+  --f3: #2f6fb3;  /* 严格 */
+  --f4: #7a4fb3;  /* 意义 */
+  --f5: #a8791a;  /* 图形 */
+  --f6: #475569;  /* 联系 */
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  padding: 32px 16px 64px;
+  background: #f2f5f8;
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei",
+               "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", sans-serif;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+/* ---------- 卡片容器 ---------- */
+.card {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 40px 44px 56px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 0 6px 28px rgba(31, 35, 40, 0.07);
+}
+
+/* ---------- 标题 ---------- */
+.card > h1:first-child {
+  margin: 0 0 6px;
+  padding-bottom: 14px;
+  font-size: 26px;
+  line-height: 1.4;
+  border-bottom: 3px solid var(--accent);
+}
+.card > h1:first-child::after {
+  content: "概念卡 · 六棱镜拆解";
+  display: block;
+  margin-top: 8px;
+  font-size: 12.5px;
+  font-weight: 400;
+  letter-spacing: .12em;
+  color: var(--muted);
+}
+
+/* 非「面」的小节标题（自检、错位清单等） */
+.card > h2 {
+  margin: 40px 0 14px;
+  padding: 8px 0 8px 16px;
+  font-size: 19px;
+  line-height: 1.5;
+  border-left: 5px solid var(--accent);
+  background: linear-gradient(90deg, var(--accent-soft), transparent 72%);
+  border-radius: 0 6px 6px 0;
+}
+
+/* ---------- 六棱镜各面：折叠面板（渐进揭示） ---------- */
+.facet-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin: 30px 0 -10px;
+}
+.facet-toggle {
+  font: inherit;
+  font-size: 13px;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid #cddff0;
+  border-radius: 999px;
+  padding: 4px 14px;
+  cursor: pointer;
+}
+.facet-toggle:hover { background: #dceaf8; }
+
+details.facet {
+  margin: 26px 0 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+}
+details.facet[open] { box-shadow: 0 1px 6px rgba(31, 35, 40, 0.05); }
+
+.facet-h {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 12px 16px;
+  font-size: 18px;
+  line-height: 1.5;
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+  border-left: 5px solid var(--accent);
+  background: linear-gradient(90deg, var(--accent-soft), transparent 72%);
+}
+.facet-h::-webkit-details-marker { display: none; }
+.facet-h::before {
+  content: "▸";
+  flex: 0 0 auto;
+  font-size: 14px;
+  color: var(--muted);
+  transition: transform .15s ease;
+}
+details.facet[open] > .facet-h::before { transform: rotate(90deg); }
+
+.facet-h.f1 { border-left-color: var(--f1); background: linear-gradient(90deg,#fbeee8,transparent 72%); }
+.facet-h.f2 { border-left-color: var(--f2); background: linear-gradient(90deg,#e8f6f1,transparent 72%); }
+.facet-h.f3 { border-left-color: var(--f3); background: linear-gradient(90deg,#eaf2fa,transparent 72%); }
+.facet-h.f4 { border-left-color: var(--f4); background: linear-gradient(90deg,#f1ecfa,transparent 72%); }
+.facet-h.f5 { border-left-color: var(--f5); background: linear-gradient(90deg,#faf3e3,transparent 72%); }
+.facet-h.f6 { border-left-color: var(--f6); background: linear-gradient(90deg,#eef1f5,transparent 72%); }
+
+.facet-body { padding: 4px 18px 16px; }
+
+/* 面内的小节标题（### 定义、### 量词骨架 …） */
+.card h3 {
+  margin: 26px 0 10px;
+  font-size: 16.5px;
+  color: var(--accent);
+}
+
+/* ---------- 段落与列表 ---------- */
+.card p { margin: 10px 0; }
+.card ul, .card ol { margin: 10px 0; padding-left: 1.6em; }
+.card li { margin: 5px 0; }
+.card li::marker { color: var(--accent); }
+
+.card strong { color: #0f1419; }
+.card em { color: var(--muted); font-style: normal; background: #fff6d9; padding: 0 3px; border-radius: 3px; }
+
+/* ---------- 表格（三线表） ---------- */
+.card table {
+  width: 100%;
+  margin: 16px 0;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+.card table th, .card table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+.card table thead th {
+  background: var(--soft);
+  border-top: 2px solid var(--line-strong);
+  border-bottom: 1.5px solid var(--line-strong);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.card table tbody tr:last-child td { border-bottom: 2px solid var(--line-strong); }
+.card table tbody tr:hover { background: #fbfcfe; }
+
+/* ---------- 引用块 = 提示框 ---------- */
+.card blockquote {
+  margin: 16px 0;
+  padding: 12px 18px;
+  background: var(--accent-soft);
+  border-left: 4px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  color: #26333f;
+}
+.card blockquote p:first-child { margin-top: 0; }
+.card blockquote p:last-child { margin-bottom: 0; }
+
+/* ---------- 代码 ---------- */
+.card code {
+  padding: 2px 6px;
+  background: #f1f4f7;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+  font-size: .9em;
+}
+.card pre {
+  margin: 16px 0;
+  padding: 14px 16px;
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow-x: auto;
+  line-height: 1.6;
+}
+.card pre code { padding: 0; background: none; border: 0; }
+
+/* ---------- 分隔线 ---------- */
+.card hr {
+  margin: 36px 0;
+  border: 0;
+  border-top: 1px dashed var(--line-strong);
+}
+
+/* ---------- 公式（MathML） ---------- */
+.card math { font-size: 1.06em; }
+.card math[display="block"],
+.card .math.display {
+  display: block;
+  margin: 14px 0;
+  text-align: center;
+  overflow-x: auto;
+}
+
+/* ---------- 图形演示占位 ---------- */
+.card img { max-width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--line); }
+.card .hint {
+  margin: 10px 0;
+  padding: 10px 14px;
+  background: #fffaf0;
+  border: 1px dashed #e0b978;
+  border-radius: 8px;
+  font-size: 14.5px;
+  color: #6b4a12;
+}
+
+/* ============================================================
+   自绘交互组件（card-widgets.js）
+   ============================================================ */
+.wb-widget {
+  margin: 18px 0 22px;
+  padding: 14px 16px 12px;
+  background: #fcfdfe;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.wb-canvas {
+  display: block;
+  width: 100%;
+  border-radius: 8px;
+  background: #fff;
+  touch-action: none;
+}
+.wb-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  margin-top: 12px;
+}
+.wb-ctl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  color: var(--ink);
+  min-width: 210px;
+  flex: 1 1 210px;
+}
+.wb-ctl-name { font-weight: 600; white-space: nowrap; }
+.wb-ctl input[type="range"] {
+  flex: 1 1 auto;
+  min-width: 80px;
+  accent-color: var(--accent);
+  height: 20px;
+}
+.wb-ctl-out {
+  min-width: 56px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+  font-weight: 600;
+}
+.wb-readout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+  margin-top: 10px;
+  padding-top: 9px;
+  border-top: 1px dashed var(--line-strong);
+  font-size: 13.5px;
+  color: var(--muted);
+}
+.wb-ro b { color: var(--ink); font-weight: 600; }
+.wb-ro { font-variant-numeric: tabular-nums; }
+.wb-hint {
+  margin: 11px 0 0;
+  padding: 9px 13px;
+  background: #fffaf0;
+  border: 1px dashed #e0b978;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #6b4a12;
+}
+.wb-err {
+  margin: 0;
+  padding: 10px 14px;
+  background: #fdeeee;
+  border: 1px solid #e8b4b4;
+  border-radius: 8px;
+  color: #a33232;
+  font-size: 14px;
+}
+
+/* ============================================================
+   GeoGebra 指令块
+   ============================================================ */
+.gb-block {
+  margin: 18px 0;
+  border: 1px solid #cfe0d4;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fbfdfb;
+}
+.gb-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 14px;
+  background: #eef6f0;
+  border-bottom: 1px solid #d8e9dd;
+  font-size: 13.5px;
+  color: #1f6b4a;
+}
+.gb-copy {
+  flex: 0 0 auto;
+  padding: 5px 13px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #fff;
+  background: #1f8a63;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.gb-copy:hover { background: #176f4f; }
+.gb-block pre {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: #fbfdfb;
+  font-size: 13.5px;
+}
+
+/* ============================================================
+   Python / R 代码选项卡（sim 模拟 / calc 概念计算器：默认 Python，可切换 R）
+   ============================================================ */
+.sim-block {
+  margin: 18px 0;
+  border: 1px solid #d3dcea;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fcfdff;
+}
+.sim-block[data-kind="calc"] { border-color: #cfe6d8; }
+.sim-block[data-kind="calc"] .sim-head { background: #eaf6ef; border-bottom-color: #d3e8dc; }
+.sim-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 10px 7px 12px;
+  background: #eef2fa;
+  border-bottom: 1px solid #dbe3f0;
+}
+.sim-kind {
+  margin-right: auto;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #46505c;
+  white-space: nowrap;
+}
+.sim-tabs { display: flex; gap: 6px; }
+.sim-tab {
+  padding: 4px 14px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #5b6570;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.sim-tab:hover { color: #2f6fb3; }
+.sim-tab.is-active {
+  color: #1d5c9e;
+  background: #fff;
+  border-color: #c3d2e8;
+  font-weight: 600;
+}
+.sim-copy {
+  flex: 0 0 auto;
+  padding: 4px 12px;
+  font-size: 12.5px;
+  font-family: inherit;
+  color: #2f6fb3;
+  background: #fff;
+  border: 1px solid #c3d2e8;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.sim-copy:hover { background: #e3ecf8; }
+.sim-pane {
+  display: none;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: #fcfdff;
+  font-size: 13.5px;
+}
+.sim-pane.is-active { display: block; }
+.sim-pane code { display: block; padding: 12px 14px; }
+
+/* ============================================================
+   知识图谱（knowledge_map.py 生成的内联 SVG）
+   ============================================================ */
+.km-svg {
+  display: block;
+  width: 100%;
+  margin: 20px 0;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei",
+               "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", sans-serif;
+}
+.km-bg { fill: #fff; }
+.km-ttl { font-size: 13px; font-weight: 700; fill: #1f2328; }
+.km-lg { font-size: 11px; fill: #5b6570; }
+.km-cap { font-size: 11px; fill: #7a8693; text-anchor: middle; }
+.km-note { font-size: 12px; fill: #5b6570; text-anchor: middle; }
+
+/* ---------- 打印 ---------- */
+/* ============================================================
+   降级模式（未安装 pandoc 时由内置转换器生成）
+   ============================================================ */
+.fb-note {
+  margin: 18px 0;
+  padding: 12px 16px;
+  background: #fff8e6;
+  border: 1px solid #f0d8a0;
+  border-left: 4px solid #e0a53a;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.75;
+  color: #6b551f;
+}
+.fb-note strong { color: #8a5a00; }
+
+/* 内置转换器解析不了的公式：原样显示 LaTeX 源码，绝不做半吊子猜测 */
+code.math-src {
+  font-family: "JetBrains Mono", Consolas, "Courier New", monospace;
+  font-size: 0.92em;
+  background: #f4f6f8;
+  border: 1px solid #e3e8ee;
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+math { font-size: 1.02em; }
+
+/* ---------- 窄屏（手机）适配 ---------- */
+@media (max-width: 640px) {
+  body { padding: 10px 6px; }
+  .card { padding: 16px 14px; border-radius: 10px; }
+  .card > h1:first-child { font-size: 1.45em; }
+  .card > h2 { font-size: 1.12em; }
+  .facet-h { font-size: 1.08em; padding: 10px 12px; }
+  .facet-body { padding: 2px 12px 14px; }
+  .card table { display: block; overflow-x: auto; white-space: nowrap; }
+  .wb-controls { flex-wrap: wrap; }
+}
+
+@media print {
+  @page { margin: 14mm 12mm; }
+  body { padding: 0; background: #fff; font-size: 11.5pt; line-height: 1.65; }
+  .card {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .card > h2 { page-break-after: avoid; break-after: avoid; }
+  /* 打印：折叠面全部展开（beforeprint 已打开），隐去折叠按钮与箭头 */
+  .facet-toolbar { display: none; }
+  details.facet { border: 0; border-radius: 0; margin: 20px 0 0; }
+  details.facet[open] { box-shadow: none; }
+  .facet-h { page-break-after: avoid; break-after: avoid; background: none; border-left-width: 4px; padding: 6px 0 6px 10px; }
+  .facet-h::before { display: none; }
+  .facet-body { padding: 0 0 0 10px; }
+  .card table, .card pre, .card blockquote, .card img { page-break-inside: avoid; break-inside: avoid; }
+  .card a { color: inherit; text-decoration: none; }
+  /* 打印时：交互组件保留图形、隐去滑块（滑块打印无意义） */
+  .wb-widget { page-break-inside: avoid; break-inside: avoid; border-color: #ccc; background: #fff; }
+  .wb-controls { display: none; }
+  .km-svg, .gb-block { page-break-inside: avoid; break-inside: avoid; }
+  .gb-copy { display: none; }
+  /* 打印：模拟代码不显示选项卡，Python / R 两段全部展示，用标签行区分 */
+  .sim-block { page-break-inside: avoid; break-inside: avoid; border-color: #ccc; background: #fff; }
+  .sim-head { display: none; }
+  .sim-pane { display: block !important; border-top: 1px dashed #ccc; font-size: 10.5pt; }
+  .sim-pane:first-of-type { border-top: 0; }
+  .sim-pane::before {
+    content: attr(data-label);
+    display: block;
+    padding: 6px 14px 0;
+    font-weight: 700;
+    font-size: 10.5pt;
+    color: #1d5c9e;
+  }
+}
+
+</style>
+</head>
+<body>
+<main class="card">
+<h1 id="秩零化定理-六棱镜拆解">秩零化定理 · 六棱镜拆解</h1>
+<blockquote>
+<p>📌 所属：高等代数 / 线性代数 · 线性变换的基本定理（第一同构定理 /
+秩零化定理） ｜ 认知动作：变换| 教材：以你教材对应章节为准 🎯
+<strong>学完你应该能</strong>：①
+分清三条长得很像、方向相反的定理（<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mi>/</mi><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>≅</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">V/\ker T\cong\operatorname{im}T</annotation></semantics></math>
+典范；<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>≅</mo><mi>V</mi><mi>/</mi><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\ker T\cong V/\operatorname{im}T</annotation></semantics></math>
+非典范；维数版相加）；② <strong>逐句验证</strong>映射
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>φ</mi><mo stretchy="false" form="prefix">(</mo><mi>𝐯</mi><mo>+</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>T</mi><mi>𝐯</mi></mrow><annotation encoding="application/x-tex">\varphi(\mathbf v+\ker T)=T\mathbf v</annotation></semantics></math>
+是同构；③ 说明「存在补空间
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>W</mi><annotation encoding="application/x-tex">W</annotation></semantics></math>
+使
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mo>=</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>⊕</mo><mi>W</mi></mrow><annotation encoding="application/x-tex">V=\operatorname{im}T\oplus W</annotation></semantics></math>
+且
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">dim</mi><mo>&#8289;</mo></mrow><mi>W</mi><mo>=</mo><mrow><mi mathvariant="normal">dim</mi><mo>&#8289;</mo></mrow><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\dim W=\dim\ker T</annotation></semantics></math>」为何成立，并写出该基下
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>
+的<strong>矩阵形状</strong>；④ 判定<strong>直和成立的充要条件</strong>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>∩</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mn>𝟎</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\operatorname{im}T\cap\ker T=\{\mathbf0\}</annotation></semantics></math>（可约），并各举一个成立
+/ 失败的例子；⑤ 用
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">dim</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>A</mi><mo>∩</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>A</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mrow><mi mathvariant="normal">rank</mi><mo>&#8289;</mo></mrow><mi>A</mi><mo>−</mo><mrow><mi mathvariant="normal">rank</mi><mo>&#8289;</mo></mrow><msup><mi>A</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">\dim(\operatorname{im}A\cap\ker A)=\operatorname{rank}A-\operatorname{rank}A^2</annotation></semantics></math>
+把「可约与否」变成可算的数。 💡
+<strong>一句话钩子</strong>：<strong>每个线性变换都能换一组基，让它的矩阵只剩「上面一块随便、下面全零」的样子。丢掉的那部分和补上的那部分，形状一定一样。</strong>
+🧱
+<strong>假设基底（待你确认）</strong>：我猜你已会「核与像、维数公式（秩–零度）、直和与补空间、商空间与陪集」——<strong>你觉得自己会吗？</strong>
+→ 我猜你缺的是<strong>把「同构」的两条方向分开</strong>：哪一条的同构是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>
+自己给的（典范），哪一条必须另选一组基才拿得到（非典范）。这一步不分开，证题时就会写出过不了良定义性的映射。</p>
+</blockquote>
+<hr />
+<div class="facet-toolbar"><button type="button" class="facet-toggle" data-open="1">收起全部</button></div><details class="facet" open><summary class="facet-h f1">F1 正反拆解：边界在哪</summary><div class="facet-body">
+<p>本概念的边界<strong>不是</strong>「是它 /
+不是它」，而是「<strong>哪一条定理管哪一对子空间</strong>」。</p>
+<h3 id="两组对照这是整张卡的核心">两组对照（这是整张卡的核心）</h3>
+<p><strong>组 A ·
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">A=\begin{pmatrix}1&amp;1\\1&amp;1\end{pmatrix}</annotation></semantics></math>，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo>,</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">T(x,y)=(x+y,x+y)</annotation></semantics></math></strong></p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>对象</th>
+<th>求法</th>
+<th>结果</th>
+<th>维数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\ker T</annotation></semantics></math></td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub><mo>+</mo><msub><mi>x</mi><mn>2</mn></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">x_1+x_2=0</annotation></semantics></math></td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">span</mtext><mo stretchy="false" form="prefix">{</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mi>−</mi><mn>1</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\text{span}\{(1,-1)^{\mathsf T}\}</annotation></semantics></math></td>
+<td>1</td>
+</tr>
+<tr>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\operatorname{im}T</annotation></semantics></math></td>
+<td>两列都是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>1</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup></mrow><annotation encoding="application/x-tex">(1,1)^{\mathsf T}</annotation></semantics></math></td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">span</mtext><mo stretchy="false" form="prefix">{</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>1</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\text{span}\{(1,1)^{\mathsf T}\}</annotation></semantics></math></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mo>∩</mo><mi mathvariant="normal">ker</mi></mrow><annotation encoding="application/x-tex">\operatorname{im}\cap\ker</annotation></semantics></math>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>s</mi><mo>,</mo><mi>s</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo>,</mo><mi>−</mi><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(s,s)=(t,-t)</annotation></semantics></math>
+⟹
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mo>=</mo><mi>t</mi></mrow><annotation encoding="application/x-tex">s=t</annotation></semantics></math>
+且
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mo>=</mo><mi>−</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">s=-t</annotation></semantics></math>
+⟹
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mo>=</mo><mi>t</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">s=t=0</annotation></semantics></math>
+⟹
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><mn>𝟎</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\{\mathbf0\}</annotation></semantics></math>
+✓ ⟹
+<strong>直和成立</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mo>=</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>⊕</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">V=\operatorname{im}T\oplus\ker T</annotation></semantics></math>
+✓</p>
+<p><strong>组 B ·
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">A=\begin{pmatrix}0&amp;1\\0&amp;0\end{pmatrix}</annotation></semantics></math>，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mi>y</mi><mo>,</mo><mn>0</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">T(x,y)=(y,0)</annotation></semantics></math></strong></p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>对象</th>
+<th>求法</th>
+<th>结果</th>
+<th>维数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\ker T</annotation></semantics></math></td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">y=0</annotation></semantics></math></td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">span</mtext><mo stretchy="false" form="prefix">{</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>0</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\text{span}\{(1,0)^{\mathsf T}\}</annotation></semantics></math></td>
+<td>1</td>
+</tr>
+<tr>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\operatorname{im}T</annotation></semantics></math></td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mi>y</mi><mo>,</mo><mn>0</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">T(x,y)=(y,0)</annotation></semantics></math></td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">span</mtext><mo stretchy="false" form="prefix">{</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>0</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\text{span}\{(1,0)^{\mathsf T}\}</annotation></semantics></math>
+—— <strong>与核完全相同</strong></td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mo>∩</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mo>=</mo><mtext mathvariant="normal">span</mtext><mo stretchy="false" form="prefix">{</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>0</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo stretchy="false" form="postfix">}</mo><mo>≠</mo><mo stretchy="false" form="prefix">{</mo><mn>𝟎</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\operatorname{im}\cap\ker=\text{span}\{(1,0)^{\mathsf T}\}\ne\{\mathbf0\}</annotation></semantics></math>
+⟹
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mo>≠</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>⊕</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">V\ne\operatorname{im}T\oplus\ker T</annotation></semantics></math>
+✗ 但<strong>定理照样成立</strong>：取补空间
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mo>=</mo><mtext mathvariant="normal">span</mtext><mo stretchy="false" form="prefix">{</mo><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>1</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">W=\text{span}\{(0,1)^{\mathsf T}\}</annotation></semantics></math>（验算
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>0</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo>∈</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">T(0,1)=(1,0)^{\mathsf T}\in\operatorname{im}T</annotation></semantics></math>，即
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mo>∩</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mn>𝟎</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">W\cap\operatorname{im}T=\{\mathbf0\}</annotation></semantics></math>
+✓），则
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mo>=</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>⊕</mo><mi>W</mi><mo>,</mo><mspace width="2.0em"></mspace><mrow><mi mathvariant="normal">dim</mi><mo>&#8289;</mo></mrow><mi>W</mi><mo>=</mo><mn>1</mn><mo>=</mo><mrow><mi mathvariant="normal">dim</mi><mo>&#8289;</mo></mrow><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mi>.</mi></mrow><annotation encoding="application/x-tex">V=\operatorname{im}T\oplus W,\qquad \dim W=1=\dim\ker T .</annotation></semantics></math></p>
+<blockquote>
+<p><strong>对照的结论</strong>：两组的核心维数数字<strong>完全一样</strong>（像
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>
+维、核
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>
+维、补空间
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>
+维）。<strong>唯一的差别是「直和成不成立」。</strong> ⟹
+「维数能对上」与「集合能凑齐」是两件完全不同的事。</p>
+</blockquote>
+<h3 id="边界例-三个">边界例 ⭐（三个）</h3>
+<p><strong>边界例 1 · 两端也要成立：零变换与恒等变换</strong> -
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mo>=</mo><mn>𝟎</mn></mrow><annotation encoding="application/x-tex">T=\mathbf0</annotation></semantics></math>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mn>𝟎</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\operatorname{im}=\{\mathbf0\}</annotation></semantics></math>（0
+维），<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mo>=</mo><mi>V</mi></mrow><annotation encoding="application/x-tex">\ker=V</annotation></semantics></math>（<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+维）；补空间取
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mo>=</mo><mi>V</mi></mrow><annotation encoding="application/x-tex">W=V</annotation></semantics></math>，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mn>𝟎</mn><mo stretchy="false" form="postfix">}</mo><mo>⊕</mo><mi>V</mi></mrow><annotation encoding="application/x-tex">V=\{\mathbf0\}\oplus V</annotation></semantics></math>
+✓ 且
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">dim</mi><mo>&#8289;</mo></mrow><mi>W</mi><mo>=</mo><mi>n</mi><mo>=</mo><mrow><mi mathvariant="normal">dim</mi><mo>&#8289;</mo></mrow><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\dim W=n=\dim\ker T</annotation></semantics></math>
+✓ -
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mo>=</mo><mi>I</mi></mrow><annotation encoding="application/x-tex">T=I</annotation></semantics></math>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mo>=</mo><mi>V</mi></mrow><annotation encoding="application/x-tex">\operatorname{im}=V</annotation></semantics></math>，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mn>𝟎</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\ker=\{\mathbf0\}</annotation></semantics></math>；补空间取
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mn>𝟎</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">W=\{\mathbf0\}</annotation></semantics></math>
+✓</p>
+<p><strong>边界例 2 ⭐ 「同维 ⟹ 同构」只在有限维成立</strong>
+本卡「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>≅</mo><mi>V</mi><mi>/</mi><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\ker T\cong V/\operatorname{im}T</annotation></semantics></math>」这一条依赖<strong>有限维</strong>（有限维空间必有补空间，且同维必同构）。无限维空间中「维数都是无穷大」<strong>推不出同构</strong>。
+&gt;
+「秩零化定理」在多数教材里就是按<strong>有限维</strong>讲的。无限维版本需要额外的集合论结果，请勿跨场合套用。</p>
+<p><strong>边界例 3 ⭐ 同构「存在」，但不「由
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>
+决定」</strong> 组 B 里
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mi>/</mi><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">V/\operatorname{im}T</annotation></semantics></math>
+与
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\ker T</annotation></semantics></math>
+都是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>
+维，同构当然存在。但<strong>由
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>
+的公式直接诱导的映射在那里恰好合法</strong>（因为
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>
+把
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\operatorname{im}T</annotation></semantics></math>
+整个打成
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>𝟎</mn><annotation encoding="application/x-tex">\mathbf0</annotation></semantics></math>）；而在<strong>组
+A</strong> 里同一个构造就<strong>不合法</strong>（见下方反例第一行）。 ⟹
+两个例子里「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mi>/</mi><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>≅</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">V/\operatorname{im}T\cong\ker T</annotation></semantics></math>」都成立，但<strong>没有一个统一的、由
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>
+单独决定的构造</strong> —— 这条同构是<strong>非典范的</strong>。</p>
+<h3 id="反例四条">反例（四条）</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>常见说法</th>
+<th>反例</th>
+<th>错在哪</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>陪集换成
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mi>/</mi><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">V/\operatorname{im}T</annotation></semantics></math>
+后，映射还是「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐯</mi><mo>↦</mo><mi>T</mi><mi>𝐯</mi></mrow><annotation encoding="application/x-tex">\mathbf v\mapsto T\mathbf v</annotation></semantics></math>」</td>
+<td><strong>组
+A</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>v</mi><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>0</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">v=(0,0)</annotation></semantics></math>、<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>v</mi><mo>′</mo></msup><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">v&#39;=(1,1)</annotation></semantics></math>，则
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>v</mi><mo>−</mo><msup><mi>v</mi><mo>′</mo></msup><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mi>−</mi><mn>1</mn><mo>,</mo><mi>−</mi><mn>1</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo>∈</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">v-v&#39;=(-1,-1)^{\mathsf T}\in\operatorname{im}T</annotation></semantics></math>（同一陪集），但
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mi>𝐯</mi><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>0</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo>≠</mo><mo stretchy="false" form="prefix">(</mo><mn>2</mn><mo>,</mo><mn>2</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo>=</mo><mi>T</mi><msup><mi>𝐯</mi><mo>′</mo></msup></mrow><annotation encoding="application/x-tex">T\mathbf v=(0,0)^{\mathsf T}\ne(2,2)^{\mathsf T}=T\mathbf v&#39;</annotation></semantics></math></td>
+<td>良定义性要求
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mo stretchy="false" form="prefix">(</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mn>𝟎</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">T(\operatorname{im}T)=\{\mathbf0\}</annotation></semantics></math>，一般不成立</td>
+</tr>
+<tr>
+<td>「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mo>=</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>⊕</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">V=\ker T\oplus\operatorname{im}T</annotation></semantics></math>」</td>
+<td><strong>组 B</strong></td>
+<td>只在
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>∩</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mn>𝟎</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\operatorname{im}T\cap\ker T=\{\mathbf0\}</annotation></semantics></math>
+时成立</td>
+</tr>
+<tr>
+<td>「零化定理说
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mo>=</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">W=\ker T</annotation></semantics></math>」</td>
+<td><strong>组 B</strong>：把
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>W</mi><annotation encoding="application/x-tex">W</annotation></semantics></math>
+写成
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>=</mo><mtext mathvariant="normal">span</mtext><mo stretchy="false" form="prefix">{</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>0</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\ker T=\text{span}\{(1,0)^{\mathsf T}\}</annotation></semantics></math>
+⟹
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>∩</mo><mi>W</mi><mo>=</mo><mtext mathvariant="normal">span</mtext><mo stretchy="false" form="prefix">{</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>0</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo stretchy="false" form="postfix">}</mo><mo>≠</mo><mo stretchy="false" form="prefix">{</mo><mn>𝟎</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\operatorname{im}T\cap W=\text{span}\{(1,0)^{\mathsf T}\}\ne\{\mathbf0\}</annotation></semantics></math>，直和失败</td>
+<td>定理说的是「<strong>存在</strong>某个
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mo>∥</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">W\parallel\operatorname{im}T</annotation></semantics></math>，且
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">dim</mi><mo>&#8289;</mo></mrow><mi>W</mi><mo>=</mo><mrow><mi mathvariant="normal">dim</mi><mo>&#8289;</mo></mrow><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\dim W=\dim\ker T</annotation></semantics></math>」，不是「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>W</mi><annotation encoding="application/x-tex">W</annotation></semantics></math>
+就是核」</td>
+</tr>
+<tr>
+<td>「维数公式
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>⇒</mo><annotation encoding="application/x-tex">\Rightarrow</annotation></semantics></math>
+集合互补」</td>
+<td>组 A 与组 B 的维数数字完全相同，但只有组 A 直和成立</td>
+<td>维数等式推不出集合关系</td>
+</tr>
+</tbody>
+</table>
+<hr />
+</div></details><details class="facet"><summary class="facet-h f2">F2 通俗理解</summary><div class="facet-body">
+<p><strong>一句人话</strong>：<strong>每个线性变换都能换一组基，让它的矩阵只剩「上面一块随便、下面全零」；丢掉的那部分和补上的那部分，形状一定一样。</strong></p>
+<p><strong>类比 · 书架与「空出来的层」</strong> &gt;
+一排书架（<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>V</mi><annotation encoding="application/x-tex">V</annotation></semantics></math>）被一台复印机（<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>）扫过一遍：扫过的部分变成「成品区」（<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\operatorname{im}T</annotation></semantics></math>），还有一些格子它「完全扫不动
+/ 没扫到」，那几个格子构成核。 &gt;
+关键在于：<strong>你可以换一种方式重新给这些格子编号</strong>。按「成品区在前、空格子在后」排，复印机对任何一格的输出都落在前面的成品区
+⟹ 矩阵下面那一大片必然全是零。 &gt; 至于「空出来的那几个格子」长什么样
+—— 它的<strong>维数</strong>被成品区牢牢钉住：成品区
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>r</mi><annotation encoding="application/x-tex">r</annotation></semantics></math>
+格 ⟹ 空格子必是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>−</mo><mi>r</mi></mrow><annotation encoding="application/x-tex">n-r</annotation></semantics></math>
+个。</p>
+<p><strong>失效边界（三条）</strong> -
+<strong>类比只告诉你「维数被钉住」，不能告诉你「核就等于那些空格子」</strong>
+—— 组 B 就是反例：真正的补空间得<strong>另选</strong>，选出来的
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>W</mi><annotation encoding="application/x-tex">W</annotation></semantics></math>
+与核只是同维，不是同一块地方。 -
+<strong>「扫不动」不是「扫成某张废纸」，是扫成空白</strong>（<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>𝟎</mn><annotation encoding="application/x-tex">\mathbf0</annotation></semantics></math>）。
+- 类比只帮想到，<strong>不作证明依据</strong>。</p>
+<p><strong>为什么需要它</strong>：它是「把抽象的核与像换成能算的东西」的通行证
+—— 换基成上块 + 下零、判可约与不可约、进 Jordan
+标准形与同态基本定理（<strong>都是更后面的工具</strong>），全靠这一步。</p>
+<hr />
+</div></details><details class="facet"><summary class="facet-h f3">F3 严格数学表述</summary><div class="facet-body">
+<h3 id="三条定理先分清哪条配哪一对">三条定理：先分清哪条配哪一对</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>编号</th>
+<th>结论</th>
+<th>地位</th>
+<th>同构由谁给出</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>T1</strong></td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mi>/</mi><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mspace width="0.278em"></mspace><mo>≅</mo><mspace width="0.278em"></mspace><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">V/\ker T\;\cong\;\operatorname{im}T</annotation></semantics></math></td>
+<td>定理（第一同构定理）</td>
+<td><strong>典范</strong>：映射就是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>φ</mi><mo stretchy="false" form="prefix">(</mo><mi>𝐯</mi><mo>+</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>T</mi><mi>𝐯</mi></mrow><annotation encoding="application/x-tex">\varphi(\mathbf v+\ker T)=T\mathbf v</annotation></semantics></math></td>
+</tr>
+<tr>
+<td><strong>T2</strong></td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mspace width="0.278em"></mspace><mo>≅</mo><mspace width="0.278em"></mspace><mi>V</mi><mi>/</mi><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\ker T\;\cong\;V/\operatorname{im}T</annotation></semantics></math></td>
+<td>定理（秩零化定理）</td>
+<td><strong>存在，但非典范</strong>：必须另选补空间（或内积）才能拿到同构</td>
+</tr>
+<tr>
+<td><strong>T3</strong></td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">dim</mi><mo>&#8289;</mo></mrow><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>+</mo><mrow><mi mathvariant="normal">dim</mi><mo>&#8289;</mo></mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>=</mo><mrow><mi mathvariant="normal">dim</mi><mo>&#8289;</mo></mrow><mi>V</mi></mrow><annotation encoding="application/x-tex">\dim\ker T+\dim\operatorname{im}T=\dim V</annotation></semantics></math></td>
+<td>定理（秩–零度）</td>
+<td>维数版，只是数，不给同构</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>记法提醒</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mi>/</mi><mi>W</mi></mrow><annotation encoding="application/x-tex">V/W</annotation></semantics></math>
+是「商空间」＝ 把
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>W</mi><annotation encoding="application/x-tex">W</annotation></semantics></math>
+里的向量全看作同一个陪集的
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>V</mi><annotation encoding="application/x-tex">V</annotation></semantics></math>，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mi>/</mi><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">V/\ker T</annotation></semantics></math>
+是「把核里的全看作同一个」，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mi>/</mi><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">V/\operatorname{im}T</annotation></semantics></math>
+是「把像里的全看作同一个」。<strong>陪集里的分子不唯一，这正是下一步要验良定义性的原因。</strong></p>
+</blockquote>
+<h3 id="t1-的证明逐句每步注依据">T1 的证明（逐句，每步注依据）</h3>
+<p><strong>命题</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>φ</mi><mo>:</mo><mi>V</mi><mi>/</mi><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>→</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\varphi:V/\ker T\to\operatorname{im}T</annotation></semantics></math>，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>φ</mi><mo stretchy="false" form="prefix">(</mo><mi>𝐯</mi><mo>+</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>T</mi><mi>𝐯</mi></mrow><annotation encoding="application/x-tex">\varphi(\mathbf v+\ker T)=T\mathbf v</annotation></semantics></math>
+是同构。</p>
+<ol type="1">
+<li><strong>良定义</strong>：若
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐯</mi><mo>+</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>=</mo><msup><mi>𝐯</mi><mo>′</mo></msup><mo>+</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\mathbf v+\ker T=\mathbf v&#39;+\ker T</annotation></semantics></math>，则
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐯</mi><mo>−</mo><msup><mi>𝐯</mi><mo>′</mo></msup><mo>∈</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\mathbf v-\mathbf v&#39;\in\ker T</annotation></semantics></math>，即
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mo stretchy="false" form="prefix">(</mo><mi>𝐯</mi><mo>−</mo><msup><mi>𝐯</mi><mo>′</mo></msup><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mn>𝟎</mn></mrow><annotation encoding="application/x-tex">T(\mathbf v-\mathbf v&#39;)=\mathbf0</annotation></semantics></math>，故
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mi>𝐯</mi><mo>=</mo><mi>T</mi><msup><mi>𝐯</mi><mo>′</mo></msup></mrow><annotation encoding="application/x-tex">T\mathbf v=T\mathbf v&#39;</annotation></semantics></math>。<em>依据</em>：陪集相等的定义
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>+</mi><annotation encoding="application/x-tex">+</annotation></semantics></math>
+核的定义。</li>
+<li><strong>线性</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>φ</mi><mo stretchy="false" form="prefix">(</mo><mi>α</mi><mo stretchy="false" form="prefix">(</mo><mi>𝐯</mi><mo>+</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo stretchy="false" form="postfix">)</mo><mo>+</mo><mi>β</mi><mo stretchy="false" form="prefix">(</mo><msup><mi>𝐯</mi><mo>′</mo></msup><mo>+</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>φ</mi><mo stretchy="false" form="prefix">(</mo><mo stretchy="false" form="prefix">(</mo><mi>α</mi><mi>𝐯</mi><mo>+</mo><mi>β</mi><msup><mi>𝐯</mi><mo>′</mo></msup><mo stretchy="false" form="postfix">)</mo><mo>+</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>T</mi><mo stretchy="false" form="prefix">(</mo><mi>α</mi><mi>𝐯</mi><mo>+</mo><mi>β</mi><msup><mi>𝐯</mi><mo>′</mo></msup><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>α</mi><mi>T</mi><mi>𝐯</mi><mo>+</mo><mi>β</mi><mi>T</mi><msup><mi>𝐯</mi><mo>′</mo></msup></mrow><annotation encoding="application/x-tex">\varphi(\alpha(\mathbf v+\ker T)+\beta(\mathbf v&#39;+\ker T))=\varphi((\alpha\mathbf v+\beta\mathbf v&#39;)+\ker T)=T(\alpha\mathbf v+\beta\mathbf v&#39;)=\alpha T\mathbf v+\beta T\mathbf v&#39;</annotation></semantics></math>。<em>依据</em>：陪集的加法定义
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>+</mi><annotation encoding="application/x-tex">+</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>
+的线性。</li>
+<li><strong>满射</strong>：任意
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐮</mi><mo>∈</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\mathbf u\in\operatorname{im}T</annotation></semantics></math>
+按定义有
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐮</mi><mo>=</mo><mi>T</mi><mi>𝐯</mi></mrow><annotation encoding="application/x-tex">\mathbf u=T\mathbf v</annotation></semantics></math>，于是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>φ</mi><mo stretchy="false" form="prefix">(</mo><mi>𝐯</mi><mo>+</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>𝐮</mi></mrow><annotation encoding="application/x-tex">\varphi(\mathbf v+\ker T)=\mathbf u</annotation></semantics></math>。<em>依据</em>：像的定义。</li>
+<li><strong>单射</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>φ</mi><mo stretchy="false" form="prefix">(</mo><mi>𝐯</mi><mo>+</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mn>𝟎</mn><mo>⇒</mo><mi>T</mi><mi>𝐯</mi><mo>=</mo><mn>𝟎</mn><mo>⇒</mo><mi>𝐯</mi><mo>∈</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>⇒</mo><mi>𝐯</mi><mo>+</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>=</mo><mn>𝟎</mn><mo>+</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\varphi(\mathbf v+\ker T)=\mathbf0\Rightarrow T\mathbf v=\mathbf0\Rightarrow\mathbf v\in\ker T\Rightarrow\mathbf v+\ker T=\mathbf0+\ker T</annotation></semantics></math>。<em>依据</em>：核的定义
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>+</mi><annotation encoding="application/x-tex">+</annotation></semantics></math>
+陪集的定义。<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>◼</mi><annotation encoding="application/x-tex">\blacksquare</annotation></semantics></math></li>
+</ol>
+<blockquote>
+<p><strong>第 1 步是整条证明的心脏</strong>。T2 那条映射（陪集用
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\operatorname{im}T</annotation></semantics></math>）在这里就崩：良定义需要
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mo stretchy="false" form="prefix">(</mo><mi>𝐯</mi><mo>−</mo><msup><mi>𝐯</mi><mo>′</mo></msup><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">T(\mathbf v-\mathbf v&#39;)=0</annotation></semantics></math>
+对一切
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐯</mi><mo>−</mo><msup><mi>𝐯</mi><mo>′</mo></msup><mo>∈</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\mathbf v-\mathbf v&#39;\in\operatorname{im}T</annotation></semantics></math>
+成立，<strong>等于要求
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mo stretchy="false" form="prefix">(</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mn>𝟎</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">T(\operatorname{im}T)=\{\mathbf0\}</annotation></semantics></math></strong>，一般不成立（组
+A 即反例）。</p>
+</blockquote>
+<h3 id="t2-的证明三步">T2 的证明（三步）</h3>
+<ol type="1">
+<li>有限维下，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\operatorname{im}T</annotation></semantics></math>
+的任何子空间都有<strong>补空间</strong>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>W</mi><annotation encoding="application/x-tex">W</annotation></semantics></math>，使
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mo>=</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>⊕</mo><mi>W</mi></mrow><annotation encoding="application/x-tex">V=\operatorname{im}T\oplus W</annotation></semantics></math>。<em>依据</em>：有限维子空间的直和分解存在性。</li>
+<li>于是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">dim</mi><mo>&#8289;</mo></mrow><mi>W</mi><mo>=</mo><mrow><mi mathvariant="normal">dim</mi><mo>&#8289;</mo></mrow><mi>V</mi><mo>−</mo><mrow><mi mathvariant="normal">dim</mi><mo>&#8289;</mo></mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\dim W=\dim V-\dim\operatorname{im}T</annotation></semantics></math>。<em>依据</em>：直和的维数可加。</li>
+<li>由
+T3（秩–零度），<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">dim</mi><mo>&#8289;</mo></mrow><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>=</mo><mrow><mi mathvariant="normal">dim</mi><mo>&#8289;</mo></mrow><mi>V</mi><mo>−</mo><mrow><mi mathvariant="normal">dim</mi><mo>&#8289;</mo></mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>=</mo><mrow><mi mathvariant="normal">dim</mi><mo>&#8289;</mo></mrow><mi>W</mi></mrow><annotation encoding="application/x-tex">\dim\ker T=\dim V-\dim\operatorname{im}T=\dim W</annotation></semantics></math>，两有限维空间同维
+⟹
+同构。<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>◼</mi><annotation encoding="application/x-tex">\blacksquare</annotation></semantics></math></li>
+</ol>
+<blockquote>
+<p><strong>注意 T2 的同构「没有给出配方」</strong> —— 因为要先选
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>W</mi><annotation encoding="application/x-tex">W</annotation></semantics></math>。要写出配方，就得额外给一个内积：此时
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mi>/</mi><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>≅</mo><mo stretchy="false" form="prefix">(</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><msup><mo stretchy="false" form="postfix">)</mo><mo>⟂</mo></msup><mo>=</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">V/\operatorname{im}T\cong(\operatorname{im}T)^{\perp}=\ker T</annotation></semantics></math>（用
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>u</mi><mo>+</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>↦</mo><mo stretchy="false" form="prefix">(</mo><mi>u</mi><mo>,</mo><mi>⋅</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">u+\operatorname{im}T\mapsto(u,\cdot)</annotation></semantics></math>
+这个对偶型配方）。<strong>这就是「非典范」的确切含义。</strong></p>
+</blockquote>
+<h3 id="实用推论换基后的矩阵形状">实用推论：换基后的矩阵形状</h3>
+<p>设
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>W</mi><annotation encoding="application/x-tex">W</annotation></semantics></math>
+如
+T2，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\operatorname{im}T</annotation></semantics></math>
+的一组基为
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>γ</mi><mn>1</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>γ</mi><mi>r</mi></msub></mrow><annotation encoding="application/x-tex">\gamma_1,\dots,\gamma_r</annotation></semantics></math>（<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi><mo>=</mo><mrow><mi mathvariant="normal">dim</mi><mo>&#8289;</mo></mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">r=\dim\operatorname{im}T</annotation></semantics></math>），<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>W</mi><annotation encoding="application/x-tex">W</annotation></semantics></math>
+的一组基为
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>δ</mi><mn>1</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>δ</mi><mrow><mi>n</mi><mo>−</mo><mi>r</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\delta_1,\dots,\delta_{n-r}</annotation></semantics></math>。在基
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>ℬ</mi><mo>′</mo></msup><mo>=</mo><mo stretchy="false" form="prefix">(</mo><msub><mi>γ</mi><mn>1</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>γ</mi><mi>r</mi></msub><mo>,</mo><msub><mi>δ</mi><mn>1</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>δ</mi><mrow><mi>n</mi><mo>−</mo><mi>r</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\mathcal B&#39;=(\gamma_1,\dots,\gamma_r,\delta_1,\dots,\delta_{n-r})</annotation></semantics></math>
+下：</p>
+<ul>
+<li>对
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>j</mi><mo>≤</mo><mi>r</mi></mrow><annotation encoding="application/x-tex">j\le r</annotation></semantics></math>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><msub><mi>γ</mi><mi>j</mi></msub><mo>∈</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">T\gamma_j\in\operatorname{im}T</annotation></semantics></math>
+⟹ 它的
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>ℬ</mi><mo>′</mo></msup><annotation encoding="application/x-tex">\mathcal B&#39;</annotation></semantics></math>
+坐标的<strong>后
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>−</mo><mi>r</mi></mrow><annotation encoding="application/x-tex">n-r</annotation></semantics></math>
+个分量全为零</strong> ⟹ 第
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
+列形如
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mi>*</mi></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>𝟎</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\begin{pmatrix}\ast\\ \mathbf0\end{pmatrix}</annotation></semantics></math></li>
+<li>对
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>j</mi><mo>&gt;</mo><mi>r</mi></mrow><annotation encoding="application/x-tex">j&gt;r</annotation></semantics></math>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><msub><mi>δ</mi><mi>j</mi></msub><mo>∈</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">T\delta_j\in\ker T</annotation></semantics></math>，而
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\ker T</annotation></semantics></math>
+一般不落在前
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>r</mi><annotation encoding="application/x-tex">r</annotation></semantics></math>
+个方向里 ⟹ 无约束</li>
+</ul>
+<p>⟹
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>
+在这组基下的矩阵形如</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mi>A</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>B</mi></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><msub><mn>𝟎</mn><mrow><mi>n</mi><mo>−</mo><mi>r</mi></mrow></msub></mtd><mtd columnalign="center" style="text-align: center"><mn>𝟎</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mspace width="2.0em"></mspace><mi>A</mi><mo>∈</mo><msup><mi>ℝ</mi><mrow><mi>r</mi><mo>×</mo><mi>r</mi></mrow></msup><mo>,</mo><mspace width="0.222em"></mspace><mi>B</mi><mo>∈</mo><msup><mi>ℝ</mi><mrow><mi>r</mi><mo>×</mo><mo stretchy="false" form="prefix">(</mo><mi>n</mi><mo>−</mo><mi>r</mi><mo stretchy="false" form="postfix">)</mo></mrow></msup></mrow><annotation encoding="application/x-tex">\begin{pmatrix} A &amp; B \\ \mathbf 0_{n-r} &amp; \mathbf 0 \end{pmatrix},\qquad A\in\mathbb{R}^{r\times r},\ B\in\mathbb{R}^{r\times(n-r)}</annotation></semantics></math></p>
+<p><strong>验证（组 A
+实算）</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>A</mi><mn>0</mn></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">A_0=\begin{pmatrix}1&amp;1\\1&amp;1\end{pmatrix}</annotation></semantics></math>，取
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>γ</mi><mn>1</mn></msub><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>1</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup></mrow><annotation encoding="application/x-tex">\gamma_1=(1,1)^{\mathsf T}</annotation></semantics></math>、<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>δ</mi><mn>1</mn></msub><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mi>−</mi><mn>1</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup></mrow><annotation encoding="application/x-tex">\delta_1=(1,-1)^{\mathsf T}</annotation></semantics></math>。
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><msub><mi>γ</mi><mn>1</mn></msub><mo>=</mo><mi>T</mi><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>2</mn><mo>,</mo><mn>2</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo>=</mo><mn>2</mn><msub><mi>γ</mi><mn>1</mn></msub><mo>+</mo><mn>0</mn><msub><mi>δ</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">T\gamma_1=T(1,1)=(2,2)^{\mathsf T}=2\gamma_1+0\delta_1</annotation></semantics></math>
+⟹ 第 1 列
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>2</mn><mo>,</mo><mn>0</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup></mrow><annotation encoding="application/x-tex">=(2,0)^{\mathsf T}</annotation></semantics></math>；
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><msub><mi>δ</mi><mn>1</mn></msub><mo>=</mo><mi>T</mi><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mi>−</mi><mn>1</mn><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>0</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup></mrow><annotation encoding="application/x-tex">T\delta_1=T(1,-1)=(0,0)^{\mathsf T}</annotation></semantics></math>
+⟹ 第 2 列
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>0</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup></mrow><annotation encoding="application/x-tex">=(0,0)^{\mathsf T}</annotation></semantics></math>。
+⟹ 矩阵
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>2</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">=\begin{pmatrix}2&amp;0\\0&amp;0\end{pmatrix}</annotation></semantics></math>
+✓ 正是「可逆块
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>+</mi><annotation encoding="application/x-tex">+</annotation></semantics></math>
+零块」的形状。</p>
+<blockquote>
+<p><strong>两个术语（考试爱考）</strong> -
+<strong>可约（reducible）</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>∩</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mn>𝟎</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\operatorname{im}T\cap\ker T=\{\mathbf0\}</annotation></semantics></math>。此时可直接取
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mo>=</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">W=\ker T</annotation></semantics></math>，矩阵进一步简化为
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mi>A</mi></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\begin{pmatrix}A&amp;0\\0&amp;0\end{pmatrix}</annotation></semantics></math>，其中
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>=</mo><mo stretchy="false" form="prefix">[</mo><mi>T</mi><msub><mo stretchy="false" form="prefix">|</mo><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow></msub><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">A=[T|_{\operatorname{im}T}]</annotation></semantics></math>
+<strong>可逆</strong>（由 T1）。 -
+<strong>不可约（irreducible）</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>⊆</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\ker T\subseteq\operatorname{im}T</annotation></semantics></math>。此时
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><msub><mo stretchy="false" form="prefix">|</mo><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow></msub></mrow><annotation encoding="application/x-tex">T|_{\operatorname{im}T}</annotation></semantics></math>
+是<strong>幂零</strong>的（<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><msup><mi>T</mi><mi>k</mi></msup></mrow><annotation encoding="application/x-tex">\operatorname{im}T^k</annotation></semantics></math>
+递减而有限维 ⟹ 稳定 ⟹ 该限制幂零）。组 B
+即是：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>
+把
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>
+轴上的
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>0</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(1,0)</annotation></semantics></math>
+打成
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>𝟎</mn><annotation encoding="application/x-tex">\mathbf0</annotation></semantics></math>，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>A</mi><mn>2</mn></msup><mo>=</mo><mn>𝟎</mn></mrow><annotation encoding="application/x-tex">A^2=\mathbf0</annotation></semantics></math>。</p>
+<p>「<strong>零化</strong>」这个名字来自
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mo>→</mo><mi>V</mi><mi>/</mi><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">V\to V/\operatorname{im}T</annotation></semantics></math>
+这个「把像压掉」的操作；<strong>它不能消掉
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\operatorname{im}T</annotation></semantics></math>
+内部的那部分核</strong> —— 不可约时那部分是消不掉的。</p>
+</blockquote>
+<h3 id="删条件实验">删条件实验 ⭐</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>删掉 / 改动</th>
+<th>后果</th>
+<th>验算</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1 的陪集由
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mi>/</mi><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">V/\ker T</annotation></semantics></math>
+改成
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mi>/</mi><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">V/\operatorname{im}T</annotation></semantics></math></td>
+<td>良定义性崩</td>
+<td>组
+A：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>v</mi><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>0</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">v=(0,0)</annotation></semantics></math>、<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>v</mi><mo>′</mo></msup><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">v&#39;=(1,1)</annotation></semantics></math>
+同陪集（差
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mi>−</mi><mn>1</mn><mo>,</mo><mi>−</mi><mn>1</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo>∈</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">=(-1,-1)^{\mathsf T}\in\operatorname{im}T</annotation></semantics></math>），但
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mi>𝐯</mi><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>0</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo>≠</mo><mo stretchy="false" form="prefix">(</mo><mn>2</mn><mo>,</mo><mn>2</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo>=</mo><mi>T</mi><msup><mi>𝐯</mi><mo>′</mo></msup></mrow><annotation encoding="application/x-tex">T\mathbf v=(0,0)^{\mathsf T}\ne(2,2)^{\mathsf T}=T\mathbf v&#39;</annotation></semantics></math></td>
+</tr>
+<tr>
+<td>T1
+里的「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐯</mi><mo>∈</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\mathbf v\in\ker T</annotation></semantics></math>」被忽略（写成
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>φ</mi><mo stretchy="false" form="prefix">(</mo><mi>𝐯</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>T</mi><mi>𝐯</mi></mrow><annotation encoding="application/x-tex">\varphi(\mathbf v)=T\mathbf v</annotation></semantics></math>）</td>
+<td>单射性失效</td>
+<td>组
+B：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>φ</mi><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>0</mn><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>T</mi><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>0</mn><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mn>𝟎</mn><mo>=</mo><mi>φ</mi><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>0</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\varphi(1,0)=T(1,0)=\mathbf0=\varphi(0,0)</annotation></semantics></math>
+⟹ 非单射</td>
+</tr>
+<tr>
+<td>T2 的「<strong>存在</strong>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>W</mi><annotation encoding="application/x-tex">W</annotation></semantics></math>」改成「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mo>=</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">W=\ker T</annotation></semantics></math>」</td>
+<td>直和可能失败</td>
+<td>组
+B：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mo>=</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>=</mo><mtext mathvariant="normal">span</mtext><mo stretchy="false" form="prefix">{</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>0</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">W=\ker T=\text{span}\{(1,0)^{\mathsf T}\}</annotation></semantics></math>
+⟹
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>∩</mo><mi>W</mi><mo>=</mo><mtext mathvariant="normal">span</mtext><mo stretchy="false" form="prefix">{</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>0</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo stretchy="false" form="postfix">}</mo><mo>≠</mo><mo stretchy="false" form="prefix">{</mo><mn>𝟎</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\operatorname{im}T\cap W=\text{span}\{(1,0)^{\mathsf T}\}\ne\{\mathbf0\}</annotation></semantics></math></td>
+</tr>
+<tr>
+<td>去掉「有限维」</td>
+<td>「同维 ⟹ 同构」失效</td>
+<td>无限维中两个「维数都是无穷」的空间未必同构；本卡按有限维</td>
+</tr>
+<tr>
+<td>T3 里的
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi mathvariant="normal">dim</mi><annotation encoding="application/x-tex">\dim</annotation></semantics></math>
+换成「元素个数」<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">|</mo><mi>⋅</mi><mo stretchy="false" form="postfix">|</mo></mrow><annotation encoding="application/x-tex">\lvert\cdot\rvert</annotation></semantics></math></td>
+<td>等式失去意义</td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\operatorname{im}T</annotation></semantics></math>
+通常是无穷集</td>
+</tr>
+</tbody>
+</table>
+<h3 id="操作骨架怎么用">操作骨架：怎么用</h3>
+<p>① 想知道
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>
+压掉几维 ⟹
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">dim</mi><mo>&#8289;</mo></mrow><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\dim\ker T</annotation></semantics></math>；②
+想知道输出范围多大 ⟹
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">dim</mi><mo>&#8289;</mo></mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\dim\operatorname{im}T</annotation></semantics></math>；③
+想把
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>
+化成最简矩阵 ⟹ 找
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mo>∥</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">W\parallel\operatorname{im}T</annotation></semantics></math>，按「像的基在前、<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>W</mi><annotation encoding="application/x-tex">W</annotation></semantics></math>
+的基在后」排序，矩阵自动呈上块 + 下零；④ 想判可约 ⟹ 算
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>∩</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\operatorname{im}T\cap\ker T</annotation></semantics></math>（可算法见下）。</p>
+<p><strong>可算的判定式（自己推一遍）</strong>：设
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>𝐲</mi><mn>1</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>𝐲</mi><mi>k</mi></msub><mo>∈</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>∩</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\mathbf y_1,\dots,\mathbf y_k\in\operatorname{im}T\cap\ker T</annotation></semantics></math>，令
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝐱</mi><mi>i</mi></msub><annotation encoding="application/x-tex">\mathbf x_i</annotation></semantics></math>
+满足
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><msub><mi>𝐱</mi><mi>i</mi></msub><mo>=</mo><msub><mi>𝐲</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">T\mathbf x_i=\mathbf y_i</annotation></semantics></math>（可能不唯一）。则
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐳</mi><mo>=</mo><mo>∑</mo><msub><mi>c</mi><mi>i</mi></msub><msub><mi>𝐲</mi><mi>i</mi></msub><mo>∈</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>∩</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\mathbf z=\sum c_i\mathbf y_i\in\operatorname{im}T\cap\ker T</annotation></semantics></math>
+⟺
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐳</mi><mo>∈</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\mathbf z\in\operatorname{im}T</annotation></semantics></math>
+且
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mi>𝐳</mi><mo>=</mo><mn>𝟎</mn></mrow><annotation encoding="application/x-tex">T\mathbf z=\mathbf0</annotation></semantics></math>，其中
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mi>𝐳</mi><mo>=</mo><mo>∑</mo><msub><mi>c</mi><mi>i</mi></msub><msub><mi>𝐲</mi><mi>i</mi></msub><mn>𝟎</mn></mrow><annotation encoding="application/x-tex">T\mathbf z=\sum c_i\mathbf y_i\mathbf0</annotation></semantics></math>…
+由 T1 得
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>∩</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mspace width="0.278em"></mspace><mo>≅</mo><mspace width="0.278em"></mspace><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mspace width="-0.167em"></mspace><mrow><mo stretchy="true" form="prefix">(</mo><mi>T</mi><msub><mo minsize="120%" maxsize="120%" stretchy="true" form="prefix">|</mo><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mspace width="2.0em"></mspace><mrow><mi mathvariant="normal">dim</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>∩</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>r</mi><mo>−</mo><mrow><mi mathvariant="normal">rank</mi><mo>&#8289;</mo></mrow><msup><mi>A</mi><mn>2</mn></msup><mi>.</mi></mrow><annotation encoding="application/x-tex">\operatorname{im}T\cap\ker T\;\cong\;\ker\!\left(T\big|_{\operatorname{im}T}\right),\qquad \dim(\operatorname{im}T\cap\ker T)=r-\operatorname{rank}A^2 .</annotation></semantics></math></p>
+<hr />
+</div></details><details class="facet"><summary class="facet-h f4">F4 几何 / 物理意义</summary><div class="facet-body">
+<ul>
+<li><strong>补空间
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>=</mo><annotation encoding="application/x-tex">=</annotation></semantics></math>「剩下的那部分」</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>V</mi><annotation encoding="application/x-tex">V</annotation></semantics></math>
+切成「已经变成像的那些方向」<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>+</mi><annotation encoding="application/x-tex">+</annotation></semantics></math>「仍待在原地的部分」。后者的维数被前者<strong>牢牢钉住</strong>：像
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>r</mi><annotation encoding="application/x-tex">r</annotation></semantics></math>
+维 ⟹ 剩下
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>−</mo><mi>r</mi></mrow><annotation encoding="application/x-tex">n-r</annotation></semantics></math>
+维 ⟹ 与核同维。</li>
+<li><strong>组 B
+的画面最该看</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mi>y</mi><mo>,</mo><mn>0</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">T(x,y)=(y,0)</annotation></semantics></math>
+里，像
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>=</mo><annotation encoding="application/x-tex">=</annotation></semantics></math>
+核
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>=</mo><annotation encoding="application/x-tex">=</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>
+轴，而那条
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>
+方向的「多出来的一条」<strong>谁也拿不走</strong> ——
+这就是为什么不能写「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mo>=</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mo>⊕</mo><mi mathvariant="normal">im</mi></mrow><annotation encoding="application/x-tex">V=\ker\oplus\operatorname{im}</annotation></semantics></math>」，只能写「<strong>存在</strong>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>W</mi><annotation encoding="application/x-tex">W</annotation></semantics></math>」。</li>
+<li><strong>回指 F3</strong>：「矩阵呈上块 +
+下零」的画面，就是「把已变成像的方向排在前面」的坐标选择结果 —— 不是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>
+变简单了，是我们换了个坐标系看它。</li>
+<li><strong>物理类比</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\operatorname{im}T</annotation></semantics></math>
+是「输出端真正能出现的态」，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\ker T</annotation></semantics></math>
+是「输入里那些完全不被听见的分量」。补空间
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>W</mi><annotation encoding="application/x-tex">W</annotation></semantics></math>
+是「<strong>为了凑齐维度而另找的</strong>、与核同维但不是核的那部分方向」——
+提醒你：<strong>同维不等于同一块地方</strong>。</li>
+<li>纪律：几何只帮你<strong>想到</strong>，结论一律以 F3
+的推理为准。</li>
+</ul>
+<hr />
+</div></details><details class="facet"><summary class="facet-h f5">F5 图形化演示</summary><div class="facet-body">
+<p><strong>认知动作 = 变换</strong>：二维下秩与核/补空间的维数
+bookkeeping 全部可视。</p>
+<p><strong>先预测再动手</strong>：盯住面板的「秩」读数 —— 秩
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>r</mi><annotation encoding="application/x-tex">r</annotation></semantics></math>
+⟹ 像
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>r</mi><annotation encoding="application/x-tex">r</annotation></semantics></math>
+维 ⟹ 核
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mo>−</mo><mi>r</mi></mrow><annotation encoding="application/x-tex">2-r</annotation></semantics></math>
+维 ⟹ 补空间也
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mo>−</mo><mi>r</mi></mrow><annotation encoding="application/x-tex">2-r</annotation></semantics></math>
+维。<strong>两种算法算出来的数永远撞在一起</strong>，这就是零化定理在二维的样子。</p>
+<div class="wb-widget" data-wb="matrix2"
+data-spec="eyJ0eXBlIjogIm1hdHJpeDIiLCAicmFuZ2UiOiBbLTMsIDNdLCAic2xpZGVycyI6IFt7Im5hbWUiOiAiYSIsICJsYWJlbCI6ICJhIiwgIm1pbiI6IC0yLCAibWF4IjogMiwgInN0ZXAiOiAwLjA1LCAidmFsdWUiOiAyfSwgeyJuYW1lIjogImIiLCAibGFiZWwiOiAiYiIsICJtaW4iOiAtMiwgIm1heCI6IDIsICJzdGVwIjogMC4wNSwgInZhbHVlIjogMH0sIHsibmFtZSI6ICJjIiwgImxhYmVsIjogImMiLCAibWluIjogLTIsICJtYXgiOiAyLCAic3RlcCI6IDAuMDUsICJ2YWx1ZSI6IDB9LCB7Im5hbWUiOiAiZCIsICJsYWJlbCI6ICJkIiwgIm1pbiI6IC0yLCAibWF4IjogMiwgInN0ZXAiOiAwLjA1LCAidmFsdWUiOiAxLjV9XSwgImhpbnQiOiAi5oqKIGHjgIFjIOmDveaLluWIsCAw77ya56ep5LuOIDIg5o6J5YiwIDEg4oCU4oCUIOWDj+WwkeS6huS4gOS4quaWueWQke+8jOS6juaYr+aguOWSjOihpeepuumXtOmDveW/hemhu+mVv+aIkCAxIOe7tO+8iOS4pOenjeeul+azleaSnuWcqOS4gOi1t++8jOi/meWwseaYr+OAjOS4ouaOieeahOWSjOihpeS4iueahOW9oueKtuS4gOagt+OAje+8ieOAguWGjeaLluWIsCBhPWM9ZD0w77ya56epIDDvvIzmoLggPSDmlbTkuKrlubPpnaLvvIgyIOe7tO+8ie+8jOihpeepuumXtOS5n+aYr+aVtOS4quW5s+mdou+8jOebtOWSjOS7jeaIkOeri++8iFYgPSB7MH0g4oqVIFbvvInjgILlj43ov4fmnaXmi5bliLDnp6kgPSAy77yI5Y+v6YCG77yJ77yM5qC4ID0gezB977yM6KGl56m66Ze0ID0gezB9IOKAlOKAlCDkuInnp43mnoHlgLznmoTnu7TmlbDotKbnm67lhajpg6jlr7nkuIrjgIIifQ==">
+
+</div>
+<blockquote>
+<p><strong>诚实说明</strong>：本卡的核心是<strong>两组子空间的关系</strong>，二维画布只显示「像的形状与秩」，<strong>看不到核的方向本身</strong>；「像
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>∩</mi><annotation encoding="application/x-tex">\cap</annotation></semantics></math>
+核
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>=</mo><annotation encoding="application/x-tex">=</annotation></semantics></math>
+零还是非零」要靠算（见计算器）。<strong>不在图上假装有它没有的信息。</strong></p>
+</blockquote>
+<p>在 GeoGebra 里复现：</p>
+<div class="gb-block">
+<div class="gb-head">
+<span>在 GeoGebra
+里自己复现（把下面指令逐行粘贴到输入栏，回车）</span><button type="button" class="gb-copy">复制指令</button>
+</div>
+<pre><code>a = Slider(-2, 2, 0.05)
+b = Slider(-2, 2, 0.05)
+c = Slider(-2, 2, 0.05)
+d = Slider(-2, 2, 0.05)
+M = {{a, b}, {c, d}}
+sq = Polygon((0, 0), (1, 0), (1, 1), (0, 1))
+img = ApplyMatrix(M, sq)
+detM = Determinant(M)
+SetColor(sq, 0.55, 0.55, 0.60)
+SetColor(img, 0.18, 0.44, 0.70)</code></pre>
+</div>
+<hr />
+</div></details><h2 id="概念计算器输入-输出">🧮 概念计算器（输入 → 输出）</h2>
+<p>「可约 / 不可约」这件事最容易口头含混，所以给它一个能算的函数：输入
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>，输出三个维数、重叠维数与直和判定。</p>
+<div class="sim-block" data-lang="python" data-kind="calc">
+<div class="sim-head">
+<span class="sim-kind">计算器 · 输入 → 输出</span>
+<div class="sim-tabs" role="tablist">
+<button type="button" class="sim-tab is-active" data-lang="python">
+Python
+</button>
+<button type="button" class="sim-tab" data-lang="r">
+R
+</button>
+</div>
+<button type="button" class="sim-copy">
+复制代码
+</button>
+</div>
+<pre class="sim-pane is-active" data-lang="python" data-label="Python"><code>import numpy as np
+def split(A):
+    A = np.array(A, dtype=float); n = A.shape[1]
+    r = int(np.linalg.matrix_rank(A))
+    ov = r - int(np.linalg.matrix_rank(A @ A))
+    return {&quot;秩/像维数&quot;: r, &quot;核维数&quot;: n - r, &quot;补空间维数&quot;: n - r,
+            &quot;im∩ker维数&quot;: ov, &quot;直和成立&quot;: &quot;是&quot; if ov == 0 else &quot;否&quot;, &quot;核对(核+像)&quot;: (n - r) + r}
+for name, A in [(&quot;组A&quot;, [[1, 1], [1, 1]]), (&quot;组B&quot;, [[0, 1], [0, 0]])]:
+    print(name, &quot; &quot;.join(f&quot;{k}={v}&quot; for k, v in split(A).items()))
+# 预期输出:
+# 组A 秩/像维数=1 核维数=1 补空间维数=1 im∩ker维数=0 直和成立=是 核对(核+像)=2
+# 组B 秩/像维数=1 核维数=1 补空间维数=1 im∩ker维数=1 直和成立=否 核对(核+像)=2</code></pre>
+<pre class="sim-pane" data-lang="r" data-label="R"><code>split = \(A) {
+  A = matrix(as.numeric(A), nrow = 2, byrow = TRUE)
+  n = ncol(A); r = qr(A)$rank; ov = r - qr(A %*% A)$rank
+  parts = c(paste0(&quot;秩/像维数=&quot;, r), paste0(&quot;核维数=&quot;, n - r), paste0(&quot;补空间维数=&quot;, n - r),
+            paste0(&quot;im∩ker维数=&quot;, ov), paste0(&quot;直和成立=&quot;, if (ov == 0) &quot;是&quot; else &quot;否&quot;),
+            paste0(&quot;核对(核+像)=&quot;, (n - r) + r))
+  cat(paste(parts, collapse = &quot; &quot;), &quot;\n&quot;)
+}
+cat(&quot;组A &quot;); split(c(1, 1, 1, 1))
+cat(&quot;组B &quot;); split(c(0, 1, 0, 0))
+# 预期输出:
+# 组A 秩/像维数=1 核维数=1 补空间维数=1 im∩ker维数=0 直和成立=是 核对(核+像)=2
+# 组B 秩/像维数=1 核维数=1 补空间维数=1 im∩ker维数=1 直和成立=否 核对(核+像)=2</code></pre>
+</div>
+<blockquote>
+<p><strong>两段输出必须逐字相同</strong>（同一个函数、同一组矩阵）——
+这本身就是「两种语言算的是同一个几何量」的证据。
+<strong>请盯住最后一行</strong>：组 A 与组 B
+的前五个数里，<strong>只有「im∩ker维数」和「直和成立」不同</strong>。<strong>这就是本卡要你记住的那句话：维数能对上，不代表集合能凑齐。</strong>
+计算器的核心公式是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">dim</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>A</mi><mo>∩</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>A</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mrow><mi mathvariant="normal">rank</mi><mo>&#8289;</mo></mrow><mi>A</mi><mo>−</mo><mrow><mi mathvariant="normal">rank</mi><mo>&#8289;</mo></mrow><msup><mi>A</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">\dim(\operatorname{im}A\cap\ker A)=\operatorname{rank}A-\operatorname{rank}A^2</annotation></semantics></math>，它来自
+T1 在
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\operatorname{im}T</annotation></semantics></math>
+上的应用（见 F3 操作骨架）。</p>
+</blockquote>
+<hr />
+<details class="facet"><summary class="facet-h f6">F6 联系其它概念</summary><div class="facet-body">
+<p><strong>先自己列三个前置</strong>，再对照下面这张图，看漏了谁。</p>
+<svg class="km-svg" viewBox="0 0 680 294" width="100%" role="img" aria-label="秩零化定理 的知识图谱">
+<rect class="km-bg" x="0" y="0" width="680" height="294"/>
+<defs><marker id="km-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8a97a3"/></marker><marker id="km-ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#a693cc"/></marker></defs>
+<text class="km-ttl" x="18" y="20">秩零化定理 · 知识图谱</text>
+<rect x="18" y="25" width="11" height="11" rx="3" fill="#eef2f6" stroke="#b9c4cf"/>
+<text class="km-lg" x="34" y="35">下楼 · 前置</text>
+<rect x="116.48" y="25" width="11" height="11" rx="3" fill="#2f6fb3" stroke="#20507f"/>
+<text class="km-lg" x="132.48000000000002" y="35">本概念</text>
+<rect x="185.48000000000002" y="25" width="11" height="11" rx="3" fill="#e8f5ef" stroke="#a9d3c1"/>
+<text class="km-lg" x="201.48000000000002" y="35">上楼 · 后续</text>
+<rect x="283.96000000000004" y="25" width="11" height="11" rx="3" fill="#f1ecfa" stroke="#c3b0e0"/>
+<text class="km-lg" x="299.96000000000004" y="35">平移 · 对偶</text>
+<rect x="19.0" y="42.0" width="178.0" height="36.0" rx="9" fill="#eef2f6" stroke="#b9c4cf" stroke-width="1.4"/>
+<text x="108.0" y="60.0" font-size="13.5" font-weight="600" fill="#33414d" text-anchor="middle" dominant-baseline="central">核与像</text>
+<path d="M197.0,60.0 H216.0" fill="none" stroke="#8a97a3" stroke-width="1.4"/>
+<rect x="19.0" y="92.0" width="178.0" height="36.0" rx="9" fill="#eef2f6" stroke="#b9c4cf" stroke-width="1.4"/>
+<text x="108.0" y="110.0" font-size="13.5" font-weight="600" fill="#33414d" text-anchor="middle" dominant-baseline="central">直和与补空间</text>
+<path d="M197.0,110.0 H216.0" fill="none" stroke="#8a97a3" stroke-width="1.4"/>
+<rect x="19.0" y="142.0" width="178.0" height="36.0" rx="9" fill="#eef2f6" stroke="#b9c4cf" stroke-width="1.4"/>
+<text x="108.0" y="160.0" font-size="13.5" font-weight="600" fill="#33414d" text-anchor="middle" dominant-baseline="central">商空间与陪集</text>
+<path d="M197.0,160.0 H216.0" fill="none" stroke="#8a97a3" stroke-width="1.4"/>
+<rect x="483.0" y="42.0" width="178.0" height="36.0" rx="9" fill="#e8f5ef" stroke="#a9d3c1" stroke-width="1.4"/>
+<text x="572.0" y="60.0" font-size="13.5" font-weight="600" fill="#17674a" text-anchor="middle" dominant-baseline="central">第一同构定理</text>
+<path d="M464.0,60.0 H483.0" fill="none" stroke="#8a97a3" stroke-width="1.4" marker-end="url(#km-ar)"/>
+<rect x="483.0" y="92.0" width="178.0" height="36.0" rx="9" fill="#e8f5ef" stroke="#a9d3c1" stroke-width="1.4"/>
+<text x="572.0" y="110.0" font-size="10.0" font-weight="600" fill="#17674a" text-anchor="middle" dominant-baseline="central">Jordan
+标准形（更后面的工具）</text>
+<path d="M464.0,110.0 H483.0" fill="none" stroke="#8a97a3" stroke-width="1.4" marker-end="url(#km-ar)"/>
+<rect x="483.0" y="142.0" width="178.0" height="36.0" rx="9" fill="#e8f5ef" stroke="#a9d3c1" stroke-width="1.4"/>
+<text x="572.0" y="160.0" font-size="9.0" font-weight="600" fill="#17674a" text-anchor="middle" dominant-baseline="central">群与环的同态基本定理（更后面的工具）</text>
+<path d="M464.0,160.0 H483.0" fill="none" stroke="#8a97a3" stroke-width="1.4" marker-end="url(#km-ar)"/>
+<path d="M216.0,42.0 V178.0" fill="none" stroke="#8a97a3" stroke-width="1.4"/>
+<path d="M216.0,110.0 H242.0" fill="none" stroke="#8a97a3" stroke-width="1.6" marker-end="url(#km-ar)"/>
+<path d="M464.0,42.0 V178.0" fill="none" stroke="#8a97a3" stroke-width="1.4"/>
+<path d="M438.0,110.0 H464.0" fill="none" stroke="#8a97a3" stroke-width="1.6" marker-end="url(#km-ar)"/>
+<text class="km-cap" x="340.0" y="77.0">高等代数 ·
+线性变换的基本定理</text>
+<rect x="242.0" y="87.0" width="196.0" height="46.0" rx="9" fill="#2f6fb3" stroke="#20507f" stroke-width="1.4"/>
+<text x="340.0" y="110.0" font-size="15.0" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">秩零化定理</text>
+<text class="km-cap" x="340.0" y="198.0">平移 ·
+同类或对偶概念（双向）</text>
+<rect x="155.0" y="206.0" width="178.0" height="36.0" rx="9" fill="#f1ecfa" stroke="#c3b0e0" stroke-width="1.4"/>
+<text x="244.0" y="224.0" font-size="13.5" font-weight="600" fill="#5b3f8f" text-anchor="middle" dominant-baseline="central">对偶映射</text>
+<path d="M244.0,202.0 V137.0" fill="none" stroke="#a693cc" stroke-width="1.4" stroke-dasharray="5 4" marker-start="url(#km-ar2)" marker-end="url(#km-ar2)"/>
+<rect x="347.0" y="206.0" width="178.0" height="36.0" rx="9" fill="#f1ecfa" stroke="#c3b0e0" stroke-width="1.4"/>
+<text x="436.0" y="224.0" font-size="13.5" font-weight="600" fill="#5b3f8f" text-anchor="middle" dominant-baseline="central">可约与不可约</text>
+<path d="M436.0,202.0 V137.0" fill="none" stroke="#a693cc" stroke-width="1.4" stroke-dasharray="5 4" marker-start="url(#km-ar2)" marker-end="url(#km-ar2)"/>
+<text class="km-note" x="340.0" y="284">丢掉的那部分与补上的那部分同维；但「同维」不等于「同一块地方」</text>
+</svg>
+<ul>
+<li><strong>下楼（谁推出它）</strong>
+<ul>
+<li><strong>核与像</strong> —— 提供
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>∩</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\operatorname{im}T\cap\ker T</annotation></semantics></math>、<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">dim</mi><mo>&#8289;</mo></mrow><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>+</mo><mrow><mi mathvariant="normal">dim</mi><mo>&#8289;</mo></mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>=</mo><mrow><mi mathvariant="normal">dim</mi><mo>&#8289;</mo></mrow><mi>V</mi></mrow><annotation encoding="application/x-tex">\dim\ker T+\dim\operatorname{im}T=\dim V</annotation></semantics></math>；</li>
+<li><strong>直和与补空间</strong> —— 「存在
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>W</mi><annotation encoding="application/x-tex">W</annotation></semantics></math>」这一步靠它；</li>
+<li><strong>商空间与陪集</strong> ——
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mi>/</mi><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">V/\operatorname{im}T</annotation></semantics></math>
+与
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mi>/</mi><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">V/\ker T</annotation></semantics></math>
+是怎么定义的。</li>
+</ul></li>
+<li><strong>上楼（它推出什么）</strong>
+<ul>
+<li><strong>第一同构定理（T1）</strong> ——
+群与环都有对应版本，是整个抽象代数的骨干定理；</li>
+<li><strong>Jordan 标准形 / Fitting
+分解</strong>（<strong>更后面的工具</strong>）—— 「不可约时
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><msub><mo stretchy="false" form="prefix">|</mo><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow></msub></mrow><annotation encoding="application/x-tex">T|_{\operatorname{im}T}</annotation></semantics></math>
+幂零」这条直接通向广义特征向量与 Jordan 块；</li>
+<li><strong>群与环的同态基本定理</strong> ——
+同一套「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>G</mi><mi>/</mi><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>φ</mi><mo>≅</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>φ</mi></mrow><annotation encoding="application/x-tex">G/\ker\varphi\cong\operatorname{im}\varphi</annotation></semantics></math>」的翻版。</li>
+</ul></li>
+<li><strong>平移（对偶 / 同类）</strong>
+<ul>
+<li><strong>对偶映射</strong> ——
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mo>≅</mo><msup><mi>V</mi><mrow><mi>*</mi><mo>*</mo></mrow></msup></mrow><annotation encoding="application/x-tex">V\cong V^{\ast\ast}</annotation></semantics></math>
+是「维数够 ⟹ 同构」的最纯粹版本；</li>
+<li><strong>可约与不可约</strong> —— T2
+的两个分支，各有各的矩阵形状。</li>
+</ul></li>
+<li><strong>它在哪一层</strong>：<strong>收口层</strong>。它把「核」「像」「补空间」「商空间」四样东西扣成一条，是通往
+Jordan
+形与同态基本定理（<strong>都是更后面的工具</strong>）的唯一入口。</li>
+</ul>
+<hr />
+</div></details><h2
+id="说到秩零化定理你要想到闭卷-60-秒4-条才算过">说到「秩零化定理」，你要想到……（闭卷
+60 秒，≥4 条才算过）</h2>
+<ol type="1">
+<li><strong>三条定理分清方向</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mi>/</mi><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>≅</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">V/\ker T\cong\operatorname{im}T</annotation></semantics></math>（<strong>典范</strong>，映射就是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mi>𝐯</mi></mrow><annotation encoding="application/x-tex">T\mathbf v</annotation></semantics></math>）；<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>≅</mo><mi>V</mi><mi>/</mi><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\ker T\cong V/\operatorname{im}T</annotation></semantics></math>（<strong>存在但非���范</strong>）；<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi mathvariant="normal">dim</mi><annotation encoding="application/x-tex">\dim</annotation></semantics></math>
+相加（维数版）。</li>
+<li><strong>良定义性是心脏</strong>：陪集用
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\ker T</annotation></semantics></math>
+才能让「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐯</mi><mo>↦</mo><mi>T</mi><mi>𝐯</mi></mrow><annotation encoding="application/x-tex">\mathbf v\mapsto T\mathbf v</annotation></semantics></math>」合法；换成
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\operatorname{im}T</annotation></semantics></math>
+就需要
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mo stretchy="false" form="prefix">(</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mn>𝟎</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">T(\operatorname{im}T)=\{\mathbf0\}</annotation></semantics></math>，一般不成立。</li>
+<li><strong>「存在补空间」不能写成「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mo>=</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">W=\ker T</annotation></semantics></math>」</strong>
+—— 只有可约时才允许。</li>
+<li><strong>可约
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>⇔</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>∩</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mn>𝟎</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\iff\operatorname{im}T\cap\ker T=\{\mathbf0\}</annotation></semantics></math></strong>；可约时矩阵简化成
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mi>A</mi></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\begin{pmatrix}A&amp;0\\0&amp;0\end{pmatrix}</annotation></semantics></math>
+且
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>
+可逆；不可约时
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><msub><mo stretchy="false" form="prefix">|</mo><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow></msub></mrow><annotation encoding="application/x-tex">T|_{\operatorname{im}T}</annotation></semantics></math>
+幂零。</li>
+<li><strong>换基到「像的基在前、补空间的基在后」⟹ 矩阵呈
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mi>A</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>B</mi></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\begin{pmatrix}A&amp;B\\0&amp;0\end{pmatrix}</annotation></semantics></math></strong>。</li>
+<li><strong>可算判据</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">dim</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>A</mi><mo>∩</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>A</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mrow><mi mathvariant="normal">rank</mi><mo>&#8289;</mo></mrow><mi>A</mi><mo>−</mo><mrow><mi mathvariant="normal">rank</mi><mo>&#8289;</mo></mrow><msup><mi>A</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">\dim(\operatorname{im}A\cap\ker A)=\operatorname{rank}A-\operatorname{rank}A^2</annotation></semantics></math>。</li>
+<li><strong>「同维
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>⇒</mo><annotation encoding="application/x-tex">\Rightarrow</annotation></semantics></math>
+同构」只在有限维成立</strong>。</li>
+<li><strong>零化消不掉
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\operatorname{im}T</annotation></semantics></math>
+内部的核</strong>。</li>
+</ol>
+<hr />
+<h2
+id="自检你学会了吗先自己想再看答案">自检：你学会了吗？（先自己想，再看答案）</h2>
+<ol type="1">
+<li><strong>判断真假，给两个数值例子</strong>：「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mo>=</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>⊕</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">V=\ker T\oplus\operatorname{im}T</annotation></semantics></math>。」一个成立、一个失败，各写出
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>。</li>
+<li><strong>验算</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">A=\begin{pmatrix}1&amp;1\\1&amp;1\end{pmatrix}</annotation></semantics></math>，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mo>=</mo><msup><mi>ℝ</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">V=\mathbb{R}^2</annotation></semantics></math>。写出
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>A</mi></mrow><annotation encoding="application/x-tex">\ker A</annotation></semantics></math>、<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>A</mi></mrow><annotation encoding="application/x-tex">\operatorname{im}A</annotation></semantics></math>，并逐步验证
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>φ</mi><mo stretchy="false" form="prefix">(</mo><mi>𝐯</mi><mo>+</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>A</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>A</mi><mi>𝐯</mi></mrow><annotation encoding="application/x-tex">\varphi(\mathbf v+\ker A)=A\mathbf v</annotation></semantics></math>
+是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mi>/</mi><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>A</mi><mo>→</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>A</mi></mrow><annotation encoding="application/x-tex">V/\ker A\to\operatorname{im}A</annotation></semantics></math>
+的同构（良定义 / 线性 / 满射 / 单射
+四步都要写依据）。然后解释：若把陪集换成
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mi>/</mi><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>A</mi></mrow><annotation encoding="application/x-tex">V/\operatorname{im}A</annotation></semantics></math>，哪一步会崩？给具体
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐯</mi><mo>,</mo><msup><mi>𝐯</mi><mo>′</mo></msup></mrow><annotation encoding="application/x-tex">\mathbf v,\mathbf v&#39;</annotation></semantics></math>。</li>
+<li><strong>（创造层）</strong> 把 T2
+里的「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mo>≅</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">W\cong\ker T</annotation></semantics></math>」改成「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mo>=</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">W=\ker T</annotation></semantics></math>」，用组
+B 算一遍，会在哪一步失败？</li>
+<li><strong>迁移题</strong>：用「假设基底 + 删条件实验」拆一个新概念 ——
+建议 <strong>群的第一同构定理</strong>（同一套骨架换到群上），或
+<strong>Fitting 分解</strong>（沿「不可约 ⟹ 幂零」往下走）。</li>
+</ol>
+<details>
+<summary>
+答案与提示（先自己做完再看 ↓）
+</summary>
+<ol type="1">
+<li><strong>不是恒真的</strong> —— 只在
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>∩</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mn>𝟎</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\operatorname{im}T\cap\ker T=\{\mathbf0\}</annotation></semantics></math>
+时成立。
+<ul>
+<li><strong>成立</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">A=\begin{pmatrix}1&amp;1\\1&amp;1\end{pmatrix}</annotation></semantics></math>，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mo>=</mo><mtext mathvariant="normal">span</mtext><mo stretchy="false" form="prefix">{</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>1</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\operatorname{im}=\text{span}\{(1,1)^{\mathsf T}\}</annotation></semantics></math>，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mo>=</mo><mtext mathvariant="normal">span</mtext><mo stretchy="false" form="prefix">{</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mi>−</mi><mn>1</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\ker=\text{span}\{(1,-1)^{\mathsf T}\}</annotation></semantics></math>；<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>s</mi><mo>,</mo><mi>s</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo>,</mo><mi>−</mi><mi>t</mi><mo stretchy="false" form="postfix">)</mo><mo>⇒</mo><mi>s</mi><mo>=</mo><mi>t</mi></mrow><annotation encoding="application/x-tex">(s,s)=(t,-t)\Rightarrow s=t</annotation></semantics></math>
+且
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mo>=</mo><mi>−</mi><mi>t</mi><mo>⇒</mo><mi>s</mi><mo>=</mo><mi>t</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">s=-t\Rightarrow s=t=0</annotation></semantics></math>
+⟹ 交为零 ⟹ 直和成立 ✓</li>
+<li><strong>失败</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">A=\begin{pmatrix}0&amp;1\\0&amp;0\end{pmatrix}</annotation></semantics></math>，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mo>=</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mo>=</mo><mtext mathvariant="normal">span</mtext><mo stretchy="false" form="prefix">{</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>0</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\operatorname{im}=\ker=\text{span}\{(1,0)^{\mathsf T}\}</annotation></semantics></math>
+⟹ 交
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>=</mo><mtext mathvariant="normal">span</mtext><mo stretchy="false" form="prefix">{</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>0</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo stretchy="false" form="postfix">}</mo><mo>≠</mo><mo stretchy="false" form="prefix">{</mo><mn>𝟎</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">=\text{span}\{(1,0)^{\mathsf T}\}\ne\{\mathbf0\}</annotation></semantics></math>，且和集只有
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>
+维 ⟹ 凑不出
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>ℝ</mi><mn>2</mn></msup><annotation encoding="application/x-tex">\mathbb{R}^2</annotation></semantics></math>
+✗</li>
+</ul></li>
+<li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>𝐱</mi><mo>=</mo><mn>𝟎</mn><mo>⇔</mo><msub><mi>x</mi><mn>1</mn></msub><mo>+</mo><msub><mi>x</mi><mn>2</mn></msub><mo>=</mo><mn>0</mn><mo>⇔</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>A</mi><mo>=</mo><mtext mathvariant="normal">span</mtext><mo stretchy="false" form="prefix">{</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mi>−</mi><mn>1</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">A\mathbf x=\mathbf0\iff x_1+x_2=0\iff\ker A=\text{span}\{(1,-1)^{\mathsf T}\}</annotation></semantics></math>（维数
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>，验
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mi>−</mi><mn>1</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>0</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup></mrow><annotation encoding="application/x-tex">A(1,-1)^{\mathsf T}=(0,0)^{\mathsf T}</annotation></semantics></math>
+✓）；两列都是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>1</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup></mrow><annotation encoding="application/x-tex">(1,1)^{\mathsf T}</annotation></semantics></math>
+⟹
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>A</mi><mo>=</mo><mtext mathvariant="normal">span</mtext><mo stretchy="false" form="prefix">{</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>1</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\operatorname{im}A=\text{span}\{(1,1)^{\mathsf T}\}</annotation></semantics></math>（维数
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>）。
+<ul>
+<li><strong>良定义</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐯</mi><mo>+</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>A</mi><mo>=</mo><msup><mi>𝐯</mi><mo>′</mo></msup><mo>+</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>A</mi><mo>⇒</mo><mi>𝐯</mi><mo>−</mo><msup><mi>𝐯</mi><mo>′</mo></msup><mo>∈</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>A</mi><mo>⇒</mo><mi>A</mi><mo stretchy="false" form="prefix">(</mo><mi>𝐯</mi><mo>−</mo><msup><mi>𝐯</mi><mo>′</mo></msup><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mn>𝟎</mn><mo>⇒</mo><mi>A</mi><mi>𝐯</mi><mo>=</mo><mi>A</mi><msup><mi>𝐯</mi><mo>′</mo></msup></mrow><annotation encoding="application/x-tex">\mathbf v+\ker A=\mathbf v&#39;+\ker A\Rightarrow\mathbf v-\mathbf v&#39;\in\ker A\Rightarrow A(\mathbf v-\mathbf v&#39;)=\mathbf0\Rightarrow A\mathbf v=A\mathbf v&#39;</annotation></semantics></math>
+✓</li>
+<li><strong>线性</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>φ</mi><mo stretchy="false" form="prefix">(</mo><mi>α</mi><mo stretchy="false" form="prefix">(</mo><mi>𝐯</mi><mo>+</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="postfix">)</mo><mo>+</mo><mi>β</mi><mo stretchy="false" form="prefix">(</mo><msup><mi>𝐯</mi><mo>′</mo></msup><mo>+</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>φ</mi><mo stretchy="false" form="prefix">(</mo><mo stretchy="false" form="prefix">(</mo><mi>α</mi><mi>𝐯</mi><mo>+</mo><mi>β</mi><msup><mi>𝐯</mi><mo>′</mo></msup><mo stretchy="false" form="postfix">)</mo><mo>+</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>A</mi><mo stretchy="false" form="prefix">(</mo><mi>α</mi><mi>𝐯</mi><mo>+</mo><mi>β</mi><msup><mi>𝐯</mi><mo>′</mo></msup><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>α</mi><mi>A</mi><mi>𝐯</mi><mo>+</mo><mi>β</mi><mi>A</mi><msup><mi>𝐯</mi><mo>′</mo></msup></mrow><annotation encoding="application/x-tex">\varphi(\alpha(\mathbf v+\ker)+\beta(\mathbf v&#39;+\ker))=\varphi((\alpha\mathbf v+\beta\mathbf v&#39;)+\ker)=A(\alpha\mathbf v+\beta\mathbf v&#39;)=\alpha A\mathbf v+\beta A\mathbf v&#39;</annotation></semantics></math>
+✓</li>
+<li><strong>满射</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐮</mi><mo>∈</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>A</mi></mrow><annotation encoding="application/x-tex">\mathbf u\in\operatorname{im}A</annotation></semantics></math>
+⟹ 有
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐯</mi><annotation encoding="application/x-tex">\mathbf v</annotation></semantics></math>
+使
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐮</mi><mo>=</mo><mi>A</mi><mi>𝐯</mi></mrow><annotation encoding="application/x-tex">\mathbf u=A\mathbf v</annotation></semantics></math>
+⟹
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>φ</mi><mo stretchy="false" form="prefix">(</mo><mi>𝐯</mi><mo>+</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>A</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>𝐮</mi></mrow><annotation encoding="application/x-tex">\varphi(\mathbf v+\ker A)=\mathbf u</annotation></semantics></math>
+✓</li>
+<li><strong>单射</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>φ</mi><mo stretchy="false" form="prefix">(</mo><mi>𝐯</mi><mo>+</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>A</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mn>𝟎</mn><mo>⇒</mo><mi>A</mi><mi>𝐯</mi><mo>=</mo><mn>𝟎</mn><mo>⇒</mo><mi>𝐯</mi><mo>∈</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>A</mi><mo>⇒</mo></mrow><annotation encoding="application/x-tex">\varphi(\mathbf v+\ker A)=\mathbf0\Rightarrow A\mathbf v=\mathbf0\Rightarrow\mathbf v\in\ker A\Rightarrow</annotation></semantics></math>
+陪集为
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>
+✓ <strong>换陪集后崩的是良定义</strong>：需要
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐯</mi><mo>−</mo><msup><mi>𝐯</mi><mo>′</mo></msup><mo>∈</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>A</mi><mo>⇒</mo><mi>A</mi><mo stretchy="false" form="prefix">(</mo><mi>𝐯</mi><mo>−</mo><msup><mi>𝐯</mi><mo>′</mo></msup><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mn>𝟎</mn></mrow><annotation encoding="application/x-tex">\mathbf v-\mathbf v&#39;\in\operatorname{im}A\Rightarrow A(\mathbf v-\mathbf v&#39;)=\mathbf0</annotation></semantics></math>，即要求
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo stretchy="false" form="prefix">(</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>A</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mn>𝟎</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">A(\operatorname{im}A)=\{\mathbf0\}</annotation></semantics></math>。取
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐯</mi><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>0</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\mathbf v=(0,0)</annotation></semantics></math>、<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>𝐯</mi><mo>′</mo></msup><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\mathbf v&#39;=(1,1)</annotation></semantics></math>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐯</mi><mo>−</mo><msup><mi>𝐯</mi><mo>′</mo></msup><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mi>−</mi><mn>1</mn><mo>,</mo><mi>−</mi><mn>1</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo>∈</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>A</mi></mrow><annotation encoding="application/x-tex">\mathbf v-\mathbf v&#39;=(-1,-1)^{\mathsf T}\in\operatorname{im}A</annotation></semantics></math>（同一陪集），但
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>𝐯</mi><mo>=</mo><mn>𝟎</mn><mo>≠</mo><mo stretchy="false" form="prefix">(</mo><mn>2</mn><mo>,</mo><mn>2</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo>=</mo><mi>A</mi><msup><mi>𝐯</mi><mo>′</mo></msup></mrow><annotation encoding="application/x-tex">A\mathbf v=\mathbf0\ne(2,2)^{\mathsf T}=A\mathbf v&#39;</annotation></semantics></math>
+⟹ 崩 ✓</li>
+</ul></li>
+<li>组
+B：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>=</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>=</mo><mtext mathvariant="normal">span</mtext><mo stretchy="false" form="prefix">{</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>0</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\operatorname{im}T=\ker T=\text{span}\{(1,0)^{\mathsf T}\}</annotation></semantics></math>。若写成
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mo>=</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">W=\ker T</annotation></semantics></math>，则
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>∩</mo><mi>W</mi><mo>=</mo><mtext mathvariant="normal">span</mtext><mo stretchy="false" form="prefix">{</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>0</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo stretchy="false" form="postfix">}</mo><mo>≠</mo><mo stretchy="false" form="prefix">{</mo><mn>𝟎</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\operatorname{im}T\cap W=\text{span}\{(1,0)^{\mathsf T}\}\ne\{\mathbf0\}</annotation></semantics></math>
+⟹ <strong>直和分解失败</strong>；而且
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>+</mo><mi>W</mi></mrow><annotation encoding="application/x-tex">\operatorname{im}T+W</annotation></semantics></math>
+仍只有
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>
+维，凑不出
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>ℝ</mi><mn>2</mn></msup><annotation encoding="application/x-tex">\mathbb{R}^2</annotation></semantics></math>。
+正确的
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>W</mi><annotation encoding="application/x-tex">W</annotation></semantics></math>
+是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">span</mtext><mo stretchy="false" form="prefix">{</mo><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>1</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\text{span}\{(0,1)^{\mathsf T}\}</annotation></semantics></math>：验
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>0</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo>∈</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">T(0,1)=(1,0)^{\mathsf T}\in\operatorname{im}T</annotation></semantics></math>
+⟹
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mo>∩</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mn>𝟎</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">W\cap\operatorname{im}T=\{\mathbf0\}</annotation></semantics></math>
+✓，且
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">dim</mi><mo>&#8289;</mo></mrow><mi>W</mi><mo>=</mo><mn>1</mn><mo>=</mo><mrow><mi mathvariant="normal">dim</mi><mo>&#8289;</mo></mrow><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\dim W=1=\dim\ker T</annotation></semantics></math>
+✓。</li>
+<li>迁移提示（拆「群的第一同构定理」）：钩子可写「群打来打去，总有一部分信息被打掉了；被打掉的那部分就是核，而剩下的群与「原群除以核」一模一样」；
+<strong>删条件实验</strong>：把「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>φ</mi><annotation encoding="application/x-tex">\varphi</annotation></semantics></math>
+是同态」改成「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>φ</mi><annotation encoding="application/x-tex">\varphi</annotation></semantics></math>
+只需在陪集上良定义」——群版本的良定义性要求
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><msup><mi>h</mi><mo>′</mo></msup><mo>∈</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mo>⇒</mo><mi>φ</mi><mo stretchy="false" form="prefix">(</mo><mi>h</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>φ</mi><mo stretchy="false" form="prefix">(</mo><msup><mi>h</mi><mo>′</mo></msup><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">hh&#39;\in\ker\Rightarrow\varphi(h)=\varphi(h&#39;)</annotation></semantics></math>，而群<strong>不是交换的</strong>，所以必须要求
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><msup><mi>h</mi><mo>′</mo></msup><mo>∈</mo><mi mathvariant="normal">ker</mi></mrow><annotation encoding="application/x-tex">hh&#39;\in\ker</annotation></semantics></math>；若只写
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>h</mi><mo>′</mo></msup><mo>∈</mo><mi mathvariant="normal">ker</mi></mrow><annotation encoding="application/x-tex">h&#39;\in\ker</annotation></semantics></math>，结论立刻不成立；
+假设基底邀请语：「我猜你已经会『核与像』和『陪集怎么读』——<strong>你觉得自己会吗？</strong>」</li>
+</ol>
+</details>
+<hr />
+<h2
+id="常见错位清单内是错误来源">常见错位清单（〔〕内是<strong>错误来源</strong>）</h2>
+<ol type="1">
+<li>〔<strong>定理当定义</strong>〕三条定理混着背：把「典范的
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mi>/</mi><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mo>≅</mo><mi mathvariant="normal">im</mi></mrow><annotation encoding="application/x-tex">V/\ker\cong\operatorname{im}</annotation></semantics></math>」与「非典范的
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mo>≅</mo><mi>V</mi><mi>/</mi><mi mathvariant="normal">im</mi></mrow><annotation encoding="application/x-tex">\ker\cong V/\operatorname{im}</annotation></semantics></math>」配对搞反。</li>
+<li>〔<strong>类比越界</strong>〕从维数相加推出「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mo>=</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mo>⊕</mo><mi mathvariant="normal">im</mi></mrow><annotation encoding="application/x-tex">V=\ker\oplus\operatorname{im}</annotation></semantics></math>」或「集合互补」。</li>
+<li>〔<strong>字眼漏读</strong>〕「<strong>存在</strong>补空间
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mo>∥</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">W\parallel\operatorname{im}T</annotation></semantics></math>」被读成「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mo>=</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">W=\ker T</annotation></semantics></math>」。</li>
+<li>〔<strong>量词顺序</strong>〕陪集里的分子不唯一，却没验良定义性就写
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>φ</mi><mo stretchy="false" form="prefix">(</mo><mi>𝐯</mi><mo>+</mo><mi>⋯</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>T</mi><mi>𝐯</mi></mrow><annotation encoding="application/x-tex">\varphi(\mathbf v+\cdots)=T\mathbf v</annotation></semantics></math>。</li>
+<li>〔<strong>字眼漏读</strong>〕忽略「有限维」——无限维里「同维
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>⇒</mo><annotation encoding="application/x-tex">\Rightarrow</annotation></semantics></math>
+同构」失效。</li>
+<li>〔<strong>定理当定义</strong>〕以为「零化」能把
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\operatorname{im}T</annotation></semantics></math>
+里那部分核也消掉；不可约时
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><msub><mo stretchy="false" form="prefix">|</mo><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow></msub></mrow><annotation encoding="application/x-tex">T|_{\operatorname{im}T}</annotation></semantics></math>
+幂零，那部分<strong>消不掉</strong>。</li>
+</ol>
+<hr />
+<h2
+id="学完自测对照勾选勾不满就回去重读">学完自测（对照勾选，勾不满就回去重读）</h2>
+<ul class="task-list">
+<li><label><input
+type="checkbox" /><strong>字字清</strong>：能逐词解释「商空间」「补空间」「可约」，并说清哪条同构是典范的；</label></li>
+<li><label><input type="checkbox" /><strong>证得明</strong>：能默写 T1
+的四步证明（每步注依据）与 T2 的三步证明；</label></li>
+<li><label><input type="checkbox" /><strong>画得出</strong>：画出「核 /
+像 / 补空间 / 商空间 / 第一同构定理 / Jordan
+形（更后面的工具）」的关系图并标方向。</label></li>
+</ul>
+<blockquote>
+<p>三条<strong>至少完成一半</strong>，再去做题也不迟。做题是<strong>验证</strong>掌握，不是掌握本身。</p>
+</blockquote>
+<h3 id="附拿到题目怎么开局-两头往中间四步">附：拿到题目怎么开局
+——「两头往中间」四步</h3>
+<blockquote>
+<p><strong>题</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mo>:</mo><msup><mi>ℝ</mi><mn>2</mn></msup><mo>→</mo><msup><mi>ℝ</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">T:\mathbb{R}^2\to\mathbb{R}^2</annotation></semantics></math>，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo>,</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">T(x,y)=(x+y,x+y)</annotation></semantics></math>。求
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\ker T</annotation></semantics></math>、<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\operatorname{im}T</annotation></semantics></math>；判断
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>V</mi><annotation encoding="application/x-tex">V</annotation></semantics></math>
+能否写成
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>⊕</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\ker T\oplus\operatorname{im}T</annotation></semantics></math>；并给出
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mi>/</mi><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>≅</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">V/\ker T\cong\operatorname{im}T</annotation></semantics></math>
+的具体同构。</p>
+</blockquote>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>步</th>
+<th>动作</th>
+<th>自问</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>① 拆题设</strong></td>
+<td>条件翻译成「哪个定义的前提」</td>
+<td>系数矩阵
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">A=\begin{pmatrix}1&amp;1\\1&amp;1\end{pmatrix}</annotation></semantics></math>；<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mo>=</mo><msup><mi>ℝ</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">V=\mathbb{R}^2</annotation></semantics></math>；「能否写成直和」⟹
+展开成「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>∩</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mn>𝟎</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\operatorname{im}T\cap\ker T=\{\mathbf0\}</annotation></semantics></math>」</td>
+</tr>
+<tr>
+<td><strong>② 拆结论</strong></td>
+<td>要答的翻译成「哪个定义的后半句」</td>
+<td>四个小问各对一条定理：核（定义）、像（列空间）、直和（可约性）、同构（T1）</td>
+</tr>
+<tr>
+<td><strong>③ 两头夹</strong></td>
+<td>倒找缺口，回题设补上</td>
+<td>还差 (a)
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mo>∩</mo><mi mathvariant="normal">ker</mi></mrow><annotation encoding="application/x-tex">\operatorname{im}\cap\ker</annotation></semantics></math>
+是否为零 ⟹ 必须先分别算出两组再比；(b) 同构的具体形式 ⟹ T1
+直接给：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>φ</mi><mo stretchy="false" form="prefix">(</mo><mi>𝐯</mi><mo>+</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>T</mi><mi>𝐯</mi></mrow><annotation encoding="application/x-tex">\varphi(\mathbf v+\ker T)=T\mathbf v</annotation></semantics></math>，故只需求
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">\ker T</annotation></semantics></math></td>
+</tr>
+<tr>
+<td><strong>④ 顺写</strong></td>
+<td>正向重写，每步注依据</td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mi>𝐱</mi><mo>=</mo><mn>𝟎</mn><mo>⇔</mo><msub><mi>x</mi><mn>1</mn></msub><mo>+</mo><msub><mi>x</mi><mn>2</mn></msub><mo>=</mo><mn>0</mn><mo>⇔</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>=</mo><mtext mathvariant="normal">span</mtext><mo stretchy="false" form="prefix">{</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mi>−</mi><mn>1</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">T\mathbf x=\mathbf0\iff x_1+x_2=0\iff\ker T=\text{span}\{(1,-1)^{\mathsf T}\}</annotation></semantics></math>（维数
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>）；两列都是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>1</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo>⇔</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>=</mo><mtext mathvariant="normal">span</mtext><mo stretchy="false" form="prefix">{</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>1</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">(1,1)^{\mathsf T}\iff\operatorname{im}T=\text{span}\{(1,1)^{\mathsf T}\}</annotation></semantics></math>（维数
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>）；<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>s</mi><mo>,</mo><mi>s</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mi>t</mi><mo>,</mo><mi>−</mi><mi>t</mi><mo stretchy="false" form="postfix">)</mo><mo>⇒</mo><mi>s</mi><mo>=</mo><mi>t</mi></mrow><annotation encoding="application/x-tex">(s,s)=(t,-t)\Rightarrow s=t</annotation></semantics></math>
+且
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mo>=</mo><mi>−</mi><mi>t</mi><mo>⇒</mo><mi>s</mi><mo>=</mo><mi>t</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">s=-t\Rightarrow s=t=0</annotation></semantics></math>
+⟹ 交零 ⟹ <strong>直和成立</strong>；同构
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>φ</mi><mo stretchy="false" form="prefix">(</mo><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo stretchy="false" form="postfix">)</mo><mo>+</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo>,</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\varphi((x,y)+\ker T)=(x+y,x+y)</annotation></semantics></math>；核对
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>+</mo><mn>1</mn><mo>=</mo><mn>2</mn><mo>=</mo><mrow><mi mathvariant="normal">dim</mi><mo>&#8289;</mo></mrow><mi>V</mi></mrow><annotation encoding="application/x-tex">1+1=2=\dim V</annotation></semantics></math>
+∎</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>看清：「两个
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>
+维子空间」不足以断定直和</strong> ——
+还得算出它们交出来是不是零。这一步就是从题设回到定义的转轴。</p>
+</blockquote>
+<hr />
+<h2 id="核对提示请以你所用教材为准">⚠️
+核对提示（请以你所用教材为准）</h2>
+<ol type="1">
+<li><p><strong>定理的命名与顺序</strong> 〔教材口径〕 本卡把三条分别叫
+T1（第一同构定理）、T2（秩零化定理）、T3（秩–零度）。<strong>各教材叫法不同</strong>：
+有的把「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mi>/</mi><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>≅</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">V/\ker T\cong\operatorname{im}T</annotation></semantics></math>」叫第一同构定理、把「存在
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi mathvariant="normal">ker</mi><annotation encoding="application/x-tex">\ker</annotation></semantics></math>
+的同构像」叫零化定理；
+有的干脆统称「基本定理」。请照你教材的<strong>名字与编号</strong>引用，但<strong>内容与方向必须对上</strong>（哪条是典范的）。</p></li>
+<li><p><strong>T2 的同构「没有配方」</strong> 〔教材口径〕 本卡明确指出
+T2
+的同构<strong>不典范</strong>，因为要先选补空间；并给出「给了内积才有配方」这条路（<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mi>/</mi><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><mo>≅</mo><mo stretchy="false" form="prefix">(</mo><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi><msup><mo stretchy="false" form="postfix">)</mo><mo>⟂</mo></msup></mrow><annotation encoding="application/x-tex">V/\operatorname{im}T\cong(\operatorname{im}T)^{\perp}</annotation></semantics></math>）。
+若你教材直接给了一个配方，请核对它<strong>用了什么额外结构</strong>（内积？指定基？），不要以为它白送。</p></li>
+<li><p><strong>不可约 ⟹
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><msub><mo stretchy="false" form="prefix">|</mo><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><mi>T</mi></mrow></msub></mrow><annotation encoding="application/x-tex">T|_{\operatorname{im}T}</annotation></semantics></math>
+幂零</strong> 〔教材口径〕
+本卡只给了一句结论与理由（<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">im</mi><mo>&#8289;</mo></mrow><msup><mi>T</mi><mi>k</mi></msup></mrow><annotation encoding="application/x-tex">\operatorname{im}T^k</annotation></semantics></math>
+递减而有限维 ⟹ 稳定 ⟹ 幂零），<strong>没有展开证明</strong>。 这条通向
+Fitting 分解与 Jordan
+标准形，请照你教材补齐，别把这一句当完整论证。</p></li>
+</ol>
+
+</main>
+<script>
+/* ============================================================
+   card-widgets.js — 概念卡自绘交互组件（零依赖 / 离线可用）
+   由 md2card.py 自动注入。扫描 .wb-widget[data-wb][data-spec] 并渲染。
+   data-spec = base64(UTF-8 JSON)
+   ============================================================ */
+(function () {
+  'use strict';
+
+  /* ---------------- 表达式编译 ---------------- */
+  var FN = {
+    sin: 'Math.sin', cos: 'Math.cos', tan: 'Math.tan',
+    asin: 'Math.asin', acos: 'Math.acos', atan: 'Math.atan',
+    sinh: 'Math.sinh', cosh: 'Math.cosh', tanh: 'Math.tanh',
+    exp: 'Math.exp', log: 'Math.log', ln: 'Math.log', sqrt: 'Math.sqrt',
+    abs: 'Math.abs', floor: 'Math.floor', ceil: 'Math.ceil', sign: 'Math.sign',
+    min: 'Math.min', max: 'Math.max', pow: 'Math.pow',
+    pi: 'Math.PI', PI: 'Math.PI', e: 'Math.E', E: 'Math.E'
+  };
+
+  // 把一个数学表达式编译为 fn(V, f)；V 含变量值，f 为主函数（供叠加层使用）
+  function makeFn(expr, vars, funcs) {
+    vars = vars || []; funcs = funcs || [];
+    var body = String(expr).replace(/[A-Za-z_][A-Za-z_0-9]*/g, function (t) {
+      if (funcs.indexOf(t) >= 0) return t;
+      if (FN[t]) return FN[t];
+      return 'V.' + t;
+    }).replace(/\^/g, '**');
+    var raw;
+    try { raw = new Function('V', 'f', 'return (' + body + ');'); }
+    catch (err) { throw new Error('表达式无法解析：' + expr); }
+    return function (V, f) {
+      var r;
+      try { r = raw(V, f); } catch (e2) { return NaN; }
+      return (typeof r === 'number' && isFinite(r)) ? r : NaN;
+    };
+  }
+
+  /* ---------------- 小工具 ---------------- */
+  function el(tag, cls, txt) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (txt != null) n.textContent = txt;
+    return n;
+  }
+  function fmtNum(v) {
+    if (!isFinite(v)) return '—';
+    if (v === 0) return '0';
+    var a = Math.abs(v);
+    if (a >= 1e5 || a < 1e-4) return v.toExponential(2);
+    return String(Math.round(v * 1e4) / 1e4);
+  }
+  function niceTicks(a, b, count) {
+    var span = b - a;
+    if (!(span > 0)) return [a];
+    var step = Math.pow(10, Math.floor(Math.log10(span / count)));
+    var err = span / count / step;
+    if (err >= 7.5) step *= 10; else if (err >= 3.5) step *= 5; else if (err >= 1.5) step *= 2;
+    var out = [], v = Math.ceil(a / step) * step, guard = 0;
+    while (v <= b + step * 1e-6 && guard++ < 200) {
+      out.push(Math.abs(v) < step * 1e-6 ? 0 : v);
+      v += step;
+    }
+    return out;
+  }
+  function b64utf8(s) {
+    var bin = atob(s);
+    var bytes = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return new TextDecoder('utf-8').decode(bytes);
+  }
+  function frame(cv, ratio) {
+    var dpr = window.devicePixelRatio || 1;
+    var w = cv.clientWidth || 640;
+    if (w < 220) w = 640;
+    var h = Math.round(w * (ratio || 0.52));
+    cv.width = Math.round(w * dpr);
+    cv.height = Math.round(h * dpr);
+    cv.style.height = h + 'px';
+    var ctx = cv.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    return { ctx: ctx, W: w, H: h };
+  }
+
+  /* ---------------- 坐标系 ---------------- */
+  function makeAxes(ctx, W, H, xr, yr, opts) {
+    opts = opts || {};
+    var pad = opts.square ? { l: 18, r: 18, t: 18, b: 18 } : { l: 50, r: 18, t: 16, b: 34 };
+    var iw = W - pad.l - pad.r, ih = H - pad.t - pad.b;
+    function X(x) { return pad.l + (x - xr[0]) / (xr[1] - xr[0]) * iw; }
+    function Y(y) { return pad.t + (yr[1] - y) / (yr[1] - yr[0]) * ih; }
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
+    if (!opts.square) {
+      ctx.strokeStyle = '#eef2f6'; ctx.lineWidth = 1;
+      niceTicks(xr[0], xr[1], 6).forEach(function (v) {
+        ctx.beginPath(); ctx.moveTo(X(v), pad.t); ctx.lineTo(X(v), pad.t + ih); ctx.stroke();
+      });
+      niceTicks(yr[0], yr[1], 5).forEach(function (v) {
+        ctx.beginPath(); ctx.moveTo(pad.l, Y(v)); ctx.lineTo(pad.l + iw, Y(v)); ctx.stroke();
+      });
+    }
+    // 坐标轴
+    ctx.strokeStyle = opts.axisColor || '#9aa6b2'; ctx.lineWidth = 1.4;
+    var y0 = Math.max(pad.t, Math.min(pad.t + ih, Y(0)));
+    var x0 = Math.max(pad.l, Math.min(pad.l + iw, X(0)));
+    ctx.beginPath(); ctx.moveTo(pad.l, y0); ctx.lineTo(pad.l + iw, y0); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x0, pad.t); ctx.lineTo(x0, pad.t + ih); ctx.stroke();
+    if (!opts.square) {
+      ctx.fillStyle = '#5b6570'; ctx.font = '11px system-ui,-apple-system,sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      niceTicks(xr[0], xr[1], 6).forEach(function (v) { ctx.fillText(fmtNum(v), X(v), pad.t + ih + 6); });
+      ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+      niceTicks(yr[0], yr[1], 5).forEach(function (v) { ctx.fillText(fmtNum(v), pad.l - 6, Y(v)); });
+    }
+    return { X: X, Y: Y, pad: pad, iw: iw, ih: ih, xr: xr, yr: yr, ctx: ctx };
+  }
+
+  function drawCurve(A, fn, V, main, color, width, dash) {
+    var ctx = A.ctx, xr = A.xr, yr = A.yr;
+    var span = yr[1] - yr[0];
+    ctx.save();
+    ctx.strokeStyle = color; ctx.lineWidth = width || 2.4;
+    if (dash) ctx.setLineDash(dash);
+    ctx.beginPath();
+    var started = false, N = Math.max(A.iw, 2);
+    for (var i = 0; i <= N; i++) {
+      var x = xr[0] + (xr[1] - xr[0]) * i / N;
+      V.x = x;
+      var y = fn(V, main);
+      if (!isFinite(y) || y < yr[0] - span * 3 || y > yr[1] + span * 3) { started = false; continue; }
+      var px = A.X(x), py = A.Y(y);
+      if (!started) { ctx.moveTo(px, py); started = true; } else ctx.lineTo(px, py);
+    }
+    ctx.stroke(); ctx.restore();
+  }
+
+  function dot(A, x, y, color, r, label) {
+    var ctx = A.ctx;
+    ctx.fillStyle = color; ctx.beginPath();
+    ctx.arc(A.X(x), A.Y(y), r || 4, 0, Math.PI * 2); ctx.fill();
+    if (label) {
+      ctx.fillStyle = color; ctx.font = '600 12px system-ui,-apple-system,sans-serif';
+      ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+      ctx.fillText(label, A.X(x) + 6, A.Y(y) - 4);
+    }
+  }
+
+  /* ---------------- 控件 ---------------- */
+  function buildControls(box, sliders, onChange) {
+    var V = {};
+    var wrap = el('div', 'wb-controls');
+    (sliders || []).forEach(function (s) {
+      V[s.name] = (s.value != null) ? s.value : (s.min + s.max) / 2;
+      var lab = el('label', 'wb-ctl');
+      lab.appendChild(el('span', 'wb-ctl-name', s.label || s.name));
+      var inp = document.createElement('input');
+      inp.type = 'range';
+      inp.min = s.min; inp.max = s.max; inp.step = s.step || 0.01; inp.value = V[s.name];
+      var out = el('span', 'wb-ctl-out', fmtNum(V[s.name]));
+      inp.addEventListener('input', function () {
+        V[s.name] = parseFloat(inp.value);
+        out.textContent = fmtNum(V[s.name]);
+        onChange();
+      });
+      lab.appendChild(inp); lab.appendChild(out);
+      wrap.appendChild(lab);
+    });
+    box.appendChild(wrap);
+    return V;
+  }
+
+  function buildReadout(box, rows) {
+    if (!rows || !rows.length) return null;
+    var d = el('div', 'wb-readout');
+    d.innerHTML = '';
+    box.appendChild(d);
+    return {
+      el: d,
+      update: function (vals) {
+        d.innerHTML = '';
+        rows.forEach(function (r) {
+          var s = el('span', 'wb-ro');
+          s.appendChild(el('b', null, r.label + ' = '));
+          s.appendChild(document.createTextNode(vals[r.label] != null ? vals[r.label] : '—'));
+          d.appendChild(s);
+        });
+      }
+    };
+  }
+
+  /* ---------------- 组件：plot ---------------- */
+  function renderPlot(box, spec) {
+    var cv = el('canvas', 'wb-canvas'); cv.style.display = 'block';
+    box.appendChild(cv);
+    var varNames = (spec.sliders || []).map(function (s) { return s.name; }).concat(['x']);
+    var main = makeFn(spec.expr, varNames, ['f']);
+    var xr = spec.xrange, yr = spec.yrange;
+    var A, ro;
+    // f(t)：把 t 作为自变量求主函数值（不能在叠加层里直接复用 V.x）
+    function fOf(t) {
+      var tmp = {}; for (var k in V) tmp[k] = V[k];
+      tmp.x = t;
+      return main(tmp, main);
+    }
+    function ev(expr) { return makeFn(expr, varNames, ['f'])(V, fOf); }
+    function draw() {
+      var f = frame(cv, spec.ratio || 0.52);
+      A = makeAxes(f.ctx, f.W, f.H, xr, yr);
+      var ctx = A.ctx;
+      // 叠加层（带 / 条）先画，压在曲线下
+      (spec.overlays || []).forEach(function (o) {
+        var col = o.color || '#f0a53a';
+        if (o.kind === 'hbar') {
+          var yc = ev(o.y);
+          var h = Math.abs(ev(o.half));
+          if (isFinite(yc) && isFinite(h)) {
+            ctx.fillStyle = col; ctx.globalAlpha = 0.18;
+            ctx.fillRect(A.pad.l, A.Y(yc + h), A.iw, A.Y(yc - h) - A.Y(yc + h));
+            ctx.globalAlpha = 1; ctx.strokeStyle = col; ctx.lineWidth = 1; ctx.setLineDash([5, 4]);
+            ctx.beginPath(); ctx.moveTo(A.pad.l, A.Y(yc + h)); ctx.lineTo(A.pad.l + A.iw, A.Y(yc + h));
+            ctx.moveTo(A.pad.l, A.Y(yc - h)); ctx.lineTo(A.pad.l + A.iw, A.Y(yc - h)); ctx.stroke();
+            ctx.setLineDash([]);
+            if (o.label) { ctx.fillStyle = col; ctx.font = '12px system-ui,sans-serif'; ctx.textAlign = 'right'; ctx.textBaseline = 'bottom'; ctx.fillText(o.label, A.pad.l + A.iw - 4, A.Y(yc + h) - 3); }
+          }
+        } else if (o.kind === 'vband') {
+          var xc = ev(o.x);
+          var hw = Math.abs(ev(o.half));
+          if (isFinite(xc) && isFinite(hw)) {
+            ctx.fillStyle = col; ctx.globalAlpha = 0.18;
+            ctx.fillRect(A.X(xc - hw), A.pad.t, A.X(xc + hw) - A.X(xc - hw), A.ih);
+            ctx.globalAlpha = 1; ctx.strokeStyle = col; ctx.lineWidth = 1; ctx.setLineDash([5, 4]);
+            ctx.beginPath(); ctx.moveTo(A.X(xc - hw), A.pad.t); ctx.lineTo(A.X(xc - hw), A.pad.t + A.ih);
+            ctx.moveTo(A.X(xc + hw), A.pad.t); ctx.lineTo(A.X(xc + hw), A.pad.t + A.ih); ctx.stroke();
+            ctx.setLineDash([]);
+          }
+        }
+      });
+      drawCurve(A, main, V, main, '#2f6fb3', 2.6);
+      // 线段（割线等）
+      (spec.segments || []).forEach(function (sg) {
+        var x1 = ev(sg.x1), y1 = ev(sg.y1), x2 = ev(sg.x2), y2 = ev(sg.y2);
+        if (!isFinite(x1) || !isFinite(x2)) return;
+        ctx.strokeStyle = sg.color || '#c2582a'; ctx.lineWidth = 2; ctx.setLineDash(sg.dash || []);
+        ctx.beginPath(); ctx.moveTo(A.X(x1), A.Y(y1)); ctx.lineTo(A.X(x2), A.Y(y2)); ctx.stroke();
+        ctx.setLineDash([]);
+      });
+      // 点
+      (spec.points || []).forEach(function (p) {
+        var x = ev(p.x), y = ev(p.y);
+        if (isFinite(x) && isFinite(y)) dot(A, x, y, p.color || '#c2582a', p.r || 4.5, p.label);
+      });
+      // 数值读出
+      if (ro) {
+        var vals = {};
+        (spec.readout || []).forEach(function (r) {
+          var v = ev(r.expr);
+          vals[r.label] = (r.digits != null) ? (isFinite(v) ? v.toFixed(r.digits) : '—') : fmtNum(v);
+        });
+        ro.update(vals);
+      }
+    }
+    var V = buildControls(box, spec.sliders, function () { draw(); });
+    ro = buildReadout(box, spec.readout);
+    if (spec.hint) box.appendChild(el('p', 'wb-hint', '👉 ' + spec.hint));
+    draw();
+    return function () { draw(); };
+  }
+
+  /* ---------------- 组件：seq（数列 ε-N） ---------------- */
+  function renderSeq(box, spec) {
+    var cv = el('canvas', 'wb-canvas'); cv.style.display = 'block';
+    box.appendChild(cv);
+    var varNames = (spec.sliders || []).map(function (s) { return s.name; }).concat(['n']);
+    var an = makeFn(spec.expr, varNames, []);
+    var n1 = spec.nrange[0], n2 = spec.nrange[1], target = spec.target;
+    var A, ro;
+    function draw() {
+      var V2 = {}; for (var k in V) V2[k] = V[k];
+      V2.x = undefined;
+      var vals = [];
+      for (var n = n1; n <= n2; n++) { V2.n = n; vals.push([n, an(V2, null)]); }
+      var lo = Math.min.apply(null, vals.map(function (p) { return isFinite(p[1]) ? p[1] : 0; }).concat([target]));
+      var hi = Math.max.apply(null, vals.map(function (p) { return isFinite(p[1]) ? p[1] : 0; }).concat([target]));
+      var pad = (hi - lo) * 0.25 || 1;
+      var yr = [lo - pad, hi + pad];
+      var f = frame(cv, 0.5);
+      A = makeAxes(f.ctx, f.W, f.H, [n1 - 1, n2 + 1], yr);
+      var ctx = A.ctx, eps = V.eps;
+      // ε 带
+      ctx.fillStyle = '#f0a53a'; ctx.globalAlpha = 0.18;
+      ctx.fillRect(A.pad.l, A.Y(target + eps), A.iw, A.Y(target - eps) - A.Y(target + eps));
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = '#f0a53a'; ctx.setLineDash([5, 4]); ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(A.pad.l, A.Y(target + eps)); ctx.lineTo(A.pad.l + A.iw, A.Y(target + eps));
+      ctx.moveTo(A.pad.l, A.Y(target - eps)); ctx.lineTo(A.pad.l + A.iw, A.Y(target - eps)); ctx.stroke();
+      ctx.setLineDash([]);
+      // 极限线
+      ctx.strokeStyle = '#1f8a63'; ctx.lineWidth = 1.6; ctx.setLineDash([6, 4]);
+      ctx.beginPath(); ctx.moveTo(A.pad.l, A.Y(target)); ctx.lineTo(A.pad.l + A.iw, A.Y(target)); ctx.stroke();
+      ctx.setLineDash([]);
+      // 找 N：所有 n>N 都落在带内
+      var N = null;
+      for (var i = vals.length - 1; i >= 0; i--) {
+        var ok = (Math.abs(vals[i][1] - target) < eps);
+        if (!ok) { N = vals[i][0]; break; }
+      }
+      if (N == null) N = n1 - 1;
+      var xN = A.X(N + 0.5);
+      ctx.strokeStyle = '#c2582a'; ctx.lineWidth = 1.8;
+      ctx.beginPath(); ctx.moveTo(xN, A.pad.t); ctx.lineTo(xN, A.pad.t + A.ih); ctx.stroke();
+      ctx.fillStyle = '#c2582a'; ctx.font = '600 12px system-ui,sans-serif';
+      ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+      ctx.fillText('N = ' + N + '（此后全部落入 ε 带）', xN + 4, A.pad.t + 2);
+      // 点
+      vals.forEach(function (p) {
+        if (!isFinite(p[1])) return;
+        var inside = Math.abs(p[1] - target) < eps;
+        ctx.fillStyle = inside ? '#1f8a63' : '#c2582a';
+        ctx.beginPath(); ctx.arc(A.X(p[0]), A.Y(p[1]), 3.2, 0, Math.PI * 2); ctx.fill();
+      });
+      if (ro) ro.update({ 'N': String(N), '第 N+1 项': fmtNum(vals[Math.max(0, N + 1 - n1)] ? vals[Math.max(0, N + 1 - n1)][1] : NaN) });
+    }
+    var V = buildControls(box, spec.sliders, function () { draw(); });
+    ro = buildReadout(box, [{ label: 'N' }, { label: '第 N+1 项' }]);
+    if (spec.hint) box.appendChild(el('p', 'wb-hint', '👉 ' + spec.hint));
+    draw();
+    return function () { draw(); };
+  }
+
+  /* ---------------- 组件：riemann ---------------- */
+  function renderRiemann(box, spec) {
+    var cv = el('canvas', 'wb-canvas'); cv.style.display = 'block';
+    box.appendChild(cv);
+    var main = makeFn(spec.expr, ['x'], []);
+    var V = { x: 0 };
+    var a = spec.xrange[0], b = spec.xrange[1];
+    var A, ro;
+    function draw() {
+      var f = frame(cv, 0.5);
+      A = makeAxes(f.ctx, f.W, f.H, spec.xrange, spec.yrange);
+      var ctx = A.ctx, n = V.n, dx = (b - a) / n, S = 0;
+      ctx.fillStyle = '#6aa3d5'; ctx.globalAlpha = 0.35; ctx.strokeStyle = '#2f6fb3'; ctx.lineWidth = 1;
+      for (var i = 0; i < n; i++) {
+        var xl = a + i * dx; V.x = xl;
+        var y = main(V, null); if (!isFinite(y)) continue;
+        S += y * dx;
+        var px = A.X(xl), pw = A.X(xl + dx) - A.X(xl), py = A.Y(y), ph = A.Y(0) - A.Y(y);
+        ctx.fillRect(px, py, pw, ph);
+        if (n <= 40) ctx.strokeRect(px, py, pw, ph);
+      }
+      ctx.globalAlpha = 1;
+      drawCurve(A, main, V, null, '#c2582a', 2.6);
+      if (ro) {
+        var ex = spec.exact;
+        ro.update({
+          'n': String(n),
+          'S_n': S.toFixed(5),
+          '精确值': (ex != null) ? ex.toFixed(5) : '—',
+          '误差': (ex != null) ? Math.abs(S - ex).toFixed(5) : '—'
+        });
+      }
+    }
+    var V2 = buildControls(box, [{
+      name: 'n', label: spec.nslider.label || 'n（分割份数）',
+      min: spec.nslider.min, max: spec.nslider.max, step: spec.nslider.step || 1, value: spec.nslider.value
+    }], function () { V.n = V2.n; draw(); });
+    V.n = V2.n;
+    ro = buildReadout(box, [{ label: 'n' }, { label: 'S_n' }, { label: '精确值' }, { label: '误差' }]);
+    if (spec.hint) box.appendChild(el('p', 'wb-hint', '👉 ' + spec.hint));
+    draw();
+    return function () { draw(); };
+  }
+
+  /* ---------------- 组件：matrix2（线性变换） ---------------- */
+  function renderMatrix2(box, spec) {
+    var cv = el('canvas', 'wb-canvas'); cv.style.display = 'block';
+    box.appendChild(cv);
+    var rng = spec.range || [-3, 3], A, ro;
+    function draw() {
+      var f = frame(cv, 0.72);
+      A = makeAxes(f.ctx, f.W, f.H, rng, rng, { square: true });
+      var ctx = A.ctx;
+      var a = V.a, b = V.b, c = V.c, d = V.d;
+      function T(x, y) { return [a * x + b * y, c * x + d * y]; }
+      var R = Math.max(Math.abs(rng[0]), Math.abs(rng[1])) * 2.2, S = 0.25;
+      // 原网格
+      ctx.strokeStyle = '#e6ebf0'; ctx.lineWidth = 1;
+      for (var k = -3; k <= 3; k += 1) {
+        ctx.beginPath(); ctx.moveTo(A.X(k), A.Y(rng[0])); ctx.lineTo(A.X(k), A.Y(rng[1])); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(A.X(rng[0]), A.Y(k)); ctx.lineTo(A.X(rng[1]), A.Y(k)); ctx.stroke();
+      }
+      // 变换后的网格
+      ctx.strokeStyle = '#6aa3d5'; ctx.lineWidth = 1.2;
+      for (var k2 = -3; k2 <= 3; k2 += 1) {
+        var p1 = T(k2, -R), p2 = T(k2, R);
+        ctx.beginPath(); ctx.moveTo(A.X(p1[0]), A.Y(p1[1])); ctx.lineTo(A.X(p2[0]), A.Y(p2[1])); ctx.stroke();
+        var q1 = T(-R, k2), q2 = T(R, k2);
+        ctx.beginPath(); ctx.moveTo(A.X(q1[0]), A.Y(q1[1])); ctx.lineTo(A.X(q2[0]), A.Y(q2[1])); ctx.stroke();
+      }
+      // 单位正方形 → 像
+      var O = T(0, 0), U = T(1, 0), W2 = T(1, 1), Z = T(0, 1);
+      ctx.fillStyle = '#c2582a'; ctx.globalAlpha = 0.22;
+      ctx.beginPath(); ctx.moveTo(A.X(O[0]), A.Y(O[1])); ctx.lineTo(A.X(U[0]), A.Y(U[1]));
+      ctx.lineTo(A.X(W2[0]), A.Y(W2[1])); ctx.lineTo(A.X(Z[0]), A.Y(Z[1])); ctx.closePath(); ctx.fill();
+      ctx.globalAlpha = 1; ctx.strokeStyle = '#c2582a'; ctx.lineWidth = 2; ctx.stroke();
+      // 列向量
+      vec(A, O, U, '#1f8a63', '列1');
+      vec(A, O, Z, '#7a4fb3', '列2');
+      if (ro) {
+        var det = a * d - b * c;
+        var rank = Math.abs(det) > 1e-9 ? 2 : (Math.abs(a) + Math.abs(b) + Math.abs(c) + Math.abs(d) > 1e-9 ? 1 : 0);
+        ro.update({
+          'det': det.toFixed(3),
+          '秩': String(rank),
+          '像': rank === 2 ? '整个平面（可逆）' : (rank === 1 ? '塌成一条直线' : '塌成一个点')
+        });
+      }
+    }
+    var V = buildControls(box, spec.sliders, function () { draw(); });
+    ro = buildReadout(box, [{ label: 'det' }, { label: '秩' }, { label: '像' }]);
+    if (spec.hint) box.appendChild(el('p', 'wb-hint', '👉 ' + spec.hint));
+    draw();
+    return function () { draw(); };
+  }
+
+  function vec(A, from, to, color, label) {
+    var ctx = A.ctx;
+    ctx.strokeStyle = color; ctx.lineWidth = 2.6;
+    ctx.beginPath(); ctx.moveTo(A.X(from[0]), A.Y(from[1])); ctx.lineTo(A.X(to[0]), A.Y(to[1])); ctx.stroke();
+    var ang = Math.atan2(-(to[1] - from[1]), to[0] - from[0]);
+    var px = A.X(to[0]), py = A.Y(to[1]), s = 9;
+    ctx.fillStyle = color; ctx.beginPath();
+    ctx.moveTo(px, py);
+    ctx.lineTo(px - s * Math.cos(ang - 0.4), py - s * Math.sin(ang - 0.4));
+    ctx.lineTo(px - s * Math.cos(ang + 0.4), py - s * Math.sin(ang + 0.4));
+    ctx.closePath(); ctx.fill();
+    if (label) {
+      ctx.font = '600 12px system-ui,sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+      ctx.fillText(label, px + 6, py - 4);
+    }
+  }
+
+  /* ---------------- 组件：vectors2（线性相关） ---------------- */
+  function renderVectors2(box, spec) {
+    var cv = el('canvas', 'wb-canvas'); cv.style.display = 'block';
+    box.appendChild(cv);
+    var rng = spec.range || [-3, 3], A, ro;
+    function draw() {
+      var f = frame(cv, 0.68);
+      A = makeAxes(f.ctx, f.W, f.H, rng, rng, { square: true });
+      var ctx = A.ctx, O = [0, 0];
+      var u = [V.u1, V.u2], v = [V.v1, V.v2];
+      var det = u[0] * v[1] - u[1] * v[0];
+      var dep = Math.abs(det) < 1e-6;
+      ctx.strokeStyle = '#e6ebf0'; ctx.lineWidth = 1;
+      for (var k = -3; k <= 3; k += 1) {
+        ctx.beginPath(); ctx.moveTo(A.X(k), A.Y(rng[0])); ctx.lineTo(A.X(k), A.Y(rng[1])); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(A.X(rng[0]), A.Y(k)); ctx.lineTo(A.X(rng[1]), A.Y(k)); ctx.stroke();
+      }
+      if (!dep) {
+        // 张成整个平面：淡色铺底
+        ctx.fillStyle = '#6aa3d5'; ctx.globalAlpha = 0.08;
+        ctx.fillRect(A.pad.l, A.pad.t, A.iw, A.ih); ctx.globalAlpha = 1;
+      } else {
+        // 共线：高亮这条直线
+        var L = 6, n0 = Math.hypot(u[0], u[1]) || 1;
+        var dx = u[0] / n0, dy = u[1] / n0;
+        ctx.strokeStyle = '#c2582a'; ctx.lineWidth = 8; ctx.globalAlpha = 0.18;
+        ctx.beginPath(); ctx.moveTo(A.X(-dx * L), A.Y(-dy * L)); ctx.lineTo(A.X(dx * L), A.Y(dy * L)); ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+      // 平行四边形（行列式的几何意义）
+      if (!dep) {
+        var S = [u[0] + v[0], u[1] + v[1]];
+        ctx.fillStyle = '#c2582a'; ctx.globalAlpha = 0.16;
+        ctx.beginPath(); ctx.moveTo(A.X(0), A.Y(0)); ctx.lineTo(A.X(u[0]), A.Y(u[1]));
+        ctx.lineTo(A.X(S[0]), A.Y(S[1])); ctx.lineTo(A.X(v[0]), A.Y(v[1])); ctx.closePath(); ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+      vec(A, O, u, '#1f8a63', 'u');
+      vec(A, O, v, '#7a4fb3', 'v');
+      if (ro) {
+        ro.update({
+          'det(u,v)': det.toFixed(3),
+          '判定': dep ? '线性相关（共线）' : '线性无关',
+          '张成空间': dep ? (Math.hypot(u[0], u[1]) + Math.hypot(v[0], v[1]) < 1e-9 ? '零空间 {0}' : '一条直线（1 维）') : '整个平面（2 维）'
+        });
+      }
+    }
+    var V = buildControls(box, spec.sliders, function () { draw(); });
+    ro = buildReadout(box, [{ label: 'det(u,v)' }, { label: '判定' }, { label: '张成空间' }]);
+    if (spec.hint) box.appendChild(el('p', 'wb-hint', '👉 ' + spec.hint));
+    draw();
+    return function () { draw(); };
+  }
+
+  /* ---------------- 复制到剪贴板（GeoGebra 指令块 / 模拟代码块共用） ---------------- */
+  function copyToClipboard(txt, done) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).then(done, function () { fallbackCopy(txt, done); });
+    } else fallbackCopy(txt, done);
+  }
+  function fallbackCopy(txt, done) {
+    var ta = document.createElement('textarea');
+    ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) { }
+    document.body.removeChild(ta);
+  }
+
+  function bindCopy() {
+    document.querySelectorAll('.gb-copy').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var blk = btn.closest('.gb-block');
+        var code = blk ? blk.querySelector('code') : null;
+        if (!code) return;
+        copyToClipboard(code.textContent, function () {
+          btn.textContent = '已复制 ✓'; setTimeout(function () { btn.textContent = '复制指令'; }, 1600);
+        });
+      });
+    });
+  }
+
+  /* ---------------- 模拟代码选项卡（sim 块：默认 Python，可切换 R） ---------------- */
+  function bindSimTabs() {
+    document.querySelectorAll('.sim-block').forEach(function (blk) {
+      var tabs = blk.querySelectorAll('.sim-tab');
+      tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          var lang = tab.getAttribute('data-lang');
+          tabs.forEach(function (t) { t.classList.toggle('is-active', t === tab); });
+          blk.querySelectorAll('.sim-pane').forEach(function (p) {
+            p.classList.toggle('is-active', p.getAttribute('data-lang') === lang);
+          });
+          var c = blk.querySelector('.sim-copy');
+          if (c) c.textContent = '复制代码';
+        });
+      });
+    });
+    document.querySelectorAll('.sim-copy').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var blk = btn.closest('.sim-block');
+        var code = blk ? blk.querySelector('.sim-pane.is-active code') : null;
+        if (!code) return;
+        copyToClipboard(code.textContent, function () {
+          btn.textContent = '已复制 ✓'; setTimeout(function () { btn.textContent = '复制代码'; }, 1600);
+        });
+      });
+    });
+  }
+
+  /* ---------------- 折叠面（渐进揭示） ---------------- */
+  function bindFacets(redrawAll) {
+    var all = document.querySelectorAll('details.facet');
+    if (!all.length) return;
+    document.querySelectorAll('.facet-toggle').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var isOpen = btn.getAttribute('data-open') === '1';
+        all.forEach(function (d) { d.open = !isOpen; });
+        btn.setAttribute('data-open', isOpen ? '0' : '1');
+        btn.textContent = isOpen ? '展开全部' : '收起全部';
+        if (redrawAll) setTimeout(redrawAll, 40);
+      });
+    });
+    // 折叠时 canvas 宽度为 0，展开后需重绘
+    all.forEach(function (d) {
+      d.addEventListener('toggle', function () { if (d.open && redrawAll) setTimeout(redrawAll, 40); });
+    });
+    // 打印前把所有折叠面打开，保证纸质版内容完整
+    window.addEventListener('beforeprint', function () {
+      document.querySelectorAll('details').forEach(function (d) { d.open = true; });
+      if (redrawAll) redrawAll();
+    });
+  }
+
+  /* ---------------- 初始化 ---------------- */
+  var RENDER = {
+    plot: renderPlot, seq: renderSeq, riemann: renderRiemann,
+    matrix2: renderMatrix2, vectors2: renderVectors2
+  };
+
+  function init() {
+    var widgets = [];
+    document.querySelectorAll('.wb-widget').forEach(function (box) {
+      var kind = box.getAttribute('data-wb');
+      var specStr = box.getAttribute('data-spec') || '';
+      var spec;
+      try { spec = JSON.parse(b64utf8(specStr)); }
+      catch (e) { box.innerHTML = '<p class="wb-err">组件参数解析失败：' + e.message + '</p>'; return; }
+      var fn = RENDER[kind];
+      if (!fn) { box.innerHTML = '<p class="wb-err">未知组件类型：' + kind + '</p>'; return; }
+      var redraw;
+      try { redraw = fn(box, spec); }
+      catch (e2) { box.innerHTML = '<p class="wb-err">组件渲染失败：' + e2.message + '</p>'; return; }
+      widgets.push(redraw);
+    });
+    if (widgets.length) {
+      var t = null;
+      window.addEventListener('resize', function () {
+        clearTimeout(t); t = setTimeout(function () { widgets.forEach(function (f) { try { f(); } catch (e) { } }); }, 160);
+      });
+    }
+    bindCopy();
+    bindSimTabs();
+    bindFacets(function () {
+      widgets.forEach(function (f) { try { f(); } catch (e) { } });
+    });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+
+</script>
+</body>
+</html>

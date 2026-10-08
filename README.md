@@ -37,19 +37,42 @@ npx skills add zhjx19/math-concept-coach
 > 面向**大学数学**（数学分析、高等代数、解析几何、概率统计、常微分方程、复变函数、抽象代数）。
 > 不适合 K12，也不代写作业与论文。
 
+**默认读者是「刚学完高中数学、正在上第一门大学数学课」的学生。**
+所以这个技能写死了一条规矩：**前置有缺口就先搭梯子补前置；不引入教材还没教到的工具；严格表述分档给、先低后高不跳档。**
+学生自陈水平更高可以上调；**他不说，就按默认走。**
+
 ---
 
 ## 它会交付什么？
 
 **不是一段讲解文字，是一张可复用的离线卡片。** 先看真实产物：
-🌐 **在线画廊** <https://zhjx19.github.io/math-concept-coach/>（点开即玩，无需安装）；也可本地打开 [`examples/index.html`](examples/index.html)。里面是 4 张**真实生成**的卡片：
+🌐 **在线画廊** <https://zhjx19.github.io/math-concept-coach/>（点开即玩，无需安装）；也可本地打开 [`examples/index.html`](examples/index.html)。里面是 **16 张真实生成**的卡片。
 
-| 卡片 | 课程 | 交互形式 | 你能玩什么 |
-|---|---|---|---|
-| [一致连续](https://zhjx19.github.io/math-concept-coach/一致连续-概念卡.html) | 数学分析 | 函数图像 + ε 带（拖滑块） | 固定 δ 只移动位置，看哪里冲出 ε 带 |
-| [数列极限](https://zhjx19.github.io/math-concept-coach/数列极限-概念卡.html) | 数学分析 | 数列 ε–N（拖滑块）＋ 🧮 计算器 | 拖 ε 看 N 怎么变；跑函数直接算 ε→N |
-| [矩阵的秩](https://zhjx19.github.io/math-concept-coach/矩阵的秩-概念卡.html) | 高等代数 | 线性变换（拖滑块） | 拖矩阵元素，看单位正方形何时被压扁、秩从 2 掉到 1 |
-| [大数定律](https://zhjx19.github.io/math-concept-coach/大数定律-概念卡.html) | 概率论 | **Python / R 模拟 ＋ 🧮 概念计算器** | 跑代码看频率稳定到概率；用函数算「样本量 ↔ 上界」 |
+**数学分析主线**（按教材顺序，一条链读下来）：
+
+| 卡片 | 交互形式 | 你能玩什么 |
+|---|---|---|
+| [确界](https://zhjx19.github.io/math-concept-coach/确界-概念卡.html) | 拖 `c`，红点冲不冲得上绿线 | 亲眼看见「确界取不到」：`sup A` 存在而 `max A` 不存在 |
+| [极限](https://zhjx19.github.io/math-concept-coach/极限-概念卡.html) | 函数图像 + δ 滑块 | 拖 δ，看「δ 减半、误差也减半」的线性关系 |
+| [连续](https://zhjx19.github.io/math-concept-coach/连续-概念卡.html) | 三数关系 / 间断点四型 | 把「远处看的出口」与「脚下这个出口」拉到一起看 |
+| [导数](https://zhjx19.github.io/math-concept-coach/导数-概念卡.html) | 割线→切线（拖 `h`） | 拖 `h → 0`，看差商趋到切线斜率 |
+| [微分](https://zhjx19.github.io/math-concept-coach/微分-概念卡.html) | 缝隙 `Δy − dy` 可视化 | 拖 `Δx`，看缝隙为何是高阶无穷小 |
+| [中值定理](https://zhjx19.github.io/math-concept-coach/中值定理-概念卡.html) | 平均速度 ↔ 瞬时速度 | 挪区间，看哪一刻的瞬时速度正好等于平均值 |
+| [洛必达法则](https://zhjx19.github.io/math-concept-coach/洛必达法则-概念卡.html) | 柯西中值定理 → 洛必达 | 看「失效」两例：求导后反而更乱 |
+| [泰勒展开](https://zhjx19.github.io/math-concept-coach/泰勒展开-概念卡.html) | 余项随 `n` 缩小 | 看 $n$ 每加一阶，误差掉一个数量级 |
+
+**其他学科**：
+
+| 卡片 | 课程 | 交互形式 |
+|---|---|---|
+| [秩零化定理](https://zhjx19.github.io/math-concept-coach/秩零化定理-概念卡.html) | 高等代数 | 拖矩阵元素，看核与像的维数此消彼长 |
+| [特征值与特征向量](https://zhjx19.github.io/math-concept-coach/特征值与特征向量-概念卡.html) | 高等代数 | 拖矩阵，看哪个方向只被拉长不转向 |
+| [矩阵的秩](https://zhjx19.github.io/math-concept-coach/矩阵的秩-概念卡.html) | 高等代数 | 拖矩阵元素，看何时被压扁、秩从 2 掉到 1 |
+| [随机变量及其分布](https://zhjx19.github.io/math-concept-coach/随机变量及其分布-概念卡.html) | 概率论 | 分布函数阶梯（拖 `p`） |
+| [贝叶斯定理](https://zhjx19.github.io/math-concept-coach/贝叶斯定理-概念卡.html) | 概率论 | 拖先验与似然比，看后验怎么被两者共同决定 |
+| [大数定律](https://zhjx19.github.io/math-concept-coach/大数定律-概念卡.html) | 概率论 | **Python / R 模拟 ＋ 🧮 计算器**：跑代码看频率稳定到概率 |
+| [一致连续](https://zhjx19.github.io/math-concept-coach/一致连续-概念卡.html) | 数学分析 | 固定 δ 只移动位置，看哪里冲出 ε 带 |
+| [数列极限](https://zhjx19.github.io/math-concept-coach/数列极限-概念卡.html) | 数学分析 | 数列 ε–N：拖 ε 看 N 怎么变 |
 
 每张卡片都包含：
 
@@ -66,7 +89,7 @@ npx skills add zhjx19/math-concept-coach
 - ✅ **渐进揭示**：六个面默认只展开 F1，其余点开看（右上角一键展开）；**打印时自动全部展开**
 - ✅ **⚠️ 核对提示**：凡讲法与教材口径不同的地方都**显式标注**（`〔教材口径〕` / `〔待核〕`），并在文末集中列出——
   存疑结论**不会静默写进卡片**（`check_card.py` 强制检查，有〔待核〕无核对提示直接报错）
-- ✅ **单文件、0 外部依赖、可打印**（约 85–105 KB）
+- ✅ **单文件、0 外部依赖、可打印**（约 90–320 KB；含 `calc` 计算器与完整公式的卡片偏大）
 
 > 断网、没装任何软件、双击就能打开；打印时自动隐去滑块与折叠按钮、展开全部内容，只留图形与文字。
 
@@ -236,13 +259,21 @@ math-concept-coach/
 │   ├── six-facets-guide.md        六棱镜逐面操作手册（含 F0 钩子与假设基底）+ 完整范例
 │   ├── rigorous-language.md       量词顺序、否定式、表述陷阱、符号规范
 │   ├── visualization-guide.md     设计三问、认知动作→组件映射、不画的情形
+│   ├── pitfalls.md                工具链陷阱清单：双语言逐字节一致、验证脚本自身的坑、
+│   │                               质检脚本的已知局限、卡片拆分/改名的引用同步、Windows 坑
 │   └── widget-spec.md             交互组件 / 知识图谱 / GeoGebra 指令的参数规范
 ├── scripts/
 │   ├── md2card.py                 Markdown → 单文件离线可交互 HTML
 │   ├── check_card.py              概念卡质检（格式 + 存疑标注 + sim / calc 代码）+ 举证清单；--run 可实跑代码
+│   ├── verify_calc.py             calc / sim 块双语言实跑 + 逐字节对账 + 程序化填预期输出
+│   │                               （--replay：把已填的预期输出打回占位符重建并与原卡对账）
+│   ├── audit_refs.py              全目录跨卡引用审计（L1 卡名 / L2 小节号 / L3 定理名套书名号）
+│   ├── audit_cards.py             全目录成品体检（六类跑偏：缺件 / F3 过重 / 自造框架 …）
+│   ├── lint_skill.py              技能自检 + 全目录难度体检（--self 每次必跑）
 │   ├── knowledge_map.py           知识图谱 SVG 生成（可单独自测）
 │   ├── texmath.py                 降级用的 LaTeX → MathML 转换器（可单独自测）
 │   ├── make_gallery.py            扫描 examples/ 重建画廊首页
+│   ├── check_examples_sync.py     样例与主目录的同步门禁（分叉 exit=1，--fix 可修）
 │   ├── make_demo_gif.py           可选：用 Chromium 渲染演示 GIF（需另装 Chromium，非必需）
 │   └── smoke_test_widgets.mjs     交互组件回归测试（开发用，Node 运行，无需浏览器）
 ├── assets/
@@ -250,12 +281,13 @@ math-concept-coach/
 │   ├── concept-card.css           概念卡样式（浅色、可打印、窄屏适配）
 │   └── demo.tape                  vhs 录制脚本（终端流水线那一段）
 └── examples/
-    ├── index.html                 画廊首页（可点开看真实产物）
+    ├── index.html                 画廊首页（可点开看真实产物；由 make_gallery.py 重建）
     ├── 核心概念清单.md            按课程列出的大学数学核心概念
-    ├── 一致连续-概念卡.md/.html   样例：数学分析 · plot 组件
-    ├── 数列极限-概念卡.md/.html   样例：数学分析 · seq 组件
-    ├── 矩阵的秩-概念卡.md/.html   样例：高等代数 · matrix2 组件
-    └── 大数定律-概念卡.md/.html   样例：概率论 · Python/R sim 选项卡
+    └── *-概念卡.md/.html          16 张样例卡，覆盖三种学科与主要组件类型：
+        数学分析主线  确界 极限 连续 导数 微分 中值定理 洛必达法则 泰勒展开（plot）
+        其他分析      一致连续 数列极限（plot / seq）
+        高等代数      秩零化定理 特征值与特征向量 矩阵的秩（matrix2）
+        概率论        随机变量及其分布 贝叶斯定理（plot）· 大数定律（sim + calc）
 ```
 
 ---
@@ -279,8 +311,19 @@ python3 scripts/check_card.py "examples/数列极限-概念卡.md"
 # 4b. 卡里有 sim 块时，--run 会实跑 Python/R 并核对「预期输出」（有解释器才跑）
 python3 scripts/check_card.py "examples/大数定律-概念卡.md" --run
 
+# 4c. calc / sim 块的双语言逐字节对账 + 程序化填「预期输出」（卡片里先放 <<<EXPECTED>>> 占位符）
+python3 scripts/verify_calc.py "examples/大数定律-概念卡.md" --rscript /path/to/Rscript
+#    R 常不在 PATH 上：传 --rscript 或设 $RSCRIPT；--dry-run 只看不写、--check 只校验
+
+# 4d. 回放验证：改过 calc 代码后必跑 —— 把已填的预期输出打回占位符、用实跑重建、与原卡对账
+python3 scripts/verify_calc.py "examples/极限-概念卡.md" --replay
+
 # 5. 重建画廊
 python3 scripts/make_gallery.py
+
+# 6. 样例与主目录的同步门禁（样例是从主目录拷贝来的；主卡改动后必跑）
+python3 scripts/check_examples_sync.py /path/to/主目录          # 分叉即 exit=1
+python3 scripts/check_examples_sync.py /path/to/主目录 --fix    # 用主卡覆盖样例并重生成
 ```
 
 **测试 prompt**（给技能本身的回归用例，期望输出见括号内）：
@@ -346,4 +389,4 @@ Python 段用 **numpy**（科学计算的事实标准，`pip install numpy` 即�
 因此本技能不输出「遇到这种题就套这个」式的题型总结，也不代写作业与论文；
 它只做一件事：**帮学生把定义真正读懂，并把概念挂进知识体系。**
 
-版本：v1.5（2026-09-13）｜更新记录见 [CHANGELOG.md](CHANGELOG.md)
+版本：v1.7（2026-10-09）｜更新记录见 [CHANGELOG.md](CHANGELOG.md)

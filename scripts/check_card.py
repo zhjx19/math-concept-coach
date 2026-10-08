@@ -459,7 +459,7 @@ def run_sim_blocks(text, timeout=120):
                         continue
                     suffix = "py" if lang == "Python" else "R"
                     src = Path(tmp) / f"blk{counter}_{lang}.{suffix}"
-                    src.write_text("\n".join(lines), encoding="utf-8")
+                    src.write_text("\n".join(lines), encoding="utf-8", newline="\n")
                     try:
                         proc = subprocess.run(
                             [interp, str(src)], capture_output=True, text=True,

@@ -31,7 +31,19 @@ def _configure_console():
 
 # 展示顺序（只定顺序、不定成员）：把新卡片放进 examples/ 后重跑本脚本即自动收录；
 # 未列进 ORDER 的卡片按文件名排序追加到末尾——画廊成员来自目录扫描，不再手工维护。
-ORDER = ["一致连续-概念卡", "数列极限-概念卡", "矩阵的秩-概念卡", "大数定律-概念卡"]
+# 排序按「学科 → 教学顺序」分组：数学分析链按确界→极限→连续→导数→微分→中值→洛必达→泰勒
+# （与教材章节顺序一致，学生可以顺着往下读），其余学科接在后面。
+ORDER = [
+    # 数学分析 · 主线（教材顺序）
+    "确界-概念卡", "极限-概念卡", "连续-概念卡", "导数-概念卡",
+    "微分-概念卡", "中值定理-概念卡", "洛必达法则-概念卡", "泰勒展开-概念卡",
+    # 数学分析 · 其他
+    "一致连续-概念卡", "数列极限-概念卡",
+    # 高等代数 · 线性代数
+    "秩零化定理-概念卡", "特征值与特征向量-概念卡", "矩阵的秩-概念卡",
+    # 概率论与数理统计
+    "随机变量及其分布-概念卡", "贝叶斯定理-概念卡", "大数定律-概念卡",
+]
 
 # 组件 key → 徽章文案与配色（key 取自卡片 HTML 的 data-wb；sim 卡片由 sim 块推断）
 BADGE = {
@@ -109,12 +121,30 @@ def meta_from_md(md_path):
         m = re.search(r"一句话钩子[」\*]*[:：]\s*(.+)$", t, re.M)
         if m:
             hook = re.sub(r"[*_`]", "", m.group(1)).strip()
-        m = re.search(r"所属[:：]\s*(.+?)\s*[|｜]", t)
+        # 所属行的值形如「数学分析 · 第 0 个概念（地基…）｜ 认知动作：逼近 | 教材：…」。
+        # 处理顺序不能颠倒：
+        #   ① 先按「认知动作：」把类别单独切出来（否则后面的「教材…」会被当成动作的一部分）；
+        #   ② 再把余下的部分截到第一个分隔符 ｜ 或 | 之前；
+        #   ③ 课程名取「·」**前**半段（「数学分析 · 第 0 个概念」里学科在前，位置在后）；
+        #   ④ 括号里是补充说明，截断；markdown 标记清掉。
+        m = re.search(r"所属[:：]\s*(.+)", t)
         if m:
-            course = m.group(1).strip()
-        m = re.search(r"认知动作[:：]\s*\**\s*([^\n*]+)", t)
-        if m:
-            action = m.group(1).strip().rstrip("—- ").strip()
+            raw = m.group(1)
+            act_m = re.search(r"认知动作[:：]\s*([^|｜\n]+)", raw)
+            if act_m:
+                action = act_m.group(1).strip().rstrip("—-* ").strip()
+                raw = raw[: act_m.start()]            # 把「认知动作…」整段从课程名里剔掉
+            raw = re.split(r"[|｜]", raw)[0].strip()
+            raw = raw.split("（", 1)[0].split("(", 1)[0].strip()
+            raw = re.sub(r"[*_`]", "", raw)
+            parts = [p.strip() for p in raw.split("·", 1)]
+            course = parts[0] if len(parts) == 2 and parts[0] else raw
+        # 所属行里没有类别时，回落到全文首个「认知动作：X」（老卡写在 F5 里的写法）。
+        # 但要排除 F5 里「认知动作 = …」那种**交互动作描述**（等号形式），只取冒号形式。
+        if not action:
+            m = re.search(r"认知动作[:：]\s*([^=—\n|｜*]+)", t)
+            if m:
+                action = m.group(1).strip().rstrip("—- ").strip()
     return hook, course, action
 
 
@@ -235,7 +265,9 @@ def main():
 </html>
 """
     out = EXAMPLES / "index.html"
-    out.write_text(doc, encoding="utf-8")
+    # newline="\n"：与 .gitattributes（仓库内统一 LF）及 md2card.py 保持一致，
+    # 否则 Windows 上产物变 CRLF，跨平台不可复现。
+    out.write_text(doc, encoding="utf-8", newline="\n")
     print(f"[OK] 画廊已生成：{out}")
     print(f"     卡片 {len(items)} 张 | 大小 {len(doc.encode('utf-8')) / 1024:.1f} KB")
     if missing:

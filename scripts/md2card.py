@@ -555,7 +555,7 @@ def main():
     pre, stats = preprocess(md_text)
     if pandoc:
         tmp_md = md_path.with_suffix(".pre.md")
-        tmp_md.write_text(pre, encoding="utf-8")
+        tmp_md.write_text(pre, encoding="utf-8", newline="\n")
         try:
             body = convert_md_to_html(pandoc, tmp_md)
         except RuntimeError as e:
@@ -582,7 +582,11 @@ def main():
         .replace("__BODY__", apply_progressive_disclosure(body))
     )
     out_path = Path(args.output) if args.output else md_path.with_suffix(".html")
-    out_path.write_text(out_text, encoding="utf-8")
+    # newline="\n" 必须显式给：Windows 上默认会把 \n 翻成 \r\n，
+    # 于是同一份 md 在不同平台产出**不同字节**的 html（破坏可复现），
+    # 也与 .gitattributes 的 `* text=auto eol=lf`（仓库内统一 LF）冲突 ——
+    # 每次重渲都会让工作区出现「只有换行不同」的伪改动。
+    out_path.write_text(out_text, encoding="utf-8", newline="\n")
 
     print(f"[OK] 概念卡已生成：{out_path}")
     print(f"     交互组件 {stats['widget']} 个 | 知识图谱 {stats['map']} 张 | "

@@ -207,7 +207,7 @@ if __name__ == "__main__":
     import os
     import tempfile
     out = os.path.join(tempfile.gettempdir(), "km_demo.svg")
-    with open(out, "w", encoding="utf-8") as f:
+    with open(out, "w", encoding="utf-8", newline="\n") as f:
         f.write(svg)
     print(f"OK -> {out}  ({len(svg)} chars, height lines: {svg.count(chr(10))})")
     assert "\n\n" not in svg, "SVG 不能含空行（会中断 pandoc 原始 HTML 块）"
