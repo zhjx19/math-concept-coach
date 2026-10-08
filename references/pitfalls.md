@@ -115,8 +115,19 @@ C:\...\Temp\struct.py   ← 会打断 numpy 的 import 链（pickle → struct�
 ImportError: cannot import name 'pack' from 'struct'
 ```
 
-**规矩**：临时脚本**不要用标准库同名的词**（`struct`、`types`、`code`、`json`、`random`、`select`、`math`、`copy`、`time`、`io`、`email`、`profile`、`test`、`token`）。
+**规矩**：临时脚本**不要用标准库同名的词**（`struct`、`types`、`code`、`json`、`random`、`select`、`math`、`copy`、`time`、`io`、`email`、`profile`、`test`、`token`、`http`、`socket`、`queue`）。
 **养成习惯**：临时脚本一律带前缀（`t_py.py`、`dcmp.py`、`chk3.py`）。
+
+### 2.3.1 ⭐ 名字撞了之后，**光改名没用** —— 肇事文件还在同一目录
+
+**实测（2026-10-09，发布流程里）**：临时脚本命名 `http.py`，`import urllib.request` 报
+`No module named 'http.client'; 'http' is not a package`。
+把脚本**改名**成 `chk_urls.py` 后**照样报同一个错** —— 因为 Python 把**脚本所在目录**放进 `sys.path[0]`，
+而 `http.py` 还躺在同一个 `Temp\` 目录里，继续遮蔽标准库。
+
+**规矩**：撞了名字，**必须把肇事文件从那个目录删掉**（连同 `__pycache__`），改名救不了。
+更稳的做法是**别把临时脚本丢进与其它临时文件混放的公共目录**，或干脆用
+`python -c "..."` / 一个**不落地的**内联脚本，不给遮蔽留机会。
 
 ### 2.4 ⭐⭐ `--dry-run` 只证明「两侧互相一致」，**证明不了「卡里的预期输出没过期」**
 
