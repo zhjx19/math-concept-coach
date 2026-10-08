@@ -1,0 +1,2254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>特征值与特征向量 · 六棱镜拆解</title>
+<style>
+/* ============================================================
+   概念卡样式（concept-card.css）
+   浅色主题 · 离线可用 · 可打印
+   ============================================================ */
+
+:root {
+  --ink: #1f2328;
+  --muted: #5b6570;
+  --line: #e4e8ec;
+  --line-strong: #cdd5dd;
+  --bg: #ffffff;
+  --soft: #f7f9fb;
+  --accent: #2f6fb3;
+  --accent-soft: #eaf2fa;
+
+  /* 六棱镜各面配色 */
+  --f1: #c2582a;  /* 正反 */
+  --f2: #1f8a63;  /* 直观 */
+  --f3: #2f6fb3;  /* 严格 */
+  --f4: #7a4fb3;  /* 意义 */
+  --f5: #a8791a;  /* 图形 */
+  --f6: #475569;  /* 联系 */
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  padding: 32px 16px 64px;
+  background: #f2f5f8;
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei",
+               "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", sans-serif;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+/* ---------- 卡片容器 ---------- */
+.card {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 40px 44px 56px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 0 6px 28px rgba(31, 35, 40, 0.07);
+}
+
+/* ---------- 标题 ---------- */
+.card > h1:first-child {
+  margin: 0 0 6px;
+  padding-bottom: 14px;
+  font-size: 26px;
+  line-height: 1.4;
+  border-bottom: 3px solid var(--accent);
+}
+.card > h1:first-child::after {
+  content: "概念卡 · 六棱镜拆解";
+  display: block;
+  margin-top: 8px;
+  font-size: 12.5px;
+  font-weight: 400;
+  letter-spacing: .12em;
+  color: var(--muted);
+}
+
+/* 非「面」的小节标题（自检、错位清单等） */
+.card > h2 {
+  margin: 40px 0 14px;
+  padding: 8px 0 8px 16px;
+  font-size: 19px;
+  line-height: 1.5;
+  border-left: 5px solid var(--accent);
+  background: linear-gradient(90deg, var(--accent-soft), transparent 72%);
+  border-radius: 0 6px 6px 0;
+}
+
+/* ---------- 六棱镜各面：折叠面板（渐进揭示） ---------- */
+.facet-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin: 30px 0 -10px;
+}
+.facet-toggle {
+  font: inherit;
+  font-size: 13px;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid #cddff0;
+  border-radius: 999px;
+  padding: 4px 14px;
+  cursor: pointer;
+}
+.facet-toggle:hover { background: #dceaf8; }
+
+details.facet {
+  margin: 26px 0 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+}
+details.facet[open] { box-shadow: 0 1px 6px rgba(31, 35, 40, 0.05); }
+
+.facet-h {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 12px 16px;
+  font-size: 18px;
+  line-height: 1.5;
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+  border-left: 5px solid var(--accent);
+  background: linear-gradient(90deg, var(--accent-soft), transparent 72%);
+}
+.facet-h::-webkit-details-marker { display: none; }
+.facet-h::before {
+  content: "▸";
+  flex: 0 0 auto;
+  font-size: 14px;
+  color: var(--muted);
+  transition: transform .15s ease;
+}
+details.facet[open] > .facet-h::before { transform: rotate(90deg); }
+
+.facet-h.f1 { border-left-color: var(--f1); background: linear-gradient(90deg,#fbeee8,transparent 72%); }
+.facet-h.f2 { border-left-color: var(--f2); background: linear-gradient(90deg,#e8f6f1,transparent 72%); }
+.facet-h.f3 { border-left-color: var(--f3); background: linear-gradient(90deg,#eaf2fa,transparent 72%); }
+.facet-h.f4 { border-left-color: var(--f4); background: linear-gradient(90deg,#f1ecfa,transparent 72%); }
+.facet-h.f5 { border-left-color: var(--f5); background: linear-gradient(90deg,#faf3e3,transparent 72%); }
+.facet-h.f6 { border-left-color: var(--f6); background: linear-gradient(90deg,#eef1f5,transparent 72%); }
+
+.facet-body { padding: 4px 18px 16px; }
+
+/* 面内的小节标题（### 定义、### 量词骨架 …） */
+.card h3 {
+  margin: 26px 0 10px;
+  font-size: 16.5px;
+  color: var(--accent);
+}
+
+/* ---------- 段落与列表 ---------- */
+.card p { margin: 10px 0; }
+.card ul, .card ol { margin: 10px 0; padding-left: 1.6em; }
+.card li { margin: 5px 0; }
+.card li::marker { color: var(--accent); }
+
+.card strong { color: #0f1419; }
+.card em { color: var(--muted); font-style: normal; background: #fff6d9; padding: 0 3px; border-radius: 3px; }
+
+/* ---------- 表格（三线表） ---------- */
+.card table {
+  width: 100%;
+  margin: 16px 0;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+.card table th, .card table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+.card table thead th {
+  background: var(--soft);
+  border-top: 2px solid var(--line-strong);
+  border-bottom: 1.5px solid var(--line-strong);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.card table tbody tr:last-child td { border-bottom: 2px solid var(--line-strong); }
+.card table tbody tr:hover { background: #fbfcfe; }
+
+/* ---------- 引用块 = 提示框 ---------- */
+.card blockquote {
+  margin: 16px 0;
+  padding: 12px 18px;
+  background: var(--accent-soft);
+  border-left: 4px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  color: #26333f;
+}
+.card blockquote p:first-child { margin-top: 0; }
+.card blockquote p:last-child { margin-bottom: 0; }
+
+/* ---------- 代码 ---------- */
+.card code {
+  padding: 2px 6px;
+  background: #f1f4f7;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+  font-size: .9em;
+}
+.card pre {
+  margin: 16px 0;
+  padding: 14px 16px;
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow-x: auto;
+  line-height: 1.6;
+}
+.card pre code { padding: 0; background: none; border: 0; }
+
+/* ---------- 分隔线 ---------- */
+.card hr {
+  margin: 36px 0;
+  border: 0;
+  border-top: 1px dashed var(--line-strong);
+}
+
+/* ---------- 公式（MathML） ---------- */
+.card math { font-size: 1.06em; }
+.card math[display="block"],
+.card .math.display {
+  display: block;
+  margin: 14px 0;
+  text-align: center;
+  overflow-x: auto;
+}
+
+/* ---------- 图形演示占位 ---------- */
+.card img { max-width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--line); }
+.card .hint {
+  margin: 10px 0;
+  padding: 10px 14px;
+  background: #fffaf0;
+  border: 1px dashed #e0b978;
+  border-radius: 8px;
+  font-size: 14.5px;
+  color: #6b4a12;
+}
+
+/* ============================================================
+   自绘交互组件（card-widgets.js）
+   ============================================================ */
+.wb-widget {
+  margin: 18px 0 22px;
+  padding: 14px 16px 12px;
+  background: #fcfdfe;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.wb-canvas {
+  display: block;
+  width: 100%;
+  border-radius: 8px;
+  background: #fff;
+  touch-action: none;
+}
+.wb-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  margin-top: 12px;
+}
+.wb-ctl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  color: var(--ink);
+  min-width: 210px;
+  flex: 1 1 210px;
+}
+.wb-ctl-name { font-weight: 600; white-space: nowrap; }
+.wb-ctl input[type="range"] {
+  flex: 1 1 auto;
+  min-width: 80px;
+  accent-color: var(--accent);
+  height: 20px;
+}
+.wb-ctl-out {
+  min-width: 56px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+  font-weight: 600;
+}
+.wb-readout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+  margin-top: 10px;
+  padding-top: 9px;
+  border-top: 1px dashed var(--line-strong);
+  font-size: 13.5px;
+  color: var(--muted);
+}
+.wb-ro b { color: var(--ink); font-weight: 600; }
+.wb-ro { font-variant-numeric: tabular-nums; }
+.wb-hint {
+  margin: 11px 0 0;
+  padding: 9px 13px;
+  background: #fffaf0;
+  border: 1px dashed #e0b978;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #6b4a12;
+}
+.wb-err {
+  margin: 0;
+  padding: 10px 14px;
+  background: #fdeeee;
+  border: 1px solid #e8b4b4;
+  border-radius: 8px;
+  color: #a33232;
+  font-size: 14px;
+}
+
+/* ============================================================
+   GeoGebra 指令块
+   ============================================================ */
+.gb-block {
+  margin: 18px 0;
+  border: 1px solid #cfe0d4;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fbfdfb;
+}
+.gb-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 14px;
+  background: #eef6f0;
+  border-bottom: 1px solid #d8e9dd;
+  font-size: 13.5px;
+  color: #1f6b4a;
+}
+.gb-copy {
+  flex: 0 0 auto;
+  padding: 5px 13px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #fff;
+  background: #1f8a63;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.gb-copy:hover { background: #176f4f; }
+.gb-block pre {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: #fbfdfb;
+  font-size: 13.5px;
+}
+
+/* ============================================================
+   Python / R 代码选项卡（sim 模拟 / calc 概念计算器：默认 Python，可切换 R）
+   ============================================================ */
+.sim-block {
+  margin: 18px 0;
+  border: 1px solid #d3dcea;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fcfdff;
+}
+.sim-block[data-kind="calc"] { border-color: #cfe6d8; }
+.sim-block[data-kind="calc"] .sim-head { background: #eaf6ef; border-bottom-color: #d3e8dc; }
+.sim-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 10px 7px 12px;
+  background: #eef2fa;
+  border-bottom: 1px solid #dbe3f0;
+}
+.sim-kind {
+  margin-right: auto;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #46505c;
+  white-space: nowrap;
+}
+.sim-tabs { display: flex; gap: 6px; }
+.sim-tab {
+  padding: 4px 14px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #5b6570;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.sim-tab:hover { color: #2f6fb3; }
+.sim-tab.is-active {
+  color: #1d5c9e;
+  background: #fff;
+  border-color: #c3d2e8;
+  font-weight: 600;
+}
+.sim-copy {
+  flex: 0 0 auto;
+  padding: 4px 12px;
+  font-size: 12.5px;
+  font-family: inherit;
+  color: #2f6fb3;
+  background: #fff;
+  border: 1px solid #c3d2e8;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.sim-copy:hover { background: #e3ecf8; }
+.sim-pane {
+  display: none;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: #fcfdff;
+  font-size: 13.5px;
+}
+.sim-pane.is-active { display: block; }
+.sim-pane code { display: block; padding: 12px 14px; }
+
+/* ============================================================
+   知识图谱（knowledge_map.py 生成的内联 SVG）
+   ============================================================ */
+.km-svg {
+  display: block;
+  width: 100%;
+  margin: 20px 0;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei",
+               "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", sans-serif;
+}
+.km-bg { fill: #fff; }
+.km-ttl { font-size: 13px; font-weight: 700; fill: #1f2328; }
+.km-lg { font-size: 11px; fill: #5b6570; }
+.km-cap { font-size: 11px; fill: #7a8693; text-anchor: middle; }
+.km-note { font-size: 12px; fill: #5b6570; text-anchor: middle; }
+
+/* ---------- 打印 ---------- */
+/* ============================================================
+   降级模式（未安装 pandoc 时由内置转换器生成）
+   ============================================================ */
+.fb-note {
+  margin: 18px 0;
+  padding: 12px 16px;
+  background: #fff8e6;
+  border: 1px solid #f0d8a0;
+  border-left: 4px solid #e0a53a;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.75;
+  color: #6b551f;
+}
+.fb-note strong { color: #8a5a00; }
+
+/* 内置转换器解析不了的公式：原样显示 LaTeX 源码，绝不做半吊子猜测 */
+code.math-src {
+  font-family: "JetBrains Mono", Consolas, "Courier New", monospace;
+  font-size: 0.92em;
+  background: #f4f6f8;
+  border: 1px solid #e3e8ee;
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+math { font-size: 1.02em; }
+
+/* ---------- 窄屏（手机）适配 ---------- */
+@media (max-width: 640px) {
+  body { padding: 10px 6px; }
+  .card { padding: 16px 14px; border-radius: 10px; }
+  .card > h1:first-child { font-size: 1.45em; }
+  .card > h2 { font-size: 1.12em; }
+  .facet-h { font-size: 1.08em; padding: 10px 12px; }
+  .facet-body { padding: 2px 12px 14px; }
+  .card table { display: block; overflow-x: auto; white-space: nowrap; }
+  .wb-controls { flex-wrap: wrap; }
+}
+
+@media print {
+  @page { margin: 14mm 12mm; }
+  body { padding: 0; background: #fff; font-size: 11.5pt; line-height: 1.65; }
+  .card {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .card > h2 { page-break-after: avoid; break-after: avoid; }
+  /* 打印：折叠面全部展开（beforeprint 已打开），隐去折叠按钮与箭头 */
+  .facet-toolbar { display: none; }
+  details.facet { border: 0; border-radius: 0; margin: 20px 0 0; }
+  details.facet[open] { box-shadow: none; }
+  .facet-h { page-break-after: avoid; break-after: avoid; background: none; border-left-width: 4px; padding: 6px 0 6px 10px; }
+  .facet-h::before { display: none; }
+  .facet-body { padding: 0 0 0 10px; }
+  .card table, .card pre, .card blockquote, .card img { page-break-inside: avoid; break-inside: avoid; }
+  .card a { color: inherit; text-decoration: none; }
+  /* 打印时：交互组件保留图形、隐去滑块（滑块打印无意义） */
+  .wb-widget { page-break-inside: avoid; break-inside: avoid; border-color: #ccc; background: #fff; }
+  .wb-controls { display: none; }
+  .km-svg, .gb-block { page-break-inside: avoid; break-inside: avoid; }
+  .gb-copy { display: none; }
+  /* 打印：模拟代码不显示选项卡，Python / R 两段全部展示，用标签行区分 */
+  .sim-block { page-break-inside: avoid; break-inside: avoid; border-color: #ccc; background: #fff; }
+  .sim-head { display: none; }
+  .sim-pane { display: block !important; border-top: 1px dashed #ccc; font-size: 10.5pt; }
+  .sim-pane:first-of-type { border-top: 0; }
+  .sim-pane::before {
+    content: attr(data-label);
+    display: block;
+    padding: 6px 14px 0;
+    font-weight: 700;
+    font-size: 10.5pt;
+    color: #1d5c9e;
+  }
+}
+
+</style>
+</head>
+<body>
+<main class="card">
+<h1 id="特征值与特征向量-六棱镜拆解">特征值与特征向量 · 六棱镜拆解</h1>
+<blockquote>
+<p>📌 所属：高等代数 / 线性代数 ·
+特征值与特征向量（也出现在常微分方程的振型、微分几何的曲率主方向、量子力学的能量本征值、马尔可夫链的平稳分布里）
+｜ 认知动作：变换| 教材：以你教材对应章节为准 🎯
+<strong>学完你应该能</strong>：①
+逐字写出定义，指出<strong>两个条件缺一不可</strong>（<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐯</mi><mo>≠</mo><mn>𝟎</mn></mrow><annotation encoding="application/x-tex">\mathbf v\ne\mathbf0</annotation></semantics></math>、<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+存在），并说明「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+可以是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>，但
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐯</mi><annotation encoding="application/x-tex">\mathbf v</annotation></semantics></math>
+不能是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>」；②
+<strong>完整推出</strong>「特征值
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>=</mo><mrow><mi mathvariant="normal">det</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>A</mi><mo>−</mo><mi>λ</mi><mi>I</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">=\det(A-\lambda I)=0</annotation></semantics></math>
+的根」，每步注依据；③ 说出<strong>特征值不是对角元</strong>并给反例；④
+区分代数重数与几何重数，并据此判断可对角化；⑤
+证明「不同特征值的特征向量线性无关」「实对称矩阵的特征向量可取成��交」；⑥
+说明特征值<strong>与基无关</strong>（是变换的属性）。 💡
+<strong>一句话钩子</strong>：有些方向，变换只把它们拉长（或压扁、或干脆打成零），不扭转、不转向——这些特殊方向与倍数，就是特征向量与特征值。
+🧱
+<strong>假设基底（待你确认）</strong>：我猜你已会「核与像、行列式与可逆、齐次方程组的解空间、内积与正交」——<strong>你觉得自己会吗？</strong>
+→
+我猜你缺的是<strong>「奇异」这个已会的概念与特征值的对接</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>−</mo><mi>λ</mi><mi>I</mi></mrow><annotation encoding="application/x-tex">A-\lambda I</annotation></semantics></math>
+把某个非零方向压成
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>𝟎</mn><annotation encoding="application/x-tex">\mathbf0</annotation></semantics></math>，那个方向就是特征向量。<strong>特征值不是天上掉下来的公式，是「奇异」的另一种问法。</strong></p>
+</blockquote>
+<hr />
+<div class="facet-toolbar"><button type="button" class="facet-toggle" data-open="1">收起全部</button></div><details class="facet" open><summary class="facet-h f1">F1 正反拆解：边界在哪</summary><div class="facet-body">
+<h3 id="正例四个不同的-a四种特殊方向">正例：四个不同的
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>，四种「特殊方向」</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math></th>
+<th>特征值</th>
+<th>每个特征值的一组特征向量</th>
+<th>独立方向数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>2</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1.5</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\begin{pmatrix}2&amp;0\\0&amp;1.5\end{pmatrix}</annotation></semantics></math></td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1.5</mn><mo>,</mo><mspace width="0.222em"></mspace><mn>2</mn></mrow><annotation encoding="application/x-tex">1.5,\ 2</annotation></semantics></math></td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>0</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mspace width="0.222em"></mspace><mo>;</mo><mspace width="0.222em"></mspace><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>1</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup></mrow><annotation encoding="application/x-tex">(1,0)^{\mathsf T}\ ;\ (0,1)^{\mathsf T}</annotation></semantics></math></td>
+<td>2</td>
+</tr>
+<tr>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\begin{pmatrix}1&amp;1\\1&amp;1\end{pmatrix}</annotation></semantics></math></td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mo>,</mo><mspace width="0.222em"></mspace><mn>0</mn></mrow><annotation encoding="application/x-tex">2,\ 0</annotation></semantics></math></td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>1</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mspace width="0.222em"></mspace><mo>;</mo><mspace width="0.222em"></mspace><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mi>−</mi><mn>1</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup></mrow><annotation encoding="application/x-tex">(1,1)^{\mathsf T}\ ;\ (1,-1)^{\mathsf T}</annotation></semantics></math></td>
+<td>2（且<strong>正交</strong>）</td>
+</tr>
+<tr>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\begin{pmatrix}0&amp;1\\0&amp;0\end{pmatrix}</annotation></semantics></math></td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>（二重）</td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>0</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup></mrow><annotation encoding="application/x-tex">(1,0)^{\mathsf T}</annotation></semantics></math></td>
+<td><strong>1</strong></td>
+</tr>
+<tr>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mi>−</mi><mn>1</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\begin{pmatrix}0&amp;-1\\1&amp;0\end{pmatrix}</annotation></semantics></math></td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>±</mi><mi>i</mi></mrow><annotation encoding="application/x-tex">\pm i</annotation></semantics></math></td>
+<td>实数范围内<strong>不存在</strong></td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>验算要点：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\begin{pmatrix}1&amp;1\\1&amp;1\end{pmatrix}</annotation></semantics></math>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false" form="prefix">(</mo><mi>λ</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msup><mi>λ</mi><mn>2</mn></msup><mo>−</mo><mn>2</mn><mi>λ</mi><mo>=</mo><mi>λ</mi><mo stretchy="false" form="prefix">(</mo><mi>λ</mi><mo>−</mo><mn>2</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">f(\lambda)=\lambda^2-2\lambda=\lambda(\lambda-2)</annotation></semantics></math>
+⟹
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>=</mo><mn>0</mn><mo>,</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">\lambda=0,2</annotation></semantics></math>；<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>=</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">\lambda=2</annotation></semantics></math>
+⟹
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>−</mo><mn>2</mn><mi>I</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mi>−</mi><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mi>−</mi><mn>1</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">A-2I=\begin{pmatrix}-1&amp;1\\1&amp;-1\end{pmatrix}</annotation></semantics></math>
+⟹
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi><mo>=</mo><mi>x</mi></mrow><annotation encoding="application/x-tex">y=x</annotation></semantics></math>
+⟹
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>1</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup></mrow><annotation encoding="application/x-tex">(1,1)^{\mathsf T}</annotation></semantics></math>
+✓；<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\lambda=0</annotation></semantics></math>
+⟹
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>𝐯</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">A\mathbf v=0</annotation></semantics></math>
+⟹
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mi>−</mi><mn>1</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup></mrow><annotation encoding="application/x-tex">(1,-1)^{\mathsf T}</annotation></semantics></math>
+✓；内积
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>=</mo><mn>1</mn><mo>−</mo><mn>1</mn><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">=1-1=0</annotation></semantics></math>
+✓。</p>
+<h3 id="边界例-三个">边界例 ⭐（三个）</h3>
+<p><strong>边界例 1 ·
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+可以是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>，但
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐯</mi><annotation encoding="application/x-tex">\mathbf v</annotation></semantics></math>
+绝不能是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>𝟎</mn><annotation encoding="application/x-tex">\mathbf0</annotation></semantics></math>（两者地位完全不同）</strong></p>
+<p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">A=\begin{pmatrix}0&amp;1\\0&amp;0\end{pmatrix}</annotation></semantics></math>：特征值<strong>只有
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\lambda=0</annotation></semantics></math></strong>（<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false" form="prefix">(</mo><mi>λ</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mrow><mi mathvariant="normal">det</mi><mo>&#8289;</mo></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mi>−</mi><mi>λ</mi></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mi>−</mi><mi>λ</mi></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><msup><mi>λ</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">f(\lambda)=\det\begin{pmatrix}-\lambda&amp;1\\0&amp;-\lambda\end{pmatrix}=\lambda^2</annotation></semantics></math>，二重根），特征向量是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>0</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\{(1,0)^{\mathsf T}\}</annotation></semantics></math>。
+验算：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>0</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo>=</mo><mn>𝟎</mn><mo>=</mo><mn>0</mn><mo>⋅</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>0</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup></mrow><annotation encoding="application/x-tex">A(1,0)^{\mathsf T}=\mathbf0=0\cdot(1,0)^{\mathsf T}</annotation></semantics></math>
+✓。 &gt; 「特征值可以是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>」与「特征向量可以是零向量」——前者<strong>成立</strong>，后者<strong>违反定义</strong>。这个区分是本卡删条件实验的核心，也是解题时最常被跳过的一句。</p>
+<p><strong>边界例 2 ⭐ 代数重数
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>≥</mo><annotation encoding="application/x-tex">\ge</annotation></semantics></math>
+几何重数</strong></p>
+<p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">A=\begin{pmatrix}1&amp;1\\0&amp;1\end{pmatrix}</annotation></semantics></math>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">det</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>A</mi><mo>−</mo><mi>λ</mi><mi>I</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>−</mo><mi>λ</mi><msup><mo stretchy="false" form="postfix">)</mo><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">\det(A-\lambda I)=(1-\lambda)^2</annotation></semantics></math>
+⟹
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\lambda=1</annotation></semantics></math>，<strong>代数重数
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2</mn><annotation encoding="application/x-tex">2</annotation></semantics></math></strong>；<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>A</mi><mo>−</mo><mi>I</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo>,</mo><mn>0</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\ker(A-I)=\{(x,0)^{\mathsf T}\}</annotation></semantics></math>
+⟹ <strong>几何重数
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math></strong>。
+⟹ 只有<strong>一个</strong>特征方向 ⟹
+<strong>不可对角化</strong>。这是「特征值算出来了，变换还是不好办」的根源。</p>
+<p><strong>边界例 3 ⭐ 实矩阵也可能有复特征值</strong></p>
+<p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mi>−</mi><mn>1</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">A=\begin{pmatrix}0&amp;-1\\1&amp;0\end{pmatrix}</annotation></semantics></math>（旋转
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>90</mn><mo>∘</mo></msup><annotation encoding="application/x-tex">90^\circ</annotation></semantics></math>）：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">det</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>A</mi><mo>−</mo><mi>λ</mi><mi>I</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mi>−</mi><mi>λ</mi><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="prefix">(</mo><mi>−</mi><mi>λ</mi><mo stretchy="false" form="postfix">)</mo><mo>−</mo><mo stretchy="false" form="prefix">(</mo><mi>−</mi><mn>1</mn><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msup><mi>λ</mi><mn>2</mn></msup><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\det(A-\lambda I)=(-\lambda)(-\lambda)-(-1)(1)=\lambda^2+1</annotation></semantics></math>
+⟹
+在<strong>实数范围内无根</strong>（<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>=</mo><mi>±</mi><mi>i</mi></mrow><annotation encoding="application/x-tex">\lambda=\pm i</annotation></semantics></math>）。
+&gt; 若把
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+限定在实数，这张矩阵「没有特征向量」——
+可它是最标准的变换之一。<strong>这说明特征值必须允许复数</strong>，否则许多变换会「丢失特征值」。当然，<strong>实对称矩阵的特征值一定是实的</strong>（见
+F3 的定理）。</p>
+<h3 id="反例三条">反例（三条）</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>常见说法</th>
+<th>反例</th>
+<th>错在哪</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>𝟎</mn><annotation encoding="application/x-tex">\mathbf0</annotation></semantics></math>
+是特征向量」</td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mn>𝟎</mn><mo>=</mo><mi>λ</mi><mn>𝟎</mn></mrow><annotation encoding="application/x-tex">A\mathbf0=\lambda\mathbf0</annotation></semantics></math>
+对任意
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+都成立；允许零向量后，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>2</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>3</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">A=\begin{pmatrix}2&amp;0\\0&amp;3\end{pmatrix}</annotation></semantics></math>
+的
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>5</mn><annotation encoding="application/x-tex">5</annotation></semantics></math>、<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>π</mi><annotation encoding="application/x-tex">\pi</annotation></semantics></math>
+全都「成立」</td>
+<td>定义里
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐯</mi><mo>≠</mo><mn>𝟎</mn></mrow><annotation encoding="application/x-tex">\mathbf v\ne\mathbf0</annotation></semantics></math>
+是命门</td>
+</tr>
+<tr>
+<td>「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>𝐯</mi><mo>=</mo><mi>λ</mi><mi>𝐯</mi></mrow><annotation encoding="application/x-tex">A\mathbf v=\lambda\mathbf v</annotation></semantics></math>
+对任意
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐯</mi><annotation encoding="application/x-tex">\mathbf v</annotation></semantics></math>
+都成立」</td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>2</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>3</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">A=\begin{pmatrix}2&amp;0\\0&amp;3\end{pmatrix}</annotation></semantics></math>，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐯</mi><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>1</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup></mrow><annotation encoding="application/x-tex">\mathbf v=(1,1)^{\mathsf T}</annotation></semantics></math>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>𝐯</mi><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>2</mn><mo>,</mo><mn>3</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup></mrow><annotation encoding="application/x-tex">A\mathbf v=(2,3)^{\mathsf T}</annotation></semantics></math>，不存在
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+使
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>1</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>2</mn><mo>,</mo><mn>3</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup></mrow><annotation encoding="application/x-tex">\lambda(1,1)^{\mathsf T}=(2,3)^{\mathsf T}</annotation></semantics></math>（需要
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>=</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">\lambda=2</annotation></semantics></math>
+又
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>=</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">\lambda=3</annotation></semantics></math>）</td>
+<td>只有<strong>特征空间</strong>（<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>=</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>A</mi><mo>−</mo><mi>λ</mi><mi>I</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">=\ker(A-\lambda I)</annotation></semantics></math>）里的非零向量才是特征向量</td>
+</tr>
+<tr>
+<td>「两个特征向量的和还是特征向量」</td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">A=\begin{pmatrix}1&amp;1\\1&amp;1\end{pmatrix}</annotation></semantics></math>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>1</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup></mrow><annotation encoding="application/x-tex">(1,1)^{\mathsf T}</annotation></semantics></math>
+是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>=</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">\lambda=2</annotation></semantics></math>
+的，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mi>−</mi><mn>1</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup></mrow><annotation encoding="application/x-tex">(1,-1)^{\mathsf T}</annotation></semantics></math>
+是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\lambda=0</annotation></semantics></math>
+的；其和
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mn>2</mn><mo>,</mo><mn>0</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup></mrow><annotation encoding="application/x-tex">(2,0)^{\mathsf T}</annotation></semantics></math>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo stretchy="false" form="prefix">(</mo><mn>2</mn><mo>,</mo><mn>0</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>2</mn><mo>,</mo><mn>2</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup></mrow><annotation encoding="application/x-tex">A(2,0)^{\mathsf T}=(2,2)^{\mathsf T}</annotation></semantics></math>，要
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo stretchy="false" form="prefix">(</mo><mn>2</mn><mo>,</mo><mn>0</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>2</mn><mo>,</mo><mn>2</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup></mrow><annotation encoding="application/x-tex">\lambda(2,0)^{\mathsf T}=(2,2)^{\mathsf T}</annotation></semantics></math>
+需要
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\lambda=1</annotation></semantics></math>
+又
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">2=0</annotation></semantics></math>，矛盾</td>
+<td><strong>同一特征值</strong>的特征向量的线性组合才是；不同特征值的不行</td>
+</tr>
+</tbody>
+</table>
+<hr />
+</div></details><details class="facet"><summary class="facet-h f2">F2 通俗理解</summary><div class="facet-body">
+<p><strong>一句人话</strong>：<strong>有些方向，变换只把它们拉长（或压扁、或干脆打成零），不扭转、不转向。</strong></p>
+<p><strong>类比 ·
+单杠上的弹簧</strong>：一根弹簧挂在固定方向上，你用力拉 ——
+方向不变，长度变了。<strong>弹簧所在的方向就是特征方向，伸长倍数就是特征值。</strong>
+不在那个方向上的东西，你一拉它就<strong>歪</strong>（既变长又转向）——
+那不是特征方向。</p>
+<p><strong>类比失效边界（三条）</strong> -
+<strong>「不转向」不能推广成「不改变」</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>=</mo><mi>−</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">\lambda=-1</annotation></semantics></math>
+时方向完全翻转（<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>𝐯</mi><mo>=</mo><mi>−</mi><mi>𝐯</mi></mrow><annotation encoding="application/x-tex">A\mathbf v=-\mathbf v</annotation></semantics></math>），<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\lambda=0</annotation></semantics></math>
+时干脆打成零，<strong>都算「只乘一个数」</strong>。特征的本质是「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>
+在这个方向上就是乘一个数」，不是「长度不变」。 -
+<strong>不能把「特征」理解成「最重要」</strong>：它只是「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>
+表现得最简单」的方向。有些变换在实数范围内<strong>根本没有</strong>特征向量（边界例
+3）。 - 类比只帮想到，<strong>不作证明依据</strong>。</p>
+<p><strong>为什么需要它</strong>：特征值把「矩阵」翻译成「一串数」，从此可以谈：矩阵的幂会不会爆炸（<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>A</mi><mi>n</mi></msup><annotation encoding="application/x-tex">A^n</annotation></semantics></math>）、矩阵能否化简（对角化）、系统会不会震荡（振型）。<strong>「这个变换重复做
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+次会怎样」这个问题，只有特征值能回答。</strong></p>
+<hr />
+</div></details><details class="facet"><summary class="facet-h f3">F3 严格数学表述</summary><div class="facet-body">
+<h3 id="定义">定义</h3>
+<p>设
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mo>:</mo><mi>V</mi><mo>→</mo><mi>V</mi></mrow><annotation encoding="application/x-tex">T:V\to V</annotation></semantics></math>
+线性。若
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐯</mi><mo>≠</mo><mn>𝟎</mn></mrow><annotation encoding="application/x-tex">\mathbf v\ne\mathbf0</annotation></semantics></math>
+且<strong>存在</strong>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>∈</mo><mi>𝔽</mi></mrow><annotation encoding="application/x-tex">\lambda\in\mathbb{F}</annotation></semantics></math>
+使
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mi>𝐯</mi><mo>=</mo><mi>λ</mi><mi>𝐯</mi></mrow><annotation encoding="application/x-tex">T\mathbf v=\lambda\mathbf v</annotation></semantics></math>，则称
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐯</mi><annotation encoding="application/x-tex">\mathbf v</annotation></semantics></math>
+是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>（关于
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>）的<strong>特征向量</strong>，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+是 <strong>特征值</strong>。</p>
+<p><strong>量词骨架</strong>：<strong>存在</strong>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>，使
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mi>𝐯</mi><mo>=</mo><mi>λ</mi><mi>𝐯</mi></mrow><annotation encoding="application/x-tex">T\mathbf v=\lambda\mathbf v</annotation></semantics></math>
+且
+<strong><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐯</mi><mo>≠</mo><mn>𝟎</mn></mrow><annotation encoding="application/x-tex">\mathbf v\ne\mathbf0</annotation></semantics></math></strong>。两个条件缺一不可。
+<strong><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐯</mi><mo>≠</mo><mn>𝟎</mn></mrow><annotation encoding="application/x-tex">\mathbf v\ne\mathbf0</annotation></semantics></math>
+保证
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+唯一</strong>：若
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐯</mi><mo>≠</mo><mn>𝟎</mn></mrow><annotation encoding="application/x-tex">\mathbf v\ne\mathbf0</annotation></semantics></math>
+且
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>λ</mi><mn>1</mn></msub><mi>𝐯</mi><mo>=</mo><msub><mi>λ</mi><mn>2</mn></msub><mi>𝐯</mi></mrow><annotation encoding="application/x-tex">\lambda_1\mathbf v=\lambda_2\mathbf v</annotation></semantics></math>，则
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><msub><mi>λ</mi><mn>1</mn></msub><mo>−</mo><msub><mi>λ</mi><mn>2</mn></msub><mo stretchy="false" form="postfix">)</mo><mi>𝐯</mi><mo>=</mo><mn>𝟎</mn></mrow><annotation encoding="application/x-tex">(\lambda_1-\lambda_2)\mathbf v=\mathbf0</annotation></semantics></math>，由
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐯</mi><mo>≠</mo><mn>𝟎</mn></mrow><annotation encoding="application/x-tex">\mathbf v\ne\mathbf0</annotation></semantics></math>
+得
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>λ</mi><mn>1</mn></msub><mo>=</mo><msub><mi>λ</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">\lambda_1=\lambda_2</annotation></semantics></math>。<em>依据</em>：向量空间公理中的非零向量不可消去。</p>
+<p><strong>定义（特征子空间）</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ℰ</mi><mi>λ</mi></msub><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mi>𝐯</mi><mo>:</mo><mi>T</mi><mi>𝐯</mi><mo>=</mo><mi>λ</mi><mi>𝐯</mi><mo stretchy="false" form="postfix">}</mo><mo>=</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>T</mi><mo>−</mo><mi>λ</mi><mi>I</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\mathcal E_\lambda=\{\mathbf v: T\mathbf v=\lambda\mathbf v\}=\ker(T-\lambda I)</annotation></semantics></math>。这是<strong>定义等式</strong>（把集合语言换成核），作用是把「找特征向量」变成「解一次齐次方程组」。</p>
+<h3 id="定义-vs-定理分界在这张表里">定义 vs 定理：分界在这张表里</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>说法</th>
+<th>身份</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mi>𝐯</mi><mo>=</mo><mi>λ</mi><mi>𝐯</mi></mrow><annotation encoding="application/x-tex">T\mathbf v=\lambda\mathbf v</annotation></semantics></math>，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐯</mi><mo>≠</mo><mn>𝟎</mn></mrow><annotation encoding="application/x-tex">\mathbf v\ne\mathbf0</annotation></semantics></math></td>
+<td><strong>定义</strong></td>
+<td>人为约定，不证</td>
+</tr>
+<tr>
+<td>特征值
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>=</mo><annotation encoding="application/x-tex">=</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">det</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>T</mi><mo>−</mo><mi>λ</mi><mi>I</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\det(T-\lambda I)</annotation></semantics></math>
+的根</td>
+<td><strong>定理</strong></td>
+<td>要证（下文给全链）</td>
+</tr>
+<tr>
+<td>给定
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐯</mi><mo>≠</mo><mn>𝟎</mn></mrow><annotation encoding="application/x-tex">\mathbf v\ne\mathbf0</annotation></semantics></math>，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+唯一</td>
+<td><strong>定理</strong></td>
+<td>一行推导</td>
+</tr>
+<tr>
+<td><strong>特征值与基无关</strong>，特征方向与基无关</td>
+<td><strong>定理</strong></td>
+<td>《线性变换与矩阵表示》卡已证</td>
+</tr>
+<tr>
+<td>代数重数
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>≥</mo><annotation encoding="application/x-tex">\ge</annotation></semantics></math>
+几何重数</td>
+<td><strong>定理</strong></td>
+<td>不可对角化的根源</td>
+</tr>
+<tr>
+<td>不同特征值的特征向量线性无关</td>
+<td><strong>定理</strong></td>
+<td>见下</td>
+</tr>
+<tr>
+<td>同一特征值的特征向量的<strong>非零</strong>线性组合仍是该特征值的特征向量</td>
+<td><strong>定理</strong></td>
+<td>由线性性直接得</td>
+</tr>
+<tr>
+<td>实对称矩阵特征值为实、特征向量可取成<strong>正交</strong></td>
+<td><strong>定理（谱定理）</strong></td>
+<td>见下</td>
+</tr>
+<tr>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>
+可对角化
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>⇔</mo><annotation encoding="application/x-tex">\iff</annotation></semantics></math>
+有
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+个线性无关的特征向量</td>
+<td><strong>定理</strong></td>
+<td>本卡的直接后果</td>
+</tr>
+</tbody>
+</table>
+<h3
+id="求特征值的唯一完整推导每步注依据">求特征值的唯一完整推导（每步注依据）</h3>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>𝐯</mi><mo>=</mo><mi>λ</mi><mi>𝐯</mi><mo>⇔</mo><mo stretchy="false" form="prefix">(</mo><mi>A</mi><mo>−</mo><mi>λ</mi><mi>I</mi><mo stretchy="false" form="postfix">)</mo><mi>𝐯</mi><mo>=</mo><mn>𝟎</mn><mo>⇔</mo><mo>∃</mo><mspace width="0.167em"></mspace><mi>𝐯</mi><mo>≠</mo><mn>𝟎</mn><mspace width="0.222em"></mspace><mtext mathvariant="normal">使</mtext><mspace width="0.222em"></mspace><mo stretchy="false" form="prefix">(</mo><mi>A</mi><mo>−</mo><mi>λ</mi><mi>I</mi><mo stretchy="false" form="postfix">)</mo><mi>𝐯</mi><mo>=</mo><mn>𝟎</mn><mo>⇔</mo><mi>A</mi><mo>−</mo><mi>λ</mi><mi>I</mi><mspace width="0.222em"></mspace><mtext mathvariant="normal">奇异</mtext><mo>⇔</mo><mrow><mi mathvariant="normal">det</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>A</mi><mo>−</mo><mi>λ</mi><mi>I</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mn>0</mn><mi>.</mi></mrow><annotation encoding="application/x-tex">A\mathbf v=\lambda\mathbf v\iff (A-\lambda I)\mathbf v=\mathbf0\iff \exists\,\mathbf v\ne\mathbf0\ \text{使}\ (A-\lambda I)\mathbf v=\mathbf0\iff A-\lambda I\ \text{奇异}\iff \det(A-\lambda I)=0 .</annotation></semantics></math></p>
+<ol type="1">
+<li><strong>移项</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>𝐯</mi><mo>−</mo><mi>λ</mi><mi>𝐯</mi><mo>=</mo><mn>𝟎</mn></mrow><annotation encoding="application/x-tex">A\mathbf v-\lambda\mathbf v=\mathbf0</annotation></semantics></math>。<em>依据</em>：向量减法定义。</li>
+<li><strong>提括号</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mi>𝐯</mi><mo>=</mo><mi>λ</mi><mi>I</mi><mi>𝐯</mi></mrow><annotation encoding="application/x-tex">\lambda\mathbf v=\lambda I\mathbf v</annotation></semantics></math>
+⟹
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>A</mi><mo>−</mo><mi>λ</mi><mi>I</mi><mo stretchy="false" form="postfix">)</mo><mi>𝐯</mi><mo>=</mo><mn>𝟎</mn></mrow><annotation encoding="application/x-tex">(A-\lambda I)\mathbf v=\mathbf0</annotation></semantics></math>。<em>依据</em>：数乘与单位矩阵的定义。</li>
+<li><strong>读成核</strong>：括号里是齐次方程组，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∃</mo><mi>𝐯</mi><mo>≠</mo><mn>𝟎</mn></mrow><annotation encoding="application/x-tex">\exists\mathbf v\ne\mathbf0</annotation></semantics></math>
+使它成立。<em>依据</em>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi mathvariant="normal">ker</mi><annotation encoding="application/x-tex">\ker</annotation></semantics></math>
+的定义。</li>
+<li><strong>用可逆判别</strong>：方阵
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>M</mi><annotation encoding="application/x-tex">M</annotation></semantics></math>
+奇异
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>⇔</mo><mrow><mi mathvariant="normal">det</mi><mo>&#8289;</mo></mrow><mi>M</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\iff\det M=0</annotation></semantics></math>。<em>依据</em>：<strong>可逆矩阵的判别定理</strong>。
+⟹ <strong>特征值
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>=</mo><annotation encoding="application/x-tex">=</annotation></semantics></math>
+特征多项式
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false" form="prefix">(</mo><mi>λ</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mrow><mi mathvariant="normal">det</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>A</mi><mo>−</mo><mi>λ</mi><mi>I</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">f(\lambda)=\det(A-\lambda I)</annotation></semantics></math>
+的根。</strong></li>
+</ol>
+<blockquote>
+<p>⚠ <strong>最容易写漏的一步是第 2 步里的
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>I</mi><annotation encoding="application/x-tex">I</annotation></semantics></math></strong>。写成
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>−</mo><mi>λ</mi></mrow><annotation encoding="application/x-tex">A-\lambda</annotation></semantics></math>（把<strong>每个元素</strong>都减
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>）就全错：
+-
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>2</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>3</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">A=\begin{pmatrix}2&amp;0\\0&amp;3\end{pmatrix}</annotation></semantics></math>
+时，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>−</mo><mi>λ</mi><mi>J</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>2</mn><mo>−</mo><mi>λ</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>−</mi><mi>λ</mi></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mi>−</mi><mi>λ</mi></mtd><mtd columnalign="center" style="text-align: center"><mn>3</mn><mo>−</mo><mi>λ</mi></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">A-\lambda J=\begin{pmatrix}2-\lambda&amp;-\lambda\\-\lambda&amp;3-\lambda\end{pmatrix}</annotation></semantics></math>
+的行列式
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>2</mn><mo>−</mo><mi>λ</mi><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="prefix">(</mo><mn>3</mn><mo>−</mo><mi>λ</mi><mo stretchy="false" form="postfix">)</mo><mo>−</mo><msup><mi>λ</mi><mn>2</mn></msup><mo>=</mo><mn>6</mn><mo>−</mo><mn>5</mn><mi>λ</mi></mrow><annotation encoding="application/x-tex">=(2-\lambda)(3-\lambda)-\lambda^2=6-5\lambda</annotation></semantics></math>，得「特征值」
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>=</mo><mn>1.2</mn></mrow><annotation encoding="application/x-tex">\lambda=1.2</annotation></semantics></math>
+—— 而真特征值是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2</mn><annotation encoding="application/x-tex">2</annotation></semantics></math>
+与
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>3</mn><annotation encoding="application/x-tex">3</annotation></semantics></math>
+✗ -
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>2</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1.5</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">A=\begin{pmatrix}2&amp;1\\1&amp;1.5\end{pmatrix}</annotation></semantics></math>
+时，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">det</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>A</mi><mo>−</mo><mi>λ</mi><mi>J</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>2</mn><mo>−</mo><mi>λ</mi><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="prefix">(</mo><mn>1.5</mn><mo>−</mo><mi>λ</mi><mo stretchy="false" form="postfix">)</mo><mo>−</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>−</mo><mi>λ</mi><msup><mo stretchy="false" form="postfix">)</mo><mn>2</mn></msup><mo>=</mo><mn>2</mn><mo>−</mo><mn>1.5</mn><mi>λ</mi></mrow><annotation encoding="application/x-tex">\det(A-\lambda J)=(2-\lambda)(1.5-\lambda)-(1-\lambda)^2=2-1.5\lambda</annotation></semantics></math>，得
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>=</mo><mstyle displaystyle="false"><mfrac><mn>4</mn><mn>3</mn></mfrac></mstyle><mo>≈</mo><mn>1.333</mn></mrow><annotation encoding="application/x-tex">\lambda=\tfrac43\approx1.333</annotation></semantics></math>
+—— 而真特征值是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.719224</mn><annotation encoding="application/x-tex">0.719224</annotation></semantics></math>
+与
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2.78078</mn><annotation encoding="application/x-tex">2.78078</annotation></semantics></math>
+✗</p>
+</blockquote>
+<h3
+id="定理不同特征值的特征向量线性无关带读证明">定理：不同特征值的特征向量线性无关（带读证明）</h3>
+<p><strong>定理</strong>：若
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>λ</mi><mn>1</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>λ</mi><mi>k</mi></msub></mrow><annotation encoding="application/x-tex">\lambda_1,\dots,\lambda_k</annotation></semantics></math>
+<strong>互不相同</strong>，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>𝐯</mi><mi>i</mi></msub><mo>≠</mo><mn>𝟎</mn></mrow><annotation encoding="application/x-tex">\mathbf v_i\ne\mathbf0</annotation></semantics></math>
+且
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><msub><mi>𝐯</mi><mi>i</mi></msub><mo>=</mo><msub><mi>λ</mi><mi>i</mi></msub><msub><mi>𝐯</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">A\mathbf v_i=\lambda_i\mathbf v_i</annotation></semantics></math>，则
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>𝐯</mi><mn>1</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>𝐯</mi><mi>k</mi></msub></mrow><annotation encoding="application/x-tex">\mathbf v_1,\dots,\mathbf v_k</annotation></semantics></math>
+线性无关。</p>
+<p><strong>证明（归纳法，请照这个版本练）</strong> 1.
+<strong><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">k=1</annotation></semantics></math></strong>：单个非零向量必然无关（否则
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>c</mi><mn>1</mn></msub><msub><mi>𝐯</mi><mn>1</mn></msub><mo>=</mo><mn>𝟎</mn></mrow><annotation encoding="application/x-tex">c_1\mathbf v_1=\mathbf0</annotation></semantics></math>
+迫使
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>c</mi><mn>1</mn></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">c_1=0</annotation></semantics></math>，与「非平凡相关」矛盾）。<em>依据</em>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>𝐯</mi><mn>1</mn></msub><mo>≠</mo><mn>𝟎</mn></mrow><annotation encoding="application/x-tex">\mathbf v_1\ne\mathbf0</annotation></semantics></math>。
+2. <strong>归纳假设</strong>：设
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>𝐯</mi><mn>1</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>𝐯</mi><mrow><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msub></mrow><annotation encoding="application/x-tex">\mathbf v_1,\dots,\mathbf v_{k-1}</annotation></semantics></math>
+已线性无关。 3. <strong>假设前
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
+个相关</strong> ⟹ 存在不全为零的
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>c</mi><mn>1</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>c</mi><mrow><mi>k</mi><mo>−</mo><mn>1</mn></mrow></msub></mrow><annotation encoding="application/x-tex">c_1,\dots,c_{k-1}</annotation></semantics></math>
+使
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>𝐯</mi><mi>k</mi></msub><mo>=</mo><msub><mo>∑</mo><mrow><mi>i</mi><mo>&lt;</mo><mi>k</mi></mrow></msub><msub><mi>c</mi><mi>i</mi></msub><msub><mi>𝐯</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\mathbf v_k=\sum_{i&lt;k}c_i\mathbf v_i</annotation></semantics></math>。<em>依据</em>：相关的定义（<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝐯</mi><mi>k</mi></msub><annotation encoding="application/x-tex">\mathbf v_k</annotation></semantics></math>
+的系数可归一为
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>）。
+4. 两边作用
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>λ</mi><mi>k</mi></msub><msub><mi>𝐯</mi><mi>k</mi></msub><mo>=</mo><mi>A</mi><msub><mi>𝐯</mi><mi>k</mi></msub><mo>=</mo><msub><mo>∑</mo><mrow><mi>i</mi><mo>&lt;</mo><mi>k</mi></mrow></msub><msub><mi>c</mi><mi>i</mi></msub><msub><mi>λ</mi><mi>i</mi></msub><msub><mi>𝐯</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\lambda_k\mathbf v_k=A\mathbf v_k=\sum_{i&lt;k}c_i\lambda_i\mathbf v_i</annotation></semantics></math>。
+5. 代入第 3
+步：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>λ</mi><mi>k</mi></msub><msub><mo>∑</mo><mrow><mi>i</mi><mo>&lt;</mo><mi>k</mi></mrow></msub><msub><mi>c</mi><mi>i</mi></msub><msub><mi>𝐯</mi><mi>i</mi></msub><mo>=</mo><msub><mo>∑</mo><mrow><mi>i</mi><mo>&lt;</mo><mi>k</mi></mrow></msub><msub><mi>c</mi><mi>i</mi></msub><msub><mi>λ</mi><mi>i</mi></msub><msub><mi>𝐯</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\lambda_k\sum_{i&lt;k}c_i\mathbf v_i=\sum_{i&lt;k}c_i\lambda_i\mathbf v_i</annotation></semantics></math>
+⟹
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mo>∑</mo><mrow><mi>i</mi><mo>&lt;</mo><mi>k</mi></mrow></msub><msub><mi>c</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>λ</mi><mi>k</mi></msub><mo>−</mo><msub><mi>λ</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">)</mo><msub><mi>𝐯</mi><mi>i</mi></msub><mo>=</mo><mn>𝟎</mn></mrow><annotation encoding="application/x-tex">\sum_{i&lt;k}c_i(\lambda_k-\lambda_i)\mathbf v_i=\mathbf0</annotation></semantics></math>。<em>依据</em>：移到同侧合并同类项。
+6. 因归纳假设，这组向量无关，故每个系数都必须为零；又
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>λ</mi><mi>k</mi></msub><mo>−</mo><msub><mi>λ</mi><mi>i</mi></msub><mo>≠</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\lambda_k-\lambda_i\ne0</annotation></semantics></math>（<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>λ</mi><mi>i</mi></msub><annotation encoding="application/x-tex">\lambda_i</annotation></semantics></math>
+<strong>互不相同</strong>），于是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>c</mi><mi>i</mi></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">c_i=0</annotation></semantics></math>
+对一切
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>&lt;</mo><mi>k</mi></mrow><annotation encoding="application/x-tex">i&lt;k</annotation></semantics></math>。
+7. 于是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>𝐯</mi><mi>k</mi></msub><mo>=</mo><mn>𝟎</mn></mrow><annotation encoding="application/x-tex">\mathbf v_k=\mathbf0</annotation></semantics></math>，与假设
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>𝐯</mi><mi>k</mi></msub><mo>≠</mo><mn>𝟎</mn></mrow><annotation encoding="application/x-tex">\mathbf v_k\ne\mathbf0</annotation></semantics></math>
+<strong>矛盾</strong>。<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>◼</mi><annotation encoding="application/x-tex">\blacksquare</annotation></semantics></math></p>
+<blockquote>
+<p><strong>关键在第 6 步用了两件东西</strong>：归纳假设（无关 ⟹
+系数全零）与
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>λ</mi><mi>k</mi></msub><mo>≠</mo><msub><mi>λ</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">\lambda_k\ne\lambda_i</annotation></semantics></math>（把
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>c</mi><mi>i</mi></msub><annotation encoding="application/x-tex">c_i</annotation></semantics></math>
+逐个救出来）。缺任何一个都推不下去。</p>
+</blockquote>
+<h3
+id="定理实对称矩阵不同特征值的特征向量正交带读证明">定理：实对称矩阵不同特征值的特征向量正交（带读证明）</h3>
+<p><strong>定理</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>
+实对称（<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>A</mi><mi>𝖳</mi></msup><mo>=</mo><mi>A</mi></mrow><annotation encoding="application/x-tex">A^{\mathsf T}=A</annotation></semantics></math>），<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>𝐯</mi><mo>=</mo><mi>λ</mi><mi>𝐯</mi></mrow><annotation encoding="application/x-tex">A\mathbf v=\lambda\mathbf v</annotation></semantics></math>、<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>𝐰</mi><mo>=</mo><mi>μ</mi><mi>𝐰</mi></mrow><annotation encoding="application/x-tex">A\mathbf w=\mu\mathbf w</annotation></semantics></math>、<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>≠</mo><mi>μ</mi></mrow><annotation encoding="application/x-tex">\lambda\ne\mu</annotation></semantics></math>
+⟹
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">⟨</mo><mi>𝐯</mi><mo>,</mo><mi>𝐰</mi><mo stretchy="false" form="postfix">⟩</mo><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\langle\mathbf v,\mathbf w\rangle=0</annotation></semantics></math>。</p>
+<p><strong>证明</strong>：
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo stretchy="false" form="prefix">⟨</mo><mi>𝐯</mi><mo>,</mo><mi>𝐰</mi><mo stretchy="false" form="postfix">⟩</mo><mo>=</mo><mo stretchy="false" form="prefix">⟨</mo><mi>A</mi><mi>𝐯</mi><mo>,</mo><mi>𝐰</mi><mo stretchy="false" form="postfix">⟩</mo><mo>=</mo><mo stretchy="false" form="prefix">⟨</mo><mi>𝐯</mi><mo>,</mo><msup><mi>A</mi><mi>𝖳</mi></msup><mi>𝐰</mi><mo stretchy="false" form="postfix">⟩</mo><mo>=</mo><mo stretchy="false" form="prefix">⟨</mo><mi>𝐯</mi><mo>,</mo><mi>A</mi><mi>𝐰</mi><mo stretchy="false" form="postfix">⟩</mo><mo>=</mo><mi>μ</mi><mo stretchy="false" form="prefix">⟨</mo><mi>𝐯</mi><mo>,</mo><mi>𝐰</mi><mo stretchy="false" form="postfix">⟩</mo><mi>.</mi></mrow><annotation encoding="application/x-tex">\lambda\langle\mathbf v,\mathbf w\rangle=\langle A\mathbf v,\mathbf w\rangle=\langle\mathbf v,A^{\mathsf T}\mathbf w\rangle=\langle\mathbf v,A\mathbf w\rangle=\mu\langle\mathbf v,\mathbf w\rangle .</annotation></semantics></math>
+⟹
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>λ</mi><mo>−</mo><mi>μ</mi><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="prefix">⟨</mo><mi>𝐯</mi><mo>,</mo><mi>𝐰</mi><mo stretchy="false" form="postfix">⟩</mo><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">(\lambda-\mu)\langle\mathbf v,\mathbf w\rangle=0</annotation></semantics></math>
+⟹
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">⟨</mo><mi>𝐯</mi><mo>,</mo><mi>𝐰</mi><mo stretchy="false" form="postfix">⟩</mo><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\langle\mathbf v,\mathbf w\rangle=0</annotation></semantics></math>。<em>依据</em>：中间那一步用到
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">⟨</mo><mi>A</mi><mi>u</mi><mo>,</mo><mi>v</mi><mo stretchy="false" form="postfix">⟩</mo><mo>=</mo><mo stretchy="false" form="prefix">⟨</mo><mi>u</mi><mo>,</mo><msup><mi>A</mi><mi>𝖳</mi></msup><mi>v</mi><mo stretchy="false" form="postfix">⟩</mo></mrow><annotation encoding="application/x-tex">\langle Au,v\rangle=\langle u,A^{\mathsf T}v\rangle</annotation></semantics></math>（<strong>伴随算子的对称性定理</strong>）与
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>A</mi><mi>𝖳</mi></msup><mo>=</mo><mi>A</mi></mrow><annotation encoding="application/x-tex">A^{\mathsf T}=A</annotation></semantics></math>。<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>◼</mi><annotation encoding="application/x-tex">\blacksquare</annotation></semantics></math></p>
+<p><strong>数值验证</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">A=\begin{pmatrix}1&amp;1\\1&amp;1\end{pmatrix}</annotation></semantics></math>
+的
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>=</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">\lambda=2</annotation></semantics></math>
+特征向量
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>1</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup></mrow><annotation encoding="application/x-tex">(1,1)^{\mathsf T}</annotation></semantics></math>
+与
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\lambda=0</annotation></semantics></math>
+的
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mi>−</mi><mn>1</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup></mrow><annotation encoding="application/x-tex">(1,-1)^{\mathsf T}</annotation></semantics></math>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo><mo>⋅</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mi>−</mi><mn>1</mn><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mn>1</mn><mo>−</mo><mn>1</mn><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">(1,1)\cdot(1,-1)=1-1=0</annotation></semantics></math>
+✓</p>
+<h3 id="删条件实验">删条件实验 ⭐</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>删掉 / 改动</th>
+<th>后果</th>
+<th>验算</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>定义里的
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐯</mi><mo>≠</mo><mn>𝟎</mn></mrow><annotation encoding="application/x-tex">\mathbf v\ne\mathbf0</annotation></semantics></math></td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>𝟎</mn><annotation encoding="application/x-tex">\mathbf0</annotation></semantics></math>
+对任何
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+都满足 ⟹ <strong>特征值
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>=</mo><annotation encoding="application/x-tex">=</annotation></semantics></math>
+全体数</strong></td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>2</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>3</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">A=\begin{pmatrix}2&amp;0\\0&amp;3\end{pmatrix}</annotation></semantics></math>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>𝟎</mn><annotation encoding="application/x-tex">\mathbf0</annotation></semantics></math>
+使
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>=</mo><mn>5</mn></mrow><annotation encoding="application/x-tex">\lambda=5</annotation></semantics></math>、<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>=</mo><mi>π</mi></mrow><annotation encoding="application/x-tex">\lambda=\pi</annotation></semantics></math>
+全都「成立」</td>
+</tr>
+<tr>
+<td>把
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+从「复数」限定成「实数」</td>
+<td>有些变换「没有特征向量」</td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mi>−</mi><mn>1</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">A=\begin{pmatrix}0&amp;-1\\1&amp;0\end{pmatrix}</annotation></semantics></math>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>λ</mi><mn>2</mn></msup><mo>+</mo><mn>1</mn><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\lambda^2+1=0</annotation></semantics></math>
+无实根；它明明是标准的旋转</td>
+</tr>
+<tr>
+<td>「给定
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐯</mi><annotation encoding="application/x-tex">\mathbf v</annotation></semantics></math>
+则
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+唯一」的前提删掉</td>
+<td>谈不了「这个
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>」</td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐯</mi><mo>=</mo><mn>𝟎</mn></mrow><annotation encoding="application/x-tex">\mathbf v=\mathbf0</annotation></semantics></math>
+时
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>λ</mi><mn>1</mn></msub><mn>𝟎</mn><mo>=</mo><msub><mi>λ</mi><mn>2</mn></msub><mn>𝟎</mn><mo>=</mo><mn>𝟎</mn></mrow><annotation encoding="application/x-tex">\lambda_1\mathbf0=\lambda_2\mathbf0=\mathbf0</annotation></semantics></math>
+对一切
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+⟹ 不唯一</td>
+</tr>
+<tr>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">det</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>A</mi><mo>−</mo><mi>λ</mi><mi>I</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\det(A-\lambda I)</annotation></semantics></math>
+里的
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>I</mi><annotation encoding="application/x-tex">I</annotation></semantics></math>
+漏掉（写成
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>−</mo><mi>λ</mi></mrow><annotation encoding="application/x-tex">A-\lambda</annotation></semantics></math>）</td>
+<td>算出与
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+纠缠的错误多项式</td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>2</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>3</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">A=\begin{pmatrix}2&amp;0\\0&amp;3\end{pmatrix}</annotation></semantics></math>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">det</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>A</mi><mo>−</mo><mi>λ</mi><mi>J</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mn>6</mn><mo>−</mo><mn>5</mn><mi>λ</mi></mrow><annotation encoding="application/x-tex">\det(A-\lambda J)=6-5\lambda</annotation></semantics></math>
+⟹ 根
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1.2</mn><annotation encoding="application/x-tex">1.2</annotation></semantics></math>，真特征值是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mo>,</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">2,3</annotation></semantics></math>
+✗</td>
+</tr>
+<tr>
+<td>「任意特征向量的线性组合仍是特征向量」</td>
+<td>立刻出反例</td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">A=\begin{pmatrix}1&amp;1\\1&amp;1\end{pmatrix}</annotation></semantics></math>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>1</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo>+</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mi>−</mi><mn>1</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>2</mn><mo>,</mo><mn>0</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup></mrow><annotation encoding="application/x-tex">(1,1)^{\mathsf T}+(1,-1)^{\mathsf T}=(2,0)^{\mathsf T}</annotation></semantics></math>，而
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo stretchy="false" form="prefix">(</mo><mn>2</mn><mo>,</mo><mn>0</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>2</mn><mo>,</mo><mn>2</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo>≠</mo><mi>λ</mi><mo stretchy="false" form="prefix">(</mo><mn>2</mn><mo>,</mo><mn>0</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup></mrow><annotation encoding="application/x-tex">A(2,0)^{\mathsf T}=(2,2)^{\mathsf T}\ne\lambda(2,0)^{\mathsf T}</annotation></semantics></math></td>
+</tr>
+</tbody>
+</table>
+<h3 id="操作骨架怎么求2-阶全流程">操作骨架：怎么求（2 阶全流程）</h3>
+<p>① <strong>写
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false" form="prefix">(</mo><mi>λ</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mrow><mi mathvariant="normal">det</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>A</mi><mo>−</mo><mi>λ</mi><mi>I</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">f(\lambda)=\det(A-\lambda I)</annotation></semantics></math></strong>（2
+阶：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>a</mi><mo>−</mo><mi>λ</mi><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="prefix">(</mo><mi>d</mi><mo>−</mo><mi>λ</mi><mo stretchy="false" form="postfix">)</mo><mo>−</mo><mi>b</mi><mi>c</mi><mo>=</mo><msup><mi>λ</mi><mn>2</mn></msup><mo>−</mo><mo stretchy="false" form="prefix">(</mo><mi>a</mi><mo>+</mo><mi>d</mi><mo stretchy="false" form="postfix">)</mo><mi>λ</mi><mo>+</mo><mo stretchy="false" form="prefix">(</mo><mi>a</mi><mi>d</mi><mo>−</mo><mi>b</mi><mi>c</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(a-\lambda)(d-\lambda)-bc=\lambda^2-(a+d)\lambda+(ad-bc)</annotation></semantics></math>）→
+② <strong>解
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false" form="prefix">(</mo><mi>λ</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">f(\lambda)=0</annotation></semantics></math></strong>
+得<strong>全部</strong>特征值 → ③ <strong>对每个
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>λ</mi><mi>i</mi></msub><annotation encoding="application/x-tex">\lambda_i</annotation></semantics></math>
+解齐次方程组</strong>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>A</mi><mo>−</mo><msub><mi>λ</mi><mi>i</mi></msub><mi>I</mi><mo stretchy="false" form="postfix">)</mo><mi>𝐱</mi><mo>=</mo><mn>𝟎</mn></mrow><annotation encoding="application/x-tex">(A-\lambda_i I)\mathbf x=\mathbf0</annotation></semantics></math>，基础解系就是该特征值的一组特征向量
+→ ④ <strong>数一数</strong>独立方向，与
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>f</mi><annotation encoding="application/x-tex">f</annotation></semantics></math>
+的根的重数比一比 → ⑤ 判断可对角化。</p>
+<p><strong>顺带的两个快算（自己证，别背）</strong>： -
+<strong>特征向量的坐标公式</strong>：由
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>a</mi><mo>−</mo><mi>λ</mi><mo stretchy="false" form="postfix">)</mo><mi>x</mi><mo>+</mo><mi>b</mi><mi>y</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">(a-\lambda)x+by=0</annotation></semantics></math>
+得
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><menclose notation="box"><mrow><mi>y</mi><mo>=</mo><mfrac><mrow><mi>λ</mi><mo>−</mo><mi>a</mi></mrow><mi>b</mi></mfrac><mspace width="0.167em"></mspace><mi>x</mi></mrow></menclose><annotation encoding="application/x-tex">\boxed{y=\frac{\lambda-a}{b}\,x}</annotation></semantics></math>（<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi><mo>≠</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">b\ne0</annotation></semantics></math>
+时），取
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">x=1</annotation></semantics></math>
+即得。
+验算：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>2</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0.75</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mi>−</mi><mn>0.75</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0.5</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">A=\begin{pmatrix}2&amp;0.75\\-0.75&amp;0.5\end{pmatrix}</annotation></semantics></math>、<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>=</mo><mn>1.25</mn></mrow><annotation encoding="application/x-tex">\lambda=1.25</annotation></semantics></math>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi><mo>=</mo><mfrac><mrow><mn>1.25</mn><mo>−</mo><mn>2</mn></mrow><mn>0.75</mn></mfrac><mi>x</mi><mo>=</mo><mi>−</mi><mi>x</mi></mrow><annotation encoding="application/x-tex">y=\frac{1.25-2}{0.75}x=-x</annotation></semantics></math>
+⟹
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐯</mi><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mi>−</mi><mn>1</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup></mrow><annotation encoding="application/x-tex">\mathbf v=(1,-1)^{\mathsf T}</annotation></semantics></math>；归一化
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle displaystyle="false"><mfrac><mn>1</mn><msqrt><mn>2</mn></msqrt></mfrac></mstyle><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mi>−</mi><mn>1</mn><mo stretchy="false" form="postfix">)</mo><mo>≈</mo><mo stretchy="false" form="prefix">(</mo><mn>0.7071</mn><mo>,</mo><mi>−</mi><mn>0.7071</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup></mrow><annotation encoding="application/x-tex">\tfrac{1}{\sqrt2}(1,-1)\approx(0.7071,-0.7071)^{\mathsf T}</annotation></semantics></math>，算
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>𝐯</mi><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>0.883883</mn><mo>,</mo><mi>−</mi><mn>0.883883</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo>=</mo><mn>1.25</mn><mspace width="0.167em"></mspace><mi>𝐯</mi></mrow><annotation encoding="application/x-tex">A\mathbf v=(0.883883,-0.883883)^{\mathsf T}=1.25\,\mathbf v</annotation></semantics></math>
+✓ （⚠ 这里的
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>b</mi><annotation encoding="application/x-tex">b</annotation></semantics></math>
+是<strong>分母</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">b=1</annotation></semantics></math>
+的例子最省事，容易让人忘字。） -
+<strong>迹与行列式</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∑</mo><msub><mi>λ</mi><mi>i</mi></msub><mo>=</mo><mrow><mi mathvariant="normal">tr</mi><mo>&#8289;</mo></mrow><mi>A</mi></mrow><annotation encoding="application/x-tex">\sum\lambda_i=\operatorname{tr}A</annotation></semantics></math>，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∏</mo><msub><mi>λ</mi><mi>i</mi></msub><mo>=</mo><mrow><mi mathvariant="normal">det</mi><mo>&#8289;</mo></mrow><mi>A</mi></mrow><annotation encoding="application/x-tex">\prod\lambda_i=\det A</annotation></semantics></math>（含重数）。
+验算：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>2</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1.5</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">A=\begin{pmatrix}2&amp;1\\1&amp;1.5\end{pmatrix}</annotation></semantics></math>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2.78078</mn><mo>+</mo><mn>0.719224</mn><mo>=</mo><mn>3.5</mn><mo>=</mo><mrow><mi mathvariant="normal">tr</mi><mo>&#8289;</mo></mrow><mi>A</mi></mrow><annotation encoding="application/x-tex">2.78078+0.719224=3.5=\operatorname{tr}A</annotation></semantics></math>
+✓；<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2.78078</mn><mo>×</mo><mn>0.719224</mn><mo>≈</mo><mn>2</mn><mo>=</mo><mrow><mi mathvariant="normal">det</mi><mo>&#8289;</mo></mrow><mi>A</mi></mrow><annotation encoding="application/x-tex">2.78078\times0.719224\approx2=\det A</annotation></semantics></math>
+✓</p>
+<hr />
+</div></details><details class="facet"><summary class="facet-h f4">F4 几何 / 物理意义</summary><div class="facet-body">
+<ul>
+<li><strong>「不变的方向」</strong>：特征向量所在的方向在变换下<strong>不变</strong>（只是长度与朝向按
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+变）。这是「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>
+表现得最简单」的方向。</li>
+<li><strong><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">det</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>A</mi><mo>−</mo><mi>λ</mi><mi>I</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\det(A-\lambda I)=0</annotation></semantics></math>
+的几何含义（最有力的一句）</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>−</mo><mi>λ</mi><mi>I</mi></mrow><annotation encoding="application/x-tex">A-\lambda I</annotation></semantics></math>
+把整个空间<strong>压扁了</strong>（奇异 ⟹ 存在非零方向被压成
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>𝟎</mn><annotation encoding="application/x-tex">\mathbf0</annotation></semantics></math>）——
+<strong>那个被压扁的方向，就是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>
+的特征向量</strong>。特征值是「在压扁之前先减掉多少」。</li>
+<li><strong>平面上的完整画面</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mi>a</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>b</mi></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mi>c</mi></mtd><mtd columnalign="center" style="text-align: center"><mi>d</mi></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">A=\begin{pmatrix}a&amp;b\\c&amp;d\end{pmatrix}</annotation></semantics></math>
+的特征值是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false" form="prefix">(</mo><mi>λ</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msup><mi>λ</mi><mn>2</mn></msup><mo>−</mo><mo stretchy="false" form="prefix">(</mo><mi>a</mi><mo>+</mo><mi>d</mi><mo stretchy="false" form="postfix">)</mo><mi>λ</mi><mo>+</mo><mo stretchy="false" form="prefix">(</mo><mi>a</mi><mi>d</mi><mo>−</mo><mi>b</mi><mi>c</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">f(\lambda)=\lambda^2-(a+d)\lambda+(ad-bc)</annotation></semantics></math>
+的根；判别式
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>a</mi><mo>−</mo><mi>d</mi><msup><mo stretchy="false" form="postfix">)</mo><mn>2</mn></msup><mo>+</mo><mn>4</mn><mi>b</mi><mi>c</mi></mrow><annotation encoding="application/x-tex">(a-d)^2+4bc</annotation></semantics></math>
+决定「有两条不变方向 / 一条 / 是复数（没有实不变方向）」。
+验算：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>=</mo><mn>2</mn><mo>,</mo><mi>b</mi><mo>=</mo><mn>1</mn><mo>,</mo><mi>c</mi><mo>=</mo><mn>1</mn><mo>,</mo><mi>d</mi><mo>=</mo><mn>1.5</mn></mrow><annotation encoding="application/x-tex">a=2,b=1,c=1,d=1.5</annotation></semantics></math>
+⟹ 判别式
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>0.5</mn><msup><mo stretchy="false" form="postfix">)</mo><mn>2</mn></msup><mo>+</mo><mn>4</mn><mo>=</mo><mn>4.25</mn><mo>&gt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">=(0.5)^2+4=4.25&gt;0</annotation></semantics></math>
+⟹ 两个实特征值 ✓（实算得
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.719224</mn><mo>,</mo><mspace width="0.222em"></mspace><mn>2.78078</mn></mrow><annotation encoding="application/x-tex">0.719224,\ 2.78078</annotation></semantics></math>
+✓）；<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>=</mo><mi>d</mi><mo>=</mo><mn>0</mn><mo>,</mo><mspace width="0.222em"></mspace><mi>b</mi><mo>=</mo><mn>1</mn><mo>,</mo><mspace width="0.222em"></mspace><mi>c</mi><mo>=</mo><mi>−</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">a=d=0,\ b=1,\ c=-1</annotation></semantics></math>（即旋转
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>90</mn><mo>∘</mo></msup><annotation encoding="application/x-tex">90^\circ</annotation></semantics></math>
+的另一种写法）⟹ 判别式
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>=</mo><mn>0</mn><mo>−</mo><mn>4</mn><mo>=</mo><mi>−</mi><mn>4</mn><mo>&lt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">=0-4=-4&lt;0</annotation></semantics></math>
+⟹ 无实特征向量 ✓。</li>
+<li><strong>回指 F3</strong>：换基后的矩阵仍是「上块 +
+下零」形状，但<strong>那个上块
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>
+的特征值就是原
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>
+的特征值</strong>（《线性变换与矩阵表示》卡已证「特征值与基无关」）——
+几何上就是「不变的方向」本身不随坐标变。</li>
+<li><strong>物理类比 · 振型（normal
+mode）</strong>：一个机械系统或电路里「只振动、不绕圈」的那些固有频率与形状，就是它的特征值与特征向量。<strong>这正是钢琴按一个键就能让某些弦共振、而其他弦不响的原因。</strong></li>
+</ul>
+<hr />
+</div></details><details class="facet"><summary class="facet-h f5">F5 图形化演示</summary><div class="facet-body">
+<p><strong>认知动作 =
+变换</strong>：矩阵的<strong>两条不变方向</strong>随四个滑块移动 ——
+而「有几条」由判别式决定。</p>
+<p><strong>先预测再动手</strong>：</p>
+<div class="wb-widget" data-wb="matrix2"
+data-spec="eyJ0eXBlIjogIm1hdHJpeDIiLCAicmFuZ2UiOiBbLTMsIDNdLCAic2xpZGVycyI6IFt7Im5hbWUiOiAiYSIsICJsYWJlbCI6ICJhIiwgIm1pbiI6IC0yLCAibWF4IjogMiwgInN0ZXAiOiAwLjA1LCAidmFsdWUiOiAyfSwgeyJuYW1lIjogImIiLCAibGFiZWwiOiAiYiIsICJtaW4iOiAtMiwgIm1heCI6IDIsICJzdGVwIjogMC4wNSwgInZhbHVlIjogMH0sIHsibmFtZSI6ICJjIiwgImxhYmVsIjogImMiLCAibWluIjogLTIsICJtYXgiOiAyLCAic3RlcCI6IDAuMDUsICJ2YWx1ZSI6IDB9LCB7Im5hbWUiOiAiZCIsICJsYWJlbCI6ICJkIiwgIm1pbiI6IC0yLCAibWF4IjogMiwgInN0ZXAiOiAwLjA1LCAidmFsdWUiOiAxLjV9XSwgImhpbnQiOiAi56ysIDEg56uZ77yI6buY6K6kIGE9MiwgZD0xLjXvvInvvJrljZXkvY3mraPmlrnlvaLnmoTkuKTmnaHovrnliIbliKvooqvpgIHliLDmsLTlubPjgIHnq5bnm7TmlrnlkJEg4oCU4oCUIOaJvuaJvuWTquadoee6v+auteiiq+mAgeaIkOS6huS4juiHqui6q+W5s+ihjOeahOe6v+aute+8n+mCo+WwseaYr+S4jeWPmOaWueWQke+8iOeJueW+geaWueWQke+8ie+8jOeJueW+geWAvOaBsOWlveWwseaYr+WvueinkuWFgyAyIOS4jiAxLjXjgILnrKwgMiDnq5nvvJrmioogYyDmi5bnprsgMCDigJTigJQg5YWI54ycIGEg5ZKMIGQg6L+Y5piv5LiN5piv54m55b6B5YC877yf44CQ5LiN5piv5LqG44CR77yaZijOuykgPSDOu8Ky4oiSKGErZCnOuysoYWTiiJJiYykg6YeMIOKIkmJjIOS4gOWHuueOsO+8jOagueWwseaVtOS9k+aMqui1sO+8iOWPliBhPTIsIGI9Yz0xLCBkPTEuNSDml7bmoLnmmK8gMC43MTkyMjQg5LiOIDIuNzgwNzjvvInjgILnibnlvoHlgLzkuI3mmK/lr7nop5LlhYPvvIzov5nmmK/mnKzljaHmnIDotLXnmoTkuIDor77jgILnrKwgMyDnq5nvvJrosIPliLAgYT0yLCBkPTAuNSwgYj0wLjc1LCBjPeKIkjAuNzUg4oCU4oCUIOWIpOWIq+W8jyAoYeKIkmQpwrIrNGJjID0gMi4yNeKIkjIuMjUgPSAw77yM5Lik5p2h5LiN5Y+Y5pa55ZCR5ZCI5bm25oiQ5LiA5p2h77yIzrs9MS4yNe+8ie+8jOefqemYteWPiOS4jeaYryAxLjI1IOWAjeWNleS9jemYtSDin7kg5LiN5Y+v5a+56KeS5YyW44CCIn0=">
+
+</div>
+<p>在 GeoGebra 里复现：</p>
+<div class="gb-block">
+<div class="gb-head">
+<span>在 GeoGebra
+里自己复现（把下面指令逐行粘贴到输入栏，回车）</span><button type="button" class="gb-copy">复制指令</button>
+</div>
+<pre><code>a = Slider(-2, 2, 0.05)
+b = Slider(-2, 2, 0.05)
+c = Slider(-2, 2, 0.05)
+d = Slider(-2, 2, 0.05)
+M = {{a, b}, {c, d}}
+sq = Polygon((0, 0), (1, 0), (1, 1), (0, 1))
+img = ApplyMatrix(M, sq)
+ev = Eigenvalues(M)
+SetColor(sq, 0.55, 0.55, 0.60)
+SetColor(img, 0.18, 0.44, 0.70)</code></pre>
+</div>
+<blockquote>
+<p>若 <code>Eigenvalues</code>
+在你的版本里报错，可整行删掉，不影响图形；核心是
+<code>a b c d</code>、<code>M</code> 与 <code>Polygon</code>。</p>
+</blockquote>
+<hr />
+</div></details><h2 id="概念计算器输入-输出">🧮 概念计算器（输入 → 输出）</h2>
+<p>特征值与几何重数手算极易错（尤其是重复特征值），所以给它一个函数：输入
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mo>×</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">2\times2</annotation></semantics></math>
+矩阵，输出特征值与每个特征值的几何重数。</p>
+<div class="sim-block" data-lang="python" data-kind="calc">
+<div class="sim-head">
+<span class="sim-kind">计算器 · 输入 → 输出</span>
+<div class="sim-tabs" role="tablist">
+<button type="button" class="sim-tab is-active" data-lang="python">
+Python
+</button>
+<button type="button" class="sim-tab" data-lang="r">
+R
+</button>
+</div>
+<button type="button" class="sim-copy">
+复制代码
+</button>
+</div>
+<pre class="sim-pane is-active" data-lang="python" data-label="Python"><code>import numpy as np
+def spec(A):
+    A = np.array(A, dtype=float)
+    tr, det = A.trace(), np.linalg.det(A)
+    lam = np.roots([1, -tr, det])
+    lam = np.where(np.abs(lam.imag) &lt; 1e-9, lam.real, lam)
+    lam = np.array(sorted(lam, key=lambda z: (z.real, z.imag)))
+    parts = []
+    for z in lam:
+        if abs(z.imag) &lt; 1e-9:
+            M = A - z.real * np.eye(2)
+            M = np.where(np.abs(M) &lt; 1e-9, 0, M)
+            parts.append(f&quot;{z.real:g}(几何重数{2 - np.linalg.matrix_rank(M)})&quot;)
+        else:
+            parts.append(f&quot;{z.real:g}{z.imag:+.4g}j(实数范围内无特征向量)&quot;)
+    return f&quot;特征值 = [{&#x27;, &#x27;.join(parts)}]  迹 = {tr:g}  行列式 = {det:g}&quot;
+for A in ([[2,0],[0,1.5]], [[2,1],[1,1.5]], [[1,1],[0,1]], [[0,-1],[1,0]], [[2,0.75],[-0.75,0.5]]):
+    print(spec(A))
+# 预期输出:
+# 特征值 = [1.5(几何重数1), 2(几何重数1)]  迹 = 3.5  行列式 = 3
+# 特征值 = [0.719224(几何重数1), 2.78078(几何重数1)]  迹 = 3.5  行列式 = 2
+# 特征值 = [1(几何重数1), 1(几何重数1)]  迹 = 2  行列式 = 1
+# 特征值 = [0-1j(实数范围内无特征向量), 0+1j(实数范围内无特征向量)]  迹 = 0  行列式 = 1
+# 特征值 = [1.25(几何重数1), 1.25(几何重数1)]  迹 = 2.5  行列式 = 1.5625</code></pre>
+<pre class="sim-pane" data-lang="r" data-label="R"><code>spec = \(A) {
+  A = matrix(as.numeric(A), nrow = 2, byrow = TRUE)
+  tr = sum(diag(A)); det = det(A); disc = tr^2 - 4 * det
+  roots = if (disc &gt;= -1e-12) sort(c((tr + sqrt(max(disc, 0)))/2, (tr - sqrt(max(disc, 0)))/2))
+          else complex(real = tr/2, imaginary = c(-sqrt(-disc)/2, sqrt(-disc)/2))
+  parts = vapply(roots, \(z) if (abs(Im(z)) &lt; 1e-9) {
+    M = A - Re(z) * diag(2); M[abs(M) &lt; 1e-9] = 0
+    paste0(sprintf(&quot;%.6g&quot;, Re(z)), &quot;(几何重数&quot;, 2 - qr(M)$rank, &quot;)&quot;)
+  } else paste0(sprintf(&quot;%.6g&quot;, Re(z)), sprintf(&quot;%+.4gj&quot;, Im(z)), &quot;(实数范围内无特征向量)&quot;), character(1))
+  cat(paste0(&quot;特征值 = [&quot;, paste(parts, collapse = &quot;, &quot;), &quot;]  迹 = &quot;, tr, &quot; 行列式 = &quot;, det, &quot;\n&quot;), sep = &quot;&quot;)
+}
+for (M in list(c(2, 0, 0, 1.5), c(2, 1, 1, 1.5), c(1, 1, 0, 1), c(0, -1, 1, 0), c(2, 0.75, -0.75, 0.5))) spec(M)
+# 预期输出:
+# 特征值 = [1.5(几何重数1), 2(几何重数1)]  迹 = 3.5  行列式 = 3
+# 特征值 = [0.719224(几何重数1), 2.78078(几何重数1)]  迹 = 3.5  行列式 = 2
+# 特征值 = [1(几何重数1), 1(几何重数1)]  迹 = 2  行列式 = 1
+# 特征值 = [0-1j(实数范围内无特征向量), 0+1j(实数范围内无特征向量)]  迹 = 0  行列式 = 1
+# 特征值 = [1.25(几何重数1), 1.25(几何重数1)]  迹 = 2.5  行列式 = 1.5625</code></pre>
+</div>
+<blockquote>
+<p><strong>读法</strong>：<strong>代数重数
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>=</mo><annotation encoding="application/x-tex">=</annotation></semantics></math>
+你数出几项</strong>（重复的
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+写几次就是几重）；<strong>几何重数
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>=</mo><annotation encoding="application/x-tex">=</annotation></semantics></math>
+每项后面那个括号</strong>。第一行
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+各出现一次 ⟹ 两个
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>；第三、五行
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+出现两次但几何重数都是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>
+⟹ <strong>代数 $&gt; $ 几何</strong>，正是边界例 2 与第 3 站那种情形。 ⚠
+<strong>三个真实踩过的坑</strong>（都写在这段代码里）： ①
+<strong>重复特征值在浮点下会「变虚」</strong>：<code>np.linalg.eig</code>
+对
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>=</mo><mn>1.25</mn></mrow><annotation encoding="application/x-tex">\lambda=1.25</annotation></semantics></math>
+的重根返回
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1.25</mn><mo>±</mo><mn>1.29</mn><mo>×</mo><msup><mn>10</mn><mrow><mi>−</mi><mn>8</mn></mrow></msup><mi>i</mi></mrow><annotation encoding="application/x-tex">1.25\pm1.29\times10^{-8}i</annotation></semantics></math>，直接打印会以为「重根变成了复根」，判独立个数也会误判成
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2</mn><annotation encoding="application/x-tex">2</annotation></semantics></math>。所以代码<strong>从特征多项式求根</strong>并<strong>抹掉虚部噪声</strong>。
+② <strong>判秩必须用容差</strong>：精确等于
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>
+的判定在数值上没有意义，代码里用
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>10</mn><mrow><mi>−</mi><mn>9</mn></mrow></msup><annotation encoding="application/x-tex">10^{-9}</annotation></semantics></math>。
+③ <strong>特征向量公式里
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>b</mi><annotation encoding="application/x-tex">b</annotation></semantics></math>
+是分母</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi><mo>=</mo><mfrac><mrow><mi>λ</mi><mo>−</mo><mi>a</mi></mrow><mi>b</mi></mfrac><mi>x</mi></mrow><annotation encoding="application/x-tex">y=\frac{\lambda-a}{b}x</annotation></semantics></math>，不是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>−</mo><mi>a</mi></mrow><annotation encoding="application/x-tex">\lambda-a</annotation></semantics></math>。我第一次就写错了，导致算出
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mn>0.8</mn><mo>,</mo><mi>−</mi><mn>0.6</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(0.8,-0.6)</annotation></semantics></math>
+这种「看着像、其实不是特征向量」的结果。</p>
+</blockquote>
+<hr />
+<details class="facet"><summary class="facet-h f6">F6 联系其它概念</summary><div class="facet-body">
+<p><strong>先自己列三个前置</strong>，再对照下面这张图，看漏了谁。</p>
+<svg class="km-svg" viewBox="0 0 680 294" width="100%" role="img" aria-label="特征值与特征向量 的知识图谱">
+<rect class="km-bg" x="0" y="0" width="680" height="294"/>
+<defs><marker id="km-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8a97a3"/></marker><marker id="km-ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#a693cc"/></marker></defs>
+<text class="km-ttl" x="18" y="20">特征值与特征向量 · 知识图谱</text>
+<rect x="18" y="25" width="11" height="11" rx="3" fill="#eef2f6" stroke="#b9c4cf"/>
+<text class="km-lg" x="34" y="35">下楼 · 前置</text>
+<rect x="116.48" y="25" width="11" height="11" rx="3" fill="#2f6fb3" stroke="#20507f"/>
+<text class="km-lg" x="132.48000000000002" y="35">本概念</text>
+<rect x="185.48000000000002" y="25" width="11" height="11" rx="3" fill="#e8f5ef" stroke="#a9d3c1"/>
+<text class="km-lg" x="201.48000000000002" y="35">上楼 · 后续</text>
+<rect x="283.96000000000004" y="25" width="11" height="11" rx="3" fill="#f1ecfa" stroke="#c3b0e0"/>
+<text class="km-lg" x="299.96000000000004" y="35">平移 · 对偶</text>
+<rect x="19.0" y="42.0" width="178.0" height="36.0" rx="9" fill="#eef2f6" stroke="#b9c4cf" stroke-width="1.4"/>
+<text x="108.0" y="60.0" font-size="13.5" font-weight="600" fill="#33414d" text-anchor="middle" dominant-baseline="central">核与像</text>
+<path d="M197.0,60.0 H216.0" fill="none" stroke="#8a97a3" stroke-width="1.4"/>
+<rect x="19.0" y="92.0" width="178.0" height="36.0" rx="9" fill="#eef2f6" stroke="#b9c4cf" stroke-width="1.4"/>
+<text x="108.0" y="110.0" font-size="13.5" font-weight="600" fill="#33414d" text-anchor="middle" dominant-baseline="central">行列式与可逆</text>
+<path d="M197.0,110.0 H216.0" fill="none" stroke="#8a97a3" stroke-width="1.4"/>
+<rect x="19.0" y="142.0" width="178.0" height="36.0" rx="9" fill="#eef2f6" stroke="#b9c4cf" stroke-width="1.4"/>
+<text x="108.0" y="160.0" font-size="13.5" font-weight="600" fill="#33414d" text-anchor="middle" dominant-baseline="central">内积与正交</text>
+<path d="M197.0,160.0 H216.0" fill="none" stroke="#8a97a3" stroke-width="1.4"/>
+<rect x="483.0" y="42.0" width="178.0" height="36.0" rx="9" fill="#e8f5ef" stroke="#a9d3c1" stroke-width="1.4"/>
+<text x="572.0" y="60.0" font-size="13.5" font-weight="600" fill="#17674a" text-anchor="middle" dominant-baseline="central">可对角化与
+Jordan 形</text>
+<path d="M464.0,60.0 H483.0" fill="none" stroke="#8a97a3" stroke-width="1.4" marker-end="url(#km-ar)"/>
+<rect x="483.0" y="92.0" width="178.0" height="36.0" rx="9" fill="#e8f5ef" stroke="#a9d3c1" stroke-width="1.4"/>
+<text x="572.0" y="110.0" font-size="13.5" font-weight="600" fill="#17674a" text-anchor="middle" dominant-baseline="central">二次型与主轴</text>
+<path d="M464.0,110.0 H483.0" fill="none" stroke="#8a97a3" stroke-width="1.4" marker-end="url(#km-ar)"/>
+<rect x="483.0" y="142.0" width="178.0" height="36.0" rx="9" fill="#e8f5ef" stroke="#a9d3c1" stroke-width="1.4"/>
+<text x="572.0" y="160.0" font-size="13.5" font-weight="600" fill="#17674a" text-anchor="middle" dominant-baseline="central">振型分析</text>
+<path d="M464.0,160.0 H483.0" fill="none" stroke="#8a97a3" stroke-width="1.4" marker-end="url(#km-ar)"/>
+<path d="M216.0,42.0 V178.0" fill="none" stroke="#8a97a3" stroke-width="1.4"/>
+<path d="M216.0,110.0 H242.0" fill="none" stroke="#8a97a3" stroke-width="1.6" marker-end="url(#km-ar)"/>
+<path d="M464.0,42.0 V178.0" fill="none" stroke="#8a97a3" stroke-width="1.4"/>
+<path d="M438.0,110.0 H464.0" fill="none" stroke="#8a97a3" stroke-width="1.6" marker-end="url(#km-ar)"/>
+<text class="km-cap" x="340.0" y="77.0">高等代数 ·
+特征值与特征向量</text>
+<rect x="242.0" y="87.0" width="196.0" height="46.0" rx="9" fill="#2f6fb3" stroke="#20507f" stroke-width="1.4"/>
+<text x="340.0" y="110.0" font-size="15.0" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="central">特征值与特征向量</text>
+<text class="km-cap" x="340.0" y="198.0">平移 ·
+同类或对偶概念（双向）</text>
+<rect x="155.0" y="206.0" width="178.0" height="36.0" rx="9" fill="#f1ecfa" stroke="#c3b0e0" stroke-width="1.4"/>
+<text x="244.0" y="224.0" font-size="13.5" font-weight="600" fill="#5b3f8f" text-anchor="middle" dominant-baseline="central">奇异值分解</text>
+<path d="M244.0,202.0 V137.0" fill="none" stroke="#a693cc" stroke-width="1.4" stroke-dasharray="5 4" marker-start="url(#km-ar2)" marker-end="url(#km-ar2)"/>
+<rect x="347.0" y="206.0" width="178.0" height="36.0" rx="9" fill="#f1ecfa" stroke="#c3b0e0" stroke-width="1.4"/>
+<text x="436.0" y="224.0" font-size="13.5" font-weight="600" fill="#5b3f8f" text-anchor="middle" dominant-baseline="central">Markov
+链的平稳分布</text>
+<path d="M436.0,202.0 V137.0" fill="none" stroke="#a693cc" stroke-width="1.4" stroke-dasharray="5 4" marker-start="url(#km-ar2)" marker-end="url(#km-ar2)"/>
+<text class="km-note" x="340.0" y="284">把「矩阵」翻译成「一串数 +
+几个不变方向」</text>
+</svg>
+<ul>
+<li><strong>下楼（谁推出它）</strong>
+<ul>
+<li><strong>核与像</strong> ——
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ℰ</mi><mi>λ</mi></msub><mo>=</mo><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>A</mi><mo>−</mo><mi>λ</mi><mi>I</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\mathcal E_\lambda=\ker(A-\lambda I)</annotation></semantics></math>
+把特征向量问题变成解线性方程组；</li>
+<li><strong>行列式与可逆</strong> —— 「奇异
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>⇔</mo><mrow><mi mathvariant="normal">det</mi><mo>&#8289;</mo></mrow><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\iff\det=0</annotation></semantics></math>」是「特征值
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>=</mo><mrow><mi mathvariant="normal">det</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>A</mi><mo>−</mo><mi>λ</mi><mi>I</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">=\det(A-\lambda I)=0</annotation></semantics></math>
+的根」的最后一步；</li>
+<li><strong>内积与正交</strong> —— 谱定理里「实对称 ⟹
+特征向量可取正交」要用内积。</li>
+</ul></li>
+<li><strong>上楼（它推出什么）</strong>
+<ul>
+<li><strong>可对角化与 Jordan 形</strong> ——
+「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+个线性无关特征向量」的判据与 Jordan 块结构；</li>
+<li><strong>二次型与主轴</strong> ——
+用正交特征向量把二次型化到主轴，这是最实用的落点；</li>
+<li><strong>振型分析</strong> ——
+机械／电路／量子系统的固有频率与模态。</li>
+</ul></li>
+<li><strong>平移（对偶 / 同类）</strong>
+<ul>
+<li><strong>奇异值分解</strong> ——
+「特征值」在非方阵／非对称情形下的对偶物（<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>A</mi><mi>𝖳</mi></msup><mi>A</mi></mrow><annotation encoding="application/x-tex">A^{\mathsf T}A</annotation></semantics></math>
+的特征值开根）；</li>
+<li><strong>Markov 链的平稳分布</strong> —— 转移矩阵的
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\lambda=1</annotation></semantics></math>
+特征向量，就是稳定分布。</li>
+</ul></li>
+<li><strong>它在哪一层</strong>：<strong>枢纽层</strong>。前面是「变换与矩阵」，后面是「对角化与二次型」；<strong>它把矩阵换算成一串数，从此矩阵运算变成了数的运算。</strong></li>
+</ul>
+<hr />
+</div></details><h2
+id="说到特征值与特征向量你要想到闭卷-60-秒4-条才算过">说到「特征值与特征向量」，你要想到……（闭卷
+60 秒，≥4 条才算过）</h2>
+<ol type="1">
+<li><strong>定义两个条件缺一不可</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐯</mi><mo>≠</mo><mn>𝟎</mn></mrow><annotation encoding="application/x-tex">\mathbf v\ne\mathbf0</annotation></semantics></math>
+且存在
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>；<strong><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+可以是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐯</mi><annotation encoding="application/x-tex">\mathbf v</annotation></semantics></math>
+不能是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>𝟎</mn><annotation encoding="application/x-tex">\mathbf0</annotation></semantics></math></strong>。</li>
+<li><strong>求法只有一条链</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>𝐯</mi><mo>=</mo><mi>λ</mi><mi>𝐯</mi><mo>⇔</mo><mrow><mi mathvariant="normal">det</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>A</mi><mo>−</mo><mi>λ</mi><mi>I</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">A\mathbf v=\lambda\mathbf v\iff\det(A-\lambda I)=0</annotation></semantics></math>
+⟹ 每个根再解一次齐次方程组。</li>
+<li><strong>特征值不是对角元</strong>！只有上／下<strong>三角</strong>矩阵才是。</li>
+<li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+<strong>可以是复数</strong>（实矩阵也可能有复特征值）；实对称矩阵则一定全为实。</li>
+<li><strong>代数重数
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>≥</mo><annotation encoding="application/x-tex">\ge</annotation></semantics></math>
+几何重数</strong>；不等 ⟹ 不可对角化。</li>
+<li><strong>同一特征值</strong>的特征向量的线性组合仍是特征向量；<strong>不同特征值的不行</strong>。</li>
+<li><strong>不同特征值的特征向量线性无关</strong>（证法：归纳 +
+错位对比）。</li>
+<li><strong>实对称 ⟹ 特征向量可取成正交</strong>（谱定理）。</li>
+<li><strong>特征值与基无关</strong> ⟹
+它是<strong>变换的属性</strong>，不是矩阵的属性。</li>
+</ol>
+<hr />
+<h2
+id="自检你学会了吗先自己想再看答案">自检：你学会了吗？（先自己想，再看答案）</h2>
+<ol type="1">
+<li><strong>判断真假并给反例</strong>：「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>
+的特征值就是它的对角元。」</li>
+<li><strong>算三题</strong>（实数范围）：</li>
+</ol>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math></th>
+<th>要你求的</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>2</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1.5</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\begin{pmatrix}2&amp;1\\1&amp;1.5\end{pmatrix}</annotation></semantics></math></td>
+<td>特征值与各一组特征向量；说明为何可对角化</td>
+</tr>
+<tr>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\begin{pmatrix}1&amp;1\\0&amp;1\end{pmatrix}</annotation></semantics></math></td>
+<td>代数重数、几何重数；能否对角化</td>
+</tr>
+<tr>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mi>−</mi><mn>1</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\begin{pmatrix}0&amp;-1\\1&amp;0\end{pmatrix}</annotation></semantics></math></td>
+<td>特征值；实数范围内有无特征向量</td>
+</tr>
+</tbody>
+</table>
+<ol start="3" type="1">
+<li><strong>（创造层）</strong> 把定义里的
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐯</mi><mo>≠</mo><mn>𝟎</mn></mrow><annotation encoding="application/x-tex">\mathbf v\ne\mathbf0</annotation></semantics></math>
+删掉，会冒出什么反例？再把「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+取复数」改成「只取实数」，又会发生什么？</li>
+<li><strong>迁移题</strong>：用「假设基底 + 删条件实验」自己拆一个新概念
+—— 建议 <strong>可对角化</strong>（正好用上「不同特征值 ⟹ 线性无关」）或
+<strong>谱定理（实对称矩阵）</strong>。</li>
+</ol>
+<details>
+<summary>
+答案与提示（先自己做完再看 ↓）
+</summary>
+<ol type="1">
+<li><strong>假</strong>。反例
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>2</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1.5</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">A=\begin{pmatrix}2&amp;1\\1&amp;1.5\end{pmatrix}</annotation></semantics></math>：对角元是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2</mn><annotation encoding="application/x-tex">2</annotation></semantics></math>
+与
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1.5</mn><annotation encoding="application/x-tex">1.5</annotation></semantics></math>，但
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false" form="prefix">(</mo><mi>λ</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msup><mi>λ</mi><mn>2</mn></msup><mo>−</mo><mn>3.5</mn><mi>λ</mi><mo>+</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">f(\lambda)=\lambda^2-3.5\lambda+2</annotation></semantics></math>
+⟹
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>≈</mo><mn>0.719224</mn><mo>,</mo><mspace width="0.222em"></mspace><mn>2.78078</mn></mrow><annotation encoding="application/x-tex">\lambda\approx0.719224,\ 2.78078</annotation></semantics></math>
+✗。 <strong>只在上三角或下三角矩阵时才成立</strong>（此时
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">det</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>A</mi><mo>−</mo><mi>λ</mi><mi>I</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\det(A-\lambda I)</annotation></semantics></math>
+是对角元的连乘）；验证：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>2</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1.5</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\begin{pmatrix}2&amp;1\\0&amp;1.5\end{pmatrix}</annotation></semantics></math>
+的特征值
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>=</mo><annotation encoding="application/x-tex">=</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mo>,</mo><mspace width="0.222em"></mspace><mn>1.5</mn></mrow><annotation encoding="application/x-tex">2,\ 1.5</annotation></semantics></math>
+✓。</li>
+<li>第一题：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false" form="prefix">(</mo><mi>λ</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msup><mi>λ</mi><mn>2</mn></msup><mo>−</mo><mn>3.5</mn><mi>λ</mi><mo>+</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">f(\lambda)=\lambda^2-3.5\lambda+2</annotation></semantics></math>，判别式
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>=</mo><mn>12.25</mn><mo>−</mo><mn>8</mn><mo>=</mo><mn>4.25</mn><mo>&gt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">=12.25-8=4.25&gt;0</annotation></semantics></math>
+⟹
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>3.5</mn><mo>±</mo><msqrt><mn>4.25</mn></msqrt><mo stretchy="false" form="postfix">)</mo><mi>/</mi><mn>2</mn><mo>≈</mo><mn>2.78078</mn><mo>,</mo><mspace width="0.222em"></mspace><mn>0.719224</mn></mrow><annotation encoding="application/x-tex">\lambda=(3.5\pm\sqrt{4.25})/2\approx2.78078,\ 0.719224</annotation></semantics></math>。
+特征向量由
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi><mo>=</mo><mfrac><mrow><mi>λ</mi><mo>−</mo><mn>2</mn></mrow><mn>1</mn></mfrac><mi>x</mi><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mi>λ</mi><mo>−</mo><mn>2</mn><mo stretchy="false" form="postfix">)</mo><mi>x</mi></mrow><annotation encoding="application/x-tex">y=\frac{\lambda-2}{1}x=(\lambda-2)x</annotation></semantics></math>
+得：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>𝐯</mi><mn>1</mn></msub><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mspace width="0.167em"></mspace><mn>0.78078</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup></mrow><annotation encoding="application/x-tex">\mathbf v_1=(1,\,0.78078)^{\mathsf T}</annotation></semantics></math>，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>𝐯</mi><mn>2</mn></msub><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mspace width="0.167em"></mspace><mo>−</mo><mn>1.28078</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup></mrow><annotation encoding="application/x-tex">\mathbf v_2=(1,\,-1.28078)^{\mathsf T}</annotation></semantics></math>。
+检：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><msub><mi>𝐯</mi><mn>1</mn></msub><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>2.78078</mn><mo>,</mo><mspace width="0.222em"></mspace><mn>2.17117</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo>≈</mo><mn>2.78078</mn><mspace width="0.167em"></mspace><msub><mi>𝐯</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">A\mathbf v_1=(2.78078,\ 2.17117)^{\mathsf T}\approx2.78078\,\mathbf v_1</annotation></semantics></math>
+✓。两向量不共线 ⟹ 2 个线性无关特征向量 ⟹
+<strong>可对角化</strong>（<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo>=</mo><mo stretchy="false" form="prefix">(</mo><msub><mi>𝐯</mi><mn>1</mn></msub><mspace width="0.222em"></mspace><msub><mi>𝐯</mi><mn>2</mn></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">P=(\mathbf v_1\ \mathbf v_2)</annotation></semantics></math>，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>P</mi><mrow><mi>−</mi><mn>1</mn></mrow></msup><mi>A</mi><mi>P</mi><mo>=</mo><mtext mathvariant="normal">diag</mtext><mo stretchy="false" form="prefix">(</mo><mn>2.78078</mn><mo>,</mo><mspace width="0.167em"></mspace><mn>0.719224</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">P^{-1}AP=\text{diag}(2.78078,\,0.719224)</annotation></semantics></math>）。
+顺带：内积
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>=</mo><mn>1</mn><mo>+</mo><mn>0.78078</mn><mo>×</mo><mo stretchy="false" form="prefix">(</mo><mi>−</mi><mn>1.28078</mn><mo stretchy="false" form="postfix">)</mo><mo>≈</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">=1+0.78078\times(-1.28078)\approx0</annotation></semantics></math>
+✓（实对称 ⟹ 正交）。
+第二题：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false" form="prefix">(</mo><mi>λ</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>−</mo><mi>λ</mi><msup><mo stretchy="false" form="postfix">)</mo><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">f(\lambda)=(1-\lambda)^2</annotation></semantics></math>
+⟹
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\lambda=1</annotation></semantics></math>，<strong>代数重数
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2</mn><annotation encoding="application/x-tex">2</annotation></semantics></math></strong>；<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>A</mi><mo>−</mo><mi>I</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo>,</mo><mn>0</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\ker(A-I)=\{(x,0)^{\mathsf T}\}</annotation></semantics></math>
+⟹ <strong>几何重数
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math></strong>
+⟹ <strong>不可对角化</strong>。
+第三题：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false" form="prefix">(</mo><mi>λ</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msup><mi>λ</mi><mn>2</mn></msup><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">f(\lambda)=\lambda^2+1</annotation></semantics></math>
+⟹
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>=</mo><mi>±</mi><mi>i</mi></mrow><annotation encoding="application/x-tex">\lambda=\pm i</annotation></semantics></math>
+⟹ <strong>实数范围内无特征向量</strong>（在复数范围内有，且
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>=</mo><mi>±</mi><mi>i</mi></mrow><annotation encoding="application/x-tex">\lambda=\pm i</annotation></semantics></math>
+各对应一条实部方向不同、虚部正交的方向）。</li>
+<li>删掉
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐯</mi><mo>≠</mo><mn>𝟎</mn></mrow><annotation encoding="application/x-tex">\mathbf v\ne\mathbf0</annotation></semantics></math>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>𝟎</mn><annotation encoding="application/x-tex">\mathbf0</annotation></semantics></math>
+对<strong>任何</strong>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+都满足
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mn>𝟎</mn><mo>=</mo><mi>λ</mi><mn>𝟎</mn></mrow><annotation encoding="application/x-tex">A\mathbf0=\lambda\mathbf0</annotation></semantics></math>
+⟹ 特征值
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>=</mo><annotation encoding="application/x-tex">=</annotation></semantics></math>
+<strong>全体数</strong>（对
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>2</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>0</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>3</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">A=\begin{pmatrix}2&amp;0\\0&amp;3\end{pmatrix}</annotation></semantics></math>
+而言，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>=</mo><mn>5</mn></mrow><annotation encoding="application/x-tex">\lambda=5</annotation></semantics></math>、<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>π</mi><annotation encoding="application/x-tex">\pi</annotation></semantics></math>
+都「成立」）⟹ 概念彻底塌掉。
+再把「复数」改成「只取实数」：回到第二题的第三小题 ——
+旋转矩阵在实数范围内<strong>没有</strong>特征向量，于是「每个变换都有
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+个特征值」这条常用结论失效。<strong>结论：特征值必须允许复数。</strong></li>
+<li>迁移提示（拆「可对角化」）：钩子可写「哪些变换能被一组特征向量撑成一副骨架，从而变成最简单的样子？」；
+<strong>删条件实验</strong>：把「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+个线性无关的特征向量」改成「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+个线性无关的向量」⟹ 任何矩阵都「可对角化」，判据彻底失效；
+假设基底邀请语：「我猜你已经会『特征值定义』和『线性相关性的判定』——<strong>你觉得自己会吗？</strong>」</li>
+</ol>
+</details>
+<hr />
+<h2
+id="常见错位清单内是错误来源">常见错位清单（〔〕内是<strong>错误来源</strong>）</h2>
+<ol type="1">
+<li>〔<strong>定理当定义</strong>〕以为「特征值
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>=</mo><annotation encoding="application/x-tex">=</annotation></semantics></math>
+对角元」——只有<strong>三角</strong>矩阵才成立。</li>
+<li>〔<strong>字眼漏读</strong>〕漏掉
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝐯</mi><mo>≠</mo><mn>𝟎</mn></mrow><annotation encoding="application/x-tex">\mathbf v\ne\mathbf0</annotation></semantics></math>，于是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>𝟎</mn><annotation encoding="application/x-tex">\mathbf0</annotation></semantics></math>
+把一切
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+都「成就」了。</li>
+<li>〔<strong>字眼漏读</strong>〕以为
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+必须非零 ——
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\lambda=0</annotation></semantics></math>
+<strong>可以是</strong>特征值（当
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>
+奇异时）。</li>
+<li>〔<strong>类比越界</strong>〕把「特征」理解成「最重要」，或以为每个变换都有实特征向量。</li>
+<li>〔<strong>定理当定义</strong>〕把「代数重数
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>≥</mo><annotation encoding="application/x-tex">\ge</annotation></semantics></math>
+几何重数」当定义；或由「特征值有
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+个（含重数）」直接推出可对角化。</li>
+<li>〔<strong>记号混用 /
+量词顺序</strong>〕以为不同特征值的特征向量之和仍是特征向量。</li>
+<li>〔<strong>字眼漏读</strong>〕<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false" form="prefix">(</mo><mi>λ</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mrow><mi mathvariant="normal">det</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>A</mi><mo>−</mo><mi>λ</mi><mi>I</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">f(\lambda)=\det(A-\lambda I)</annotation></semantics></math>
+里的
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>I</mi><annotation encoding="application/x-tex">I</annotation></semantics></math>
+漏掉，写成
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">det</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>A</mi><mo>−</mo><mi>λ</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\det(A-\lambda)</annotation></semantics></math>。</li>
+<li>〔<strong>计算陷阱</strong>〕特征向量公式里
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>b</mi><annotation encoding="application/x-tex">b</annotation></semantics></math>
+是<strong>分母</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi><mo>=</mo><mfrac><mrow><mi>λ</mi><mo>−</mo><mi>a</mi></mrow><mi>b</mi></mfrac><mi>x</mi></mrow><annotation encoding="application/x-tex">y=\frac{\lambda-a}{b}x</annotation></semantics></math>。</li>
+</ol>
+<hr />
+<h2
+id="学完自测对照勾选勾不满就回去重读">学完自测（对照勾选，勾不满就回去重读）</h2>
+<ul class="task-list">
+<li><label><input
+type="checkbox" /><strong>字字清</strong>：逐词解释「特征向量」「特征值」「特征子空间」，并说清「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+可为
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>」与「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝐯</mi><annotation encoding="application/x-tex">\mathbf v</annotation></semantics></math>
+不可为
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>」为什么地位不同；</label></li>
+<li><label><input type="checkbox" /><strong>证得明</strong>：能完整推出
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">det</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>A</mi><mo>−</mo><mi>λ</mi><mi>I</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\det(A-\lambda I)=0</annotation></semantics></math>，并能用归纳法证明「不同特征值的特征向量线性无关」；</label></li>
+<li><label><input
+type="checkbox" /><strong>画得出</strong>：画出「特征值 / 核与像 /
+行列式 / 可对角化 / 二次型主轴 / 振型」的关系图并标方向。</label></li>
+</ul>
+<blockquote>
+<p>三条<strong>至少完成一半</strong>，再去做题也不迟。做题是<strong>验证</strong>掌握，不是掌握本身。</p>
+</blockquote>
+<h3 id="附拿到题目怎么开局-两头往中间四步">附：拿到题目怎么开局
+——「两头往中间」四步</h3>
+<blockquote>
+<p><strong>题</strong>：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mtable><mtr><mtd columnalign="center" style="text-align: center"><mn>2</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mn>1</mn></mtd><mtd columnalign="center" style="text-align: center"><mn>1.5</mn></mtd></mtr></mtable><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">A=\begin{pmatrix}2&amp;1\\1&amp;1.5\end{pmatrix}</annotation></semantics></math>，求特征值与特征向量，并判断能否对角化。</p>
+</blockquote>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>步</th>
+<th>动作</th>
+<th>自问</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>① 拆题设</strong></td>
+<td>条件翻译成「哪个定义的前提」</td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>
+实对称
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mo>×</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">2\times2</annotation></semantics></math>；「特征值」⟹
+展开成「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false" form="prefix">(</mo><mi>λ</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mrow><mi mathvariant="normal">det</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>A</mi><mo>−</mo><mi>λ</mi><mi>I</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">f(\lambda)=\det(A-\lambda I)=0</annotation></semantics></math>
+的根」；「特征向量」⟹
+「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">ker</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>A</mi><mo>−</mo><mi>λ</mi><mi>I</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\ker(A-\lambda I)</annotation></semantics></math>
+的非零元素」；「能否对角化」⟹ 「有没有
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2</mn><annotation encoding="application/x-tex">2</annotation></semantics></math>
+个线性无关的特征向量」</td>
+</tr>
+<tr>
+<td><strong>② 拆结论</strong></td>
+<td>要答的翻译成「哪个定义的后半句」</td>
+<td>四问是一条链：<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+⟹ 每
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+的核 ⟹ 数独立方向 ⟹ 与代数重数比 ⟹ 可否对角化</td>
+</tr>
+<tr>
+<td><strong>③ 两头夹</strong></td>
+<td>倒找缺口，回题设补上</td>
+<td>还差 (a)
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>f</mi><annotation encoding="application/x-tex">f</annotation></semantics></math>
+的根 ⟹
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2</mn><annotation encoding="application/x-tex">2</annotation></semantics></math>
+阶行列式直接手算；(b) 特征向量 ⟹ 解一次齐次方程组；(c)
+<strong>可对角化这一步靠「两个特征值不同 ⟹ 特征向量自动无关」</strong> ⟹
+需先验判别式
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>=</mo><mn>4.25</mn><mo>&gt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">=4.25&gt;0</annotation></semantics></math>（题设「实对称」只保证
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+为实，不保证互不相同）</td>
+</tr>
+<tr>
+<td><strong>④ 顺写</strong></td>
+<td>正向重写，每步注依据</td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false" form="prefix">(</mo><mi>λ</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msup><mi>λ</mi><mn>2</mn></msup><mo>−</mo><mn>3.5</mn><mi>λ</mi><mo>+</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">f(\lambda)=\lambda^2-3.5\lambda+2</annotation></semantics></math>，判别式
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>4.25</mn><mo>&gt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">4.25&gt;0</annotation></semantics></math>
+⟹
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>≈</mo><mn>2.78078</mn><mo>,</mo><mspace width="0.222em"></mspace><mn>0.719224</mn></mrow><annotation encoding="application/x-tex">\lambda\approx2.78078,\ 0.719224</annotation></semantics></math>；由
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mi>λ</mi><mo>−</mo><mn>2</mn><mo stretchy="false" form="postfix">)</mo><mi>x</mi></mrow><annotation encoding="application/x-tex">y=(\lambda-2)x</annotation></semantics></math>
+得
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>𝐯</mi><mn>1</mn></msub><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mspace width="0.167em"></mspace><mn>0.78078</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup></mrow><annotation encoding="application/x-tex">\mathbf v_1=(1,\,0.78078)^{\mathsf T}</annotation></semantics></math>、<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>𝐯</mi><mn>2</mn></msub><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mspace width="0.167em"></mspace><mo>−</mo><mn>1.28078</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup></mrow><annotation encoding="application/x-tex">\mathbf v_2=(1,\,-1.28078)^{\mathsf T}</annotation></semantics></math>；检
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><msub><mi>𝐯</mi><mn>1</mn></msub><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>2.78078</mn><mo>,</mo><mspace width="0.167em"></mspace><mn>2.17117</mn><msup><mo stretchy="false" form="postfix">)</mo><mi>𝖳</mi></msup><mo>=</mo><mn>2.78078</mn><mspace width="0.167em"></mspace><msub><mi>𝐯</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">A\mathbf v_1=(2.78078,\,2.17117)^{\mathsf T}=2.78078\,\mathbf v_1</annotation></semantics></math>
+✓；两向量不共线 ⟹
+<strong>可对角化</strong>，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>P</mi><mrow><mi>−</mi><mn>1</mn></mrow></msup><mi>A</mi><mi>P</mi><mo>=</mo><mtext mathvariant="normal">diag</mtext><mo stretchy="false" form="prefix">(</mo><mn>2.78078</mn><mo>,</mo><mspace width="0.167em"></mspace><mn>0.719224</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">P^{-1}AP=\text{diag}(2.78078,\,0.719224)</annotation></semantics></math>
+∎</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>看清：「判别式
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&gt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">&gt;0</annotation></semantics></math>」这一步同时替你证了两件事</strong>
+——
+有两个实特征值、以及它们的特征向量自动无关。<strong>一个判别式省掉两步。</strong></p>
+</blockquote>
+<hr />
+<h2 id="核对提示请以你所用教材为准">⚠️
+核对提示（请以你所用教材为准）</h2>
+<ol type="1">
+<li><p><strong>特征多项式的符号约定</strong> 〔教材口径〕 本卡用
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false" form="prefix">(</mo><mi>λ</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mrow><mi mathvariant="normal">det</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>A</mi><mo>−</mo><mi>λ</mi><mi>I</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">f(\lambda)=\det(A-\lambda I)</annotation></semantics></math>（<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+为偶数时与
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">det</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>λ</mi><mi>I</mi><mo>−</mo><mi>A</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\det(\lambda I-A)</annotation></semantics></math>
+同号，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+为奇数时差一个负号）。有的教材写
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">det</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>λ</mi><mi>I</mi><mo>−</mo><mi>A</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\det(\lambda I-A)</annotation></semantics></math>。
+<strong>根的集合完全相同</strong>，但<strong>代数重数的符号约定</strong>可能不同，请以你教材的写法为准。</p></li>
+<li><p><strong>几何重数的定义域</strong> 〔教材口径〕
+本卡用「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>ℰ</mi><mi>λ</mi></msub><annotation encoding="application/x-tex">\mathcal E_\lambda</annotation></semantics></math>
+的维数」定义几何重数，并对<strong>复数</strong>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+说明「实数范围内无特征向量」。若你的课程全程在
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ℂ</mi><annotation encoding="application/x-tex">\mathbb{C}</annotation></semantics></math>
+上讨论，则复
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+也有几何重数，请照教材。</p></li>
+<li><p><strong>「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+个线性无关的特征向量」的证明</strong> 〔教材口径〕
+本卡用<strong>归纳法</strong>（第 1–7 步，每步注依据），第 6
+步同时用到归纳假设与「<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
+互不相同」。若你教材用「多项式
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mo>∏</mo><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo>−</mo><msub><mi>λ</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\prod_i(x-\lambda_i)</annotation></semantics></math>
+与
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mo>∏</mo><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo>−</mo><msubsup><mi>λ</mi><mi>i</mi><mo>*</mo></msubsup><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\prod_i(x-\lambda_i^{\ast})</annotation></semantics></math>
+的关系」来证，那是另一条路（用到内积与自伴算子），本卡未展开。</p></li>
+</ol>
+
+</main>
+<script>
+/* ============================================================
+   card-widgets.js — 概念卡自绘交互组件（零依赖 / 离线可用）
+   由 md2card.py 自动注入。扫描 .wb-widget[data-wb][data-spec] 并渲染。
+   data-spec = base64(UTF-8 JSON)
+   ============================================================ */
+(function () {
+  'use strict';
+
+  /* ---------------- 表达式编译 ---------------- */
+  var FN = {
+    sin: 'Math.sin', cos: 'Math.cos', tan: 'Math.tan',
+    asin: 'Math.asin', acos: 'Math.acos', atan: 'Math.atan',
+    sinh: 'Math.sinh', cosh: 'Math.cosh', tanh: 'Math.tanh',
+    exp: 'Math.exp', log: 'Math.log', ln: 'Math.log', sqrt: 'Math.sqrt',
+    abs: 'Math.abs', floor: 'Math.floor', ceil: 'Math.ceil', sign: 'Math.sign',
+    min: 'Math.min', max: 'Math.max', pow: 'Math.pow',
+    pi: 'Math.PI', PI: 'Math.PI', e: 'Math.E', E: 'Math.E'
+  };
+
+  // 把一个数学表达式编译为 fn(V, f)；V 含变量值，f 为主函数（供叠加层使用）
+  function makeFn(expr, vars, funcs) {
+    vars = vars || []; funcs = funcs || [];
+    var body = String(expr).replace(/[A-Za-z_][A-Za-z_0-9]*/g, function (t) {
+      if (funcs.indexOf(t) >= 0) return t;
+      if (FN[t]) return FN[t];
+      return 'V.' + t;
+    }).replace(/\^/g, '**');
+    var raw;
+    try { raw = new Function('V', 'f', 'return (' + body + ');'); }
+    catch (err) { throw new Error('表达式无法解析：' + expr); }
+    return function (V, f) {
+      var r;
+      try { r = raw(V, f); } catch (e2) { return NaN; }
+      return (typeof r === 'number' && isFinite(r)) ? r : NaN;
+    };
+  }
+
+  /* ---------------- 小工具 ---------------- */
+  function el(tag, cls, txt) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (txt != null) n.textContent = txt;
+    return n;
+  }
+  function fmtNum(v) {
+    if (!isFinite(v)) return '—';
+    if (v === 0) return '0';
+    var a = Math.abs(v);
+    if (a >= 1e5 || a < 1e-4) return v.toExponential(2);
+    return String(Math.round(v * 1e4) / 1e4);
+  }
+  function niceTicks(a, b, count) {
+    var span = b - a;
+    if (!(span > 0)) return [a];
+    var step = Math.pow(10, Math.floor(Math.log10(span / count)));
+    var err = span / count / step;
+    if (err >= 7.5) step *= 10; else if (err >= 3.5) step *= 5; else if (err >= 1.5) step *= 2;
+    var out = [], v = Math.ceil(a / step) * step, guard = 0;
+    while (v <= b + step * 1e-6 && guard++ < 200) {
+      out.push(Math.abs(v) < step * 1e-6 ? 0 : v);
+      v += step;
+    }
+    return out;
+  }
+  function b64utf8(s) {
+    var bin = atob(s);
+    var bytes = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return new TextDecoder('utf-8').decode(bytes);
+  }
+  function frame(cv, ratio) {
+    var dpr = window.devicePixelRatio || 1;
+    var w = cv.clientWidth || 640;
+    if (w < 220) w = 640;
+    var h = Math.round(w * (ratio || 0.52));
+    cv.width = Math.round(w * dpr);
+    cv.height = Math.round(h * dpr);
+    cv.style.height = h + 'px';
+    var ctx = cv.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    return { ctx: ctx, W: w, H: h };
+  }
+
+  /* ---------------- 坐标系 ---------------- */
+  function makeAxes(ctx, W, H, xr, yr, opts) {
+    opts = opts || {};
+    var pad = opts.square ? { l: 18, r: 18, t: 18, b: 18 } : { l: 50, r: 18, t: 16, b: 34 };
+    var iw = W - pad.l - pad.r, ih = H - pad.t - pad.b;
+    function X(x) { return pad.l + (x - xr[0]) / (xr[1] - xr[0]) * iw; }
+    function Y(y) { return pad.t + (yr[1] - y) / (yr[1] - yr[0]) * ih; }
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
+    if (!opts.square) {
+      ctx.strokeStyle = '#eef2f6'; ctx.lineWidth = 1;
+      niceTicks(xr[0], xr[1], 6).forEach(function (v) {
+        ctx.beginPath(); ctx.moveTo(X(v), pad.t); ctx.lineTo(X(v), pad.t + ih); ctx.stroke();
+      });
+      niceTicks(yr[0], yr[1], 5).forEach(function (v) {
+        ctx.beginPath(); ctx.moveTo(pad.l, Y(v)); ctx.lineTo(pad.l + iw, Y(v)); ctx.stroke();
+      });
+    }
+    // 坐标轴
+    ctx.strokeStyle = opts.axisColor || '#9aa6b2'; ctx.lineWidth = 1.4;
+    var y0 = Math.max(pad.t, Math.min(pad.t + ih, Y(0)));
+    var x0 = Math.max(pad.l, Math.min(pad.l + iw, X(0)));
+    ctx.beginPath(); ctx.moveTo(pad.l, y0); ctx.lineTo(pad.l + iw, y0); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x0, pad.t); ctx.lineTo(x0, pad.t + ih); ctx.stroke();
+    if (!opts.square) {
+      ctx.fillStyle = '#5b6570'; ctx.font = '11px system-ui,-apple-system,sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      niceTicks(xr[0], xr[1], 6).forEach(function (v) { ctx.fillText(fmtNum(v), X(v), pad.t + ih + 6); });
+      ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+      niceTicks(yr[0], yr[1], 5).forEach(function (v) { ctx.fillText(fmtNum(v), pad.l - 6, Y(v)); });
+    }
+    return { X: X, Y: Y, pad: pad, iw: iw, ih: ih, xr: xr, yr: yr, ctx: ctx };
+  }
+
+  function drawCurve(A, fn, V, main, color, width, dash) {
+    var ctx = A.ctx, xr = A.xr, yr = A.yr;
+    var span = yr[1] - yr[0];
+    ctx.save();
+    ctx.strokeStyle = color; ctx.lineWidth = width || 2.4;
+    if (dash) ctx.setLineDash(dash);
+    ctx.beginPath();
+    var started = false, N = Math.max(A.iw, 2);
+    for (var i = 0; i <= N; i++) {
+      var x = xr[0] + (xr[1] - xr[0]) * i / N;
+      V.x = x;
+      var y = fn(V, main);
+      if (!isFinite(y) || y < yr[0] - span * 3 || y > yr[1] + span * 3) { started = false; continue; }
+      var px = A.X(x), py = A.Y(y);
+      if (!started) { ctx.moveTo(px, py); started = true; } else ctx.lineTo(px, py);
+    }
+    ctx.stroke(); ctx.restore();
+  }
+
+  function dot(A, x, y, color, r, label) {
+    var ctx = A.ctx;
+    ctx.fillStyle = color; ctx.beginPath();
+    ctx.arc(A.X(x), A.Y(y), r || 4, 0, Math.PI * 2); ctx.fill();
+    if (label) {
+      ctx.fillStyle = color; ctx.font = '600 12px system-ui,-apple-system,sans-serif';
+      ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+      ctx.fillText(label, A.X(x) + 6, A.Y(y) - 4);
+    }
+  }
+
+  /* ---------------- 控件 ---------------- */
+  function buildControls(box, sliders, onChange) {
+    var V = {};
+    var wrap = el('div', 'wb-controls');
+    (sliders || []).forEach(function (s) {
+      V[s.name] = (s.value != null) ? s.value : (s.min + s.max) / 2;
+      var lab = el('label', 'wb-ctl');
+      lab.appendChild(el('span', 'wb-ctl-name', s.label || s.name));
+      var inp = document.createElement('input');
+      inp.type = 'range';
+      inp.min = s.min; inp.max = s.max; inp.step = s.step || 0.01; inp.value = V[s.name];
+      var out = el('span', 'wb-ctl-out', fmtNum(V[s.name]));
+      inp.addEventListener('input', function () {
+        V[s.name] = parseFloat(inp.value);
+        out.textContent = fmtNum(V[s.name]);
+        onChange();
+      });
+      lab.appendChild(inp); lab.appendChild(out);
+      wrap.appendChild(lab);
+    });
+    box.appendChild(wrap);
+    return V;
+  }
+
+  function buildReadout(box, rows) {
+    if (!rows || !rows.length) return null;
+    var d = el('div', 'wb-readout');
+    d.innerHTML = '';
+    box.appendChild(d);
+    return {
+      el: d,
+      update: function (vals) {
+        d.innerHTML = '';
+        rows.forEach(function (r) {
+          var s = el('span', 'wb-ro');
+          s.appendChild(el('b', null, r.label + ' = '));
+          s.appendChild(document.createTextNode(vals[r.label] != null ? vals[r.label] : '—'));
+          d.appendChild(s);
+        });
+      }
+    };
+  }
+
+  /* ---------------- 组件：plot ---------------- */
+  function renderPlot(box, spec) {
+    var cv = el('canvas', 'wb-canvas'); cv.style.display = 'block';
+    box.appendChild(cv);
+    var varNames = (spec.sliders || []).map(function (s) { return s.name; }).concat(['x']);
+    var main = makeFn(spec.expr, varNames, ['f']);
+    var xr = spec.xrange, yr = spec.yrange;
+    var A, ro;
+    // f(t)：把 t 作为自变量求主函数值（不能在叠加层里直接复用 V.x）
+    function fOf(t) {
+      var tmp = {}; for (var k in V) tmp[k] = V[k];
+      tmp.x = t;
+      return main(tmp, main);
+    }
+    function ev(expr) { return makeFn(expr, varNames, ['f'])(V, fOf); }
+    function draw() {
+      var f = frame(cv, spec.ratio || 0.52);
+      A = makeAxes(f.ctx, f.W, f.H, xr, yr);
+      var ctx = A.ctx;
+      // 叠加层（带 / 条）先画，压在曲线下
+      (spec.overlays || []).forEach(function (o) {
+        var col = o.color || '#f0a53a';
+        if (o.kind === 'hbar') {
+          var yc = ev(o.y);
+          var h = Math.abs(ev(o.half));
+          if (isFinite(yc) && isFinite(h)) {
+            ctx.fillStyle = col; ctx.globalAlpha = 0.18;
+            ctx.fillRect(A.pad.l, A.Y(yc + h), A.iw, A.Y(yc - h) - A.Y(yc + h));
+            ctx.globalAlpha = 1; ctx.strokeStyle = col; ctx.lineWidth = 1; ctx.setLineDash([5, 4]);
+            ctx.beginPath(); ctx.moveTo(A.pad.l, A.Y(yc + h)); ctx.lineTo(A.pad.l + A.iw, A.Y(yc + h));
+            ctx.moveTo(A.pad.l, A.Y(yc - h)); ctx.lineTo(A.pad.l + A.iw, A.Y(yc - h)); ctx.stroke();
+            ctx.setLineDash([]);
+            if (o.label) { ctx.fillStyle = col; ctx.font = '12px system-ui,sans-serif'; ctx.textAlign = 'right'; ctx.textBaseline = 'bottom'; ctx.fillText(o.label, A.pad.l + A.iw - 4, A.Y(yc + h) - 3); }
+          }
+        } else if (o.kind === 'vband') {
+          var xc = ev(o.x);
+          var hw = Math.abs(ev(o.half));
+          if (isFinite(xc) && isFinite(hw)) {
+            ctx.fillStyle = col; ctx.globalAlpha = 0.18;
+            ctx.fillRect(A.X(xc - hw), A.pad.t, A.X(xc + hw) - A.X(xc - hw), A.ih);
+            ctx.globalAlpha = 1; ctx.strokeStyle = col; ctx.lineWidth = 1; ctx.setLineDash([5, 4]);
+            ctx.beginPath(); ctx.moveTo(A.X(xc - hw), A.pad.t); ctx.lineTo(A.X(xc - hw), A.pad.t + A.ih);
+            ctx.moveTo(A.X(xc + hw), A.pad.t); ctx.lineTo(A.X(xc + hw), A.pad.t + A.ih); ctx.stroke();
+            ctx.setLineDash([]);
+          }
+        }
+      });
+      drawCurve(A, main, V, main, '#2f6fb3', 2.6);
+      // 线段（割线等）
+      (spec.segments || []).forEach(function (sg) {
+        var x1 = ev(sg.x1), y1 = ev(sg.y1), x2 = ev(sg.x2), y2 = ev(sg.y2);
+        if (!isFinite(x1) || !isFinite(x2)) return;
+        ctx.strokeStyle = sg.color || '#c2582a'; ctx.lineWidth = 2; ctx.setLineDash(sg.dash || []);
+        ctx.beginPath(); ctx.moveTo(A.X(x1), A.Y(y1)); ctx.lineTo(A.X(x2), A.Y(y2)); ctx.stroke();
+        ctx.setLineDash([]);
+      });
+      // 点
+      (spec.points || []).forEach(function (p) {
+        var x = ev(p.x), y = ev(p.y);
+        if (isFinite(x) && isFinite(y)) dot(A, x, y, p.color || '#c2582a', p.r || 4.5, p.label);
+      });
+      // 数值读出
+      if (ro) {
+        var vals = {};
+        (spec.readout || []).forEach(function (r) {
+          var v = ev(r.expr);
+          vals[r.label] = (r.digits != null) ? (isFinite(v) ? v.toFixed(r.digits) : '—') : fmtNum(v);
+        });
+        ro.update(vals);
+      }
+    }
+    var V = buildControls(box, spec.sliders, function () { draw(); });
+    ro = buildReadout(box, spec.readout);
+    if (spec.hint) box.appendChild(el('p', 'wb-hint', '👉 ' + spec.hint));
+    draw();
+    return function () { draw(); };
+  }
+
+  /* ---------------- 组件：seq（数列 ε-N） ---------------- */
+  function renderSeq(box, spec) {
+    var cv = el('canvas', 'wb-canvas'); cv.style.display = 'block';
+    box.appendChild(cv);
+    var varNames = (spec.sliders || []).map(function (s) { return s.name; }).concat(['n']);
+    var an = makeFn(spec.expr, varNames, []);
+    var n1 = spec.nrange[0], n2 = spec.nrange[1], target = spec.target;
+    var A, ro;
+    function draw() {
+      var V2 = {}; for (var k in V) V2[k] = V[k];
+      V2.x = undefined;
+      var vals = [];
+      for (var n = n1; n <= n2; n++) { V2.n = n; vals.push([n, an(V2, null)]); }
+      var lo = Math.min.apply(null, vals.map(function (p) { return isFinite(p[1]) ? p[1] : 0; }).concat([target]));
+      var hi = Math.max.apply(null, vals.map(function (p) { return isFinite(p[1]) ? p[1] : 0; }).concat([target]));
+      var pad = (hi - lo) * 0.25 || 1;
+      var yr = [lo - pad, hi + pad];
+      var f = frame(cv, 0.5);
+      A = makeAxes(f.ctx, f.W, f.H, [n1 - 1, n2 + 1], yr);
+      var ctx = A.ctx, eps = V.eps;
+      // ε 带
+      ctx.fillStyle = '#f0a53a'; ctx.globalAlpha = 0.18;
+      ctx.fillRect(A.pad.l, A.Y(target + eps), A.iw, A.Y(target - eps) - A.Y(target + eps));
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = '#f0a53a'; ctx.setLineDash([5, 4]); ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(A.pad.l, A.Y(target + eps)); ctx.lineTo(A.pad.l + A.iw, A.Y(target + eps));
+      ctx.moveTo(A.pad.l, A.Y(target - eps)); ctx.lineTo(A.pad.l + A.iw, A.Y(target - eps)); ctx.stroke();
+      ctx.setLineDash([]);
+      // 极限线
+      ctx.strokeStyle = '#1f8a63'; ctx.lineWidth = 1.6; ctx.setLineDash([6, 4]);
+      ctx.beginPath(); ctx.moveTo(A.pad.l, A.Y(target)); ctx.lineTo(A.pad.l + A.iw, A.Y(target)); ctx.stroke();
+      ctx.setLineDash([]);
+      // 找 N：所有 n>N 都落在带内
+      var N = null;
+      for (var i = vals.length - 1; i >= 0; i--) {
+        var ok = (Math.abs(vals[i][1] - target) < eps);
+        if (!ok) { N = vals[i][0]; break; }
+      }
+      if (N == null) N = n1 - 1;
+      var xN = A.X(N + 0.5);
+      ctx.strokeStyle = '#c2582a'; ctx.lineWidth = 1.8;
+      ctx.beginPath(); ctx.moveTo(xN, A.pad.t); ctx.lineTo(xN, A.pad.t + A.ih); ctx.stroke();
+      ctx.fillStyle = '#c2582a'; ctx.font = '600 12px system-ui,sans-serif';
+      ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+      ctx.fillText('N = ' + N + '（此后全部落入 ε 带）', xN + 4, A.pad.t + 2);
+      // 点
+      vals.forEach(function (p) {
+        if (!isFinite(p[1])) return;
+        var inside = Math.abs(p[1] - target) < eps;
+        ctx.fillStyle = inside ? '#1f8a63' : '#c2582a';
+        ctx.beginPath(); ctx.arc(A.X(p[0]), A.Y(p[1]), 3.2, 0, Math.PI * 2); ctx.fill();
+      });
+      if (ro) ro.update({ 'N': String(N), '第 N+1 项': fmtNum(vals[Math.max(0, N + 1 - n1)] ? vals[Math.max(0, N + 1 - n1)][1] : NaN) });
+    }
+    var V = buildControls(box, spec.sliders, function () { draw(); });
+    ro = buildReadout(box, [{ label: 'N' }, { label: '第 N+1 项' }]);
+    if (spec.hint) box.appendChild(el('p', 'wb-hint', '👉 ' + spec.hint));
+    draw();
+    return function () { draw(); };
+  }
+
+  /* ---------------- 组件：riemann ---------------- */
+  function renderRiemann(box, spec) {
+    var cv = el('canvas', 'wb-canvas'); cv.style.display = 'block';
+    box.appendChild(cv);
+    var main = makeFn(spec.expr, ['x'], []);
+    var V = { x: 0 };
+    var a = spec.xrange[0], b = spec.xrange[1];
+    var A, ro;
+    function draw() {
+      var f = frame(cv, 0.5);
+      A = makeAxes(f.ctx, f.W, f.H, spec.xrange, spec.yrange);
+      var ctx = A.ctx, n = V.n, dx = (b - a) / n, S = 0;
+      ctx.fillStyle = '#6aa3d5'; ctx.globalAlpha = 0.35; ctx.strokeStyle = '#2f6fb3'; ctx.lineWidth = 1;
+      for (var i = 0; i < n; i++) {
+        var xl = a + i * dx; V.x = xl;
+        var y = main(V, null); if (!isFinite(y)) continue;
+        S += y * dx;
+        var px = A.X(xl), pw = A.X(xl + dx) - A.X(xl), py = A.Y(y), ph = A.Y(0) - A.Y(y);
+        ctx.fillRect(px, py, pw, ph);
+        if (n <= 40) ctx.strokeRect(px, py, pw, ph);
+      }
+      ctx.globalAlpha = 1;
+      drawCurve(A, main, V, null, '#c2582a', 2.6);
+      if (ro) {
+        var ex = spec.exact;
+        ro.update({
+          'n': String(n),
+          'S_n': S.toFixed(5),
+          '精确值': (ex != null) ? ex.toFixed(5) : '—',
+          '误差': (ex != null) ? Math.abs(S - ex).toFixed(5) : '—'
+        });
+      }
+    }
+    var V2 = buildControls(box, [{
+      name: 'n', label: spec.nslider.label || 'n（分割份数）',
+      min: spec.nslider.min, max: spec.nslider.max, step: spec.nslider.step || 1, value: spec.nslider.value
+    }], function () { V.n = V2.n; draw(); });
+    V.n = V2.n;
+    ro = buildReadout(box, [{ label: 'n' }, { label: 'S_n' }, { label: '精确值' }, { label: '误差' }]);
+    if (spec.hint) box.appendChild(el('p', 'wb-hint', '👉 ' + spec.hint));
+    draw();
+    return function () { draw(); };
+  }
+
+  /* ---------------- 组件：matrix2（线性变换） ---------------- */
+  function renderMatrix2(box, spec) {
+    var cv = el('canvas', 'wb-canvas'); cv.style.display = 'block';
+    box.appendChild(cv);
+    var rng = spec.range || [-3, 3], A, ro;
+    function draw() {
+      var f = frame(cv, 0.72);
+      A = makeAxes(f.ctx, f.W, f.H, rng, rng, { square: true });
+      var ctx = A.ctx;
+      var a = V.a, b = V.b, c = V.c, d = V.d;
+      function T(x, y) { return [a * x + b * y, c * x + d * y]; }
+      var R = Math.max(Math.abs(rng[0]), Math.abs(rng[1])) * 2.2, S = 0.25;
+      // 原网格
+      ctx.strokeStyle = '#e6ebf0'; ctx.lineWidth = 1;
+      for (var k = -3; k <= 3; k += 1) {
+        ctx.beginPath(); ctx.moveTo(A.X(k), A.Y(rng[0])); ctx.lineTo(A.X(k), A.Y(rng[1])); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(A.X(rng[0]), A.Y(k)); ctx.lineTo(A.X(rng[1]), A.Y(k)); ctx.stroke();
+      }
+      // 变换后的网格
+      ctx.strokeStyle = '#6aa3d5'; ctx.lineWidth = 1.2;
+      for (var k2 = -3; k2 <= 3; k2 += 1) {
+        var p1 = T(k2, -R), p2 = T(k2, R);
+        ctx.beginPath(); ctx.moveTo(A.X(p1[0]), A.Y(p1[1])); ctx.lineTo(A.X(p2[0]), A.Y(p2[1])); ctx.stroke();
+        var q1 = T(-R, k2), q2 = T(R, k2);
+        ctx.beginPath(); ctx.moveTo(A.X(q1[0]), A.Y(q1[1])); ctx.lineTo(A.X(q2[0]), A.Y(q2[1])); ctx.stroke();
+      }
+      // 单位正方形 → 像
+      var O = T(0, 0), U = T(1, 0), W2 = T(1, 1), Z = T(0, 1);
+      ctx.fillStyle = '#c2582a'; ctx.globalAlpha = 0.22;
+      ctx.beginPath(); ctx.moveTo(A.X(O[0]), A.Y(O[1])); ctx.lineTo(A.X(U[0]), A.Y(U[1]));
+      ctx.lineTo(A.X(W2[0]), A.Y(W2[1])); ctx.lineTo(A.X(Z[0]), A.Y(Z[1])); ctx.closePath(); ctx.fill();
+      ctx.globalAlpha = 1; ctx.strokeStyle = '#c2582a'; ctx.lineWidth = 2; ctx.stroke();
+      // 列向量
+      vec(A, O, U, '#1f8a63', '列1');
+      vec(A, O, Z, '#7a4fb3', '列2');
+      if (ro) {
+        var det = a * d - b * c;
+        var rank = Math.abs(det) > 1e-9 ? 2 : (Math.abs(a) + Math.abs(b) + Math.abs(c) + Math.abs(d) > 1e-9 ? 1 : 0);
+        ro.update({
+          'det': det.toFixed(3),
+          '秩': String(rank),
+          '像': rank === 2 ? '整个平面（可逆）' : (rank === 1 ? '塌成一条直线' : '塌成一个点')
+        });
+      }
+    }
+    var V = buildControls(box, spec.sliders, function () { draw(); });
+    ro = buildReadout(box, [{ label: 'det' }, { label: '秩' }, { label: '像' }]);
+    if (spec.hint) box.appendChild(el('p', 'wb-hint', '👉 ' + spec.hint));
+    draw();
+    return function () { draw(); };
+  }
+
+  function vec(A, from, to, color, label) {
+    var ctx = A.ctx;
+    ctx.strokeStyle = color; ctx.lineWidth = 2.6;
+    ctx.beginPath(); ctx.moveTo(A.X(from[0]), A.Y(from[1])); ctx.lineTo(A.X(to[0]), A.Y(to[1])); ctx.stroke();
+    var ang = Math.atan2(-(to[1] - from[1]), to[0] - from[0]);
+    var px = A.X(to[0]), py = A.Y(to[1]), s = 9;
+    ctx.fillStyle = color; ctx.beginPath();
+    ctx.moveTo(px, py);
+    ctx.lineTo(px - s * Math.cos(ang - 0.4), py - s * Math.sin(ang - 0.4));
+    ctx.lineTo(px - s * Math.cos(ang + 0.4), py - s * Math.sin(ang + 0.4));
+    ctx.closePath(); ctx.fill();
+    if (label) {
+      ctx.font = '600 12px system-ui,sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+      ctx.fillText(label, px + 6, py - 4);
+    }
+  }
+
+  /* ---------------- 组件：vectors2（线性相关） ---------------- */
+  function renderVectors2(box, spec) {
+    var cv = el('canvas', 'wb-canvas'); cv.style.display = 'block';
+    box.appendChild(cv);
+    var rng = spec.range || [-3, 3], A, ro;
+    function draw() {
+      var f = frame(cv, 0.68);
+      A = makeAxes(f.ctx, f.W, f.H, rng, rng, { square: true });
+      var ctx = A.ctx, O = [0, 0];
+      var u = [V.u1, V.u2], v = [V.v1, V.v2];
+      var det = u[0] * v[1] - u[1] * v[0];
+      var dep = Math.abs(det) < 1e-6;
+      ctx.strokeStyle = '#e6ebf0'; ctx.lineWidth = 1;
+      for (var k = -3; k <= 3; k += 1) {
+        ctx.beginPath(); ctx.moveTo(A.X(k), A.Y(rng[0])); ctx.lineTo(A.X(k), A.Y(rng[1])); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(A.X(rng[0]), A.Y(k)); ctx.lineTo(A.X(rng[1]), A.Y(k)); ctx.stroke();
+      }
+      if (!dep) {
+        // 张成整个平面：淡色铺底
+        ctx.fillStyle = '#6aa3d5'; ctx.globalAlpha = 0.08;
+        ctx.fillRect(A.pad.l, A.pad.t, A.iw, A.ih); ctx.globalAlpha = 1;
+      } else {
+        // 共线：高亮这条直线
+        var L = 6, n0 = Math.hypot(u[0], u[1]) || 1;
+        var dx = u[0] / n0, dy = u[1] / n0;
+        ctx.strokeStyle = '#c2582a'; ctx.lineWidth = 8; ctx.globalAlpha = 0.18;
+        ctx.beginPath(); ctx.moveTo(A.X(-dx * L), A.Y(-dy * L)); ctx.lineTo(A.X(dx * L), A.Y(dy * L)); ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+      // 平行四边形（行列式的几何意义）
+      if (!dep) {
+        var S = [u[0] + v[0], u[1] + v[1]];
+        ctx.fillStyle = '#c2582a'; ctx.globalAlpha = 0.16;
+        ctx.beginPath(); ctx.moveTo(A.X(0), A.Y(0)); ctx.lineTo(A.X(u[0]), A.Y(u[1]));
+        ctx.lineTo(A.X(S[0]), A.Y(S[1])); ctx.lineTo(A.X(v[0]), A.Y(v[1])); ctx.closePath(); ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+      vec(A, O, u, '#1f8a63', 'u');
+      vec(A, O, v, '#7a4fb3', 'v');
+      if (ro) {
+        ro.update({
+          'det(u,v)': det.toFixed(3),
+          '判定': dep ? '线性相关（共线）' : '线性无关',
+          '张成空间': dep ? (Math.hypot(u[0], u[1]) + Math.hypot(v[0], v[1]) < 1e-9 ? '零空间 {0}' : '一条直线（1 维）') : '整个平面（2 维）'
+        });
+      }
+    }
+    var V = buildControls(box, spec.sliders, function () { draw(); });
+    ro = buildReadout(box, [{ label: 'det(u,v)' }, { label: '判定' }, { label: '张成空间' }]);
+    if (spec.hint) box.appendChild(el('p', 'wb-hint', '👉 ' + spec.hint));
+    draw();
+    return function () { draw(); };
+  }
+
+  /* ---------------- 复制到剪贴板（GeoGebra 指令块 / 模拟代码块共用） ---------------- */
+  function copyToClipboard(txt, done) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).then(done, function () { fallbackCopy(txt, done); });
+    } else fallbackCopy(txt, done);
+  }
+  function fallbackCopy(txt, done) {
+    var ta = document.createElement('textarea');
+    ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) { }
+    document.body.removeChild(ta);
+  }
+
+  function bindCopy() {
+    document.querySelectorAll('.gb-copy').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var blk = btn.closest('.gb-block');
+        var code = blk ? blk.querySelector('code') : null;
+        if (!code) return;
+        copyToClipboard(code.textContent, function () {
+          btn.textContent = '已复制 ✓'; setTimeout(function () { btn.textContent = '复制指令'; }, 1600);
+        });
+      });
+    });
+  }
+
+  /* ---------------- 模拟代码选项卡（sim 块：默认 Python，可切换 R） ---------------- */
+  function bindSimTabs() {
+    document.querySelectorAll('.sim-block').forEach(function (blk) {
+      var tabs = blk.querySelectorAll('.sim-tab');
+      tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          var lang = tab.getAttribute('data-lang');
+          tabs.forEach(function (t) { t.classList.toggle('is-active', t === tab); });
+          blk.querySelectorAll('.sim-pane').forEach(function (p) {
+            p.classList.toggle('is-active', p.getAttribute('data-lang') === lang);
+          });
+          var c = blk.querySelector('.sim-copy');
+          if (c) c.textContent = '复制代码';
+        });
+      });
+    });
+    document.querySelectorAll('.sim-copy').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var blk = btn.closest('.sim-block');
+        var code = blk ? blk.querySelector('.sim-pane.is-active code') : null;
+        if (!code) return;
+        copyToClipboard(code.textContent, function () {
+          btn.textContent = '已复制 ✓'; setTimeout(function () { btn.textContent = '复制代码'; }, 1600);
+        });
+      });
+    });
+  }
+
+  /* ---------------- 折叠面（渐进揭示） ---------------- */
+  function bindFacets(redrawAll) {
+    var all = document.querySelectorAll('details.facet');
+    if (!all.length) return;
+    document.querySelectorAll('.facet-toggle').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var isOpen = btn.getAttribute('data-open') === '1';
+        all.forEach(function (d) { d.open = !isOpen; });
+        btn.setAttribute('data-open', isOpen ? '0' : '1');
+        btn.textContent = isOpen ? '展开全部' : '收起全部';
+        if (redrawAll) setTimeout(redrawAll, 40);
+      });
+    });
+    // 折叠时 canvas 宽度为 0，展开后需重绘
+    all.forEach(function (d) {
+      d.addEventListener('toggle', function () { if (d.open && redrawAll) setTimeout(redrawAll, 40); });
+    });
+    // 打印前把所有折叠面打开，保证纸质版内容完整
+    window.addEventListener('beforeprint', function () {
+      document.querySelectorAll('details').forEach(function (d) { d.open = true; });
+      if (redrawAll) redrawAll();
+    });
+  }
+
+  /* ---------------- 初始化 ---------------- */
+  var RENDER = {
+    plot: renderPlot, seq: renderSeq, riemann: renderRiemann,
+    matrix2: renderMatrix2, vectors2: renderVectors2
+  };
+
+  function init() {
+    var widgets = [];
+    document.querySelectorAll('.wb-widget').forEach(function (box) {
+      var kind = box.getAttribute('data-wb');
+      var specStr = box.getAttribute('data-spec') || '';
+      var spec;
+      try { spec = JSON.parse(b64utf8(specStr)); }
+      catch (e) { box.innerHTML = '<p class="wb-err">组件参数解析失败：' + e.message + '</p>'; return; }
+      var fn = RENDER[kind];
+      if (!fn) { box.innerHTML = '<p class="wb-err">未知组件类型：' + kind + '</p>'; return; }
+      var redraw;
+      try { redraw = fn(box, spec); }
+      catch (e2) { box.innerHTML = '<p class="wb-err">组件渲染失败：' + e2.message + '</p>'; return; }
+      widgets.push(redraw);
+    });
+    if (widgets.length) {
+      var t = null;
+      window.addEventListener('resize', function () {
+        clearTimeout(t); t = setTimeout(function () { widgets.forEach(function (f) { try { f(); } catch (e) { } }); }, 160);
+      });
+    }
+    bindCopy();
+    bindSimTabs();
+    bindFacets(function () {
+      widgets.forEach(function (f) { try { f(); } catch (e) { } });
+    });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+
+</script>
+</body>
+</html>
